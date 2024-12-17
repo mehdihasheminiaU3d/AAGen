@@ -14,7 +14,7 @@ namespace AAGen.Editor.DependencyGraph
 
         public override bool SelectSubgraphsOfOriginCategory(SubgraphInfo subgraphInfo)
         {
-            if (_OriginKeywords.Count == 0) //no keyword is set
+            if (_OriginKeywords == null || _OriginKeywords.Count == 0) //no keyword is set
                 return true; //return all
 
             foreach (var keyword in _OriginKeywords)
@@ -31,7 +31,7 @@ namespace AAGen.Editor.DependencyGraph
         
         public override bool SelectSubgraphsOfDestinationCategory(SubgraphInfo subgraphInfo)
         {
-            if (_DestinationKeywords.Count == 0) //no keyword is set
+            if (_DestinationKeywords == null || _DestinationKeywords.Count == 0) //no keyword is set
                 return true; //return all
             
             foreach (var keyword in _DestinationKeywords)
