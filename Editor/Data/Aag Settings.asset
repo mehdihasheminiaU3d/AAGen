@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _InputFilterRules:
   - {fileID: 11400000, guid: be1b9f7a466e72c4cbc83255dc1c2407, type: 2}
-  - {fileID: 11400000, guid: acf997f354d8daf4d8b644535714ca5f, type: 2}
-  - {fileID: 11400000, guid: 7a5c8dc2d28ee6b468d3d49686d16ad0, type: 2}
-  - {fileID: 11400000, guid: 0b96a1b42354bc346ba8183d89beb145, type: 2}
   _MergeRules:
   - {fileID: 11400000, guid: d5cb55b6c823f954ab404b979c2da147, type: 2}
   - {fileID: 11400000, guid: 69b8a52dfcf8a694a95d8bca1a56f325, type: 2}

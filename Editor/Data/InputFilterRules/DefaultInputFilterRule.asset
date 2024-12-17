@@ -17,5 +17,4 @@ MonoBehaviour:
   - Assets/
   _IgnorePaths:
   - /Editor/
-  - Assets/Prefabs/TestSet/IgnoreFolder
   _DontIgnorePaths: []
