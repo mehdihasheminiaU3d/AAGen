@@ -21,13 +21,13 @@ namespace AAGen.Editor.DependencyGraph
         {
             var assetPath = node.AssetPath;
 
-            if (_DontIgnorePaths!=null && _DontIgnorePaths.Any(path => node.AssetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
+            if (_DontIgnorePaths.Any(path => node.AssetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            if (_IgnorePathsExcept!=null && _IgnorePathsExcept.Any(path => !assetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
+            if (_IgnorePathsExcept.Any(path => !assetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
                 return true;
             
-            if (_IgnorePaths!=null && _IgnorePaths.Any(path => assetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
+            if (_IgnorePaths.Any(path => assetPath.Contains(path, StringComparison.OrdinalIgnoreCase)))
                 return true;
             
             return false;

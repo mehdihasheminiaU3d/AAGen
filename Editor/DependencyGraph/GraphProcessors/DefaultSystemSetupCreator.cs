@@ -87,7 +87,8 @@ namespace AAGen.Editor.DependencyGraph
                 
                 aagSettings._InputFilterRules = new List<InputFilterRule>
                 {
-                    CreateDefaultInputRule()
+                    CreateDefaultInputRule(),
+                    CreateHardIgnoreInputRule()
                 };
 
                 aagSettings._MergeRules = new List<MergeRule>
@@ -135,12 +136,28 @@ namespace AAGen.Editor.DependencyGraph
             inputFilterRule._IgnorePaths = new List<string>
             {
                 "/Editor/",
+                "Assets/Plugins",
+            };
+            inputFilterRule._DontIgnorePaths = new List<string>();
+            AssetDatabase.CreateAsset(inputFilterRule, inputFilterRulePath);
+            AssetDatabase.SaveAssets();
+            return inputFilterRule;
+        }
+        
+        InputFilterRule CreateHardIgnoreInputRule()
+        {
+            var inputFilterRulePath = Path.Combine(DefaultAagenSettingsFolder, $"HardIgnore {nameof(InputFilterRule)}.asset");
+            var inputFilterRule = ScriptableObject.CreateInstance<IgnoreAssetByPathRule>();
+            inputFilterRule._IgnoreOnlySourceNodes = false;
+            inputFilterRule._IgnorePathsExcept = new List<string>();
+            inputFilterRule._IgnorePaths = new List<string>
+            {
                 "Assets/AddressableAssetsData",
                 "Assets/StreamingAssets",
                 "Assets/Resources",
-                "Assets/Plugins",
-                "Assets/Gizmos",
+                "Assets/Gizmos"
             };
+            inputFilterRule._DontIgnorePaths = new List<string>();
             AssetDatabase.CreateAsset(inputFilterRule, inputFilterRulePath);
             AssetDatabase.SaveAssets();
             return inputFilterRule;
