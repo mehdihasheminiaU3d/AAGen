@@ -59,28 +59,31 @@ namespace AAGen.Editor.DependencyGraph
                 return;
 
             AagSettings = (AagSettings)EditorGUILayout.ObjectField("Settings", AagSettings, typeof(AagSettings), false);
-            if (AagSettings == null)
-                return;
-
+            
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(position.height));
             {
-                _defaultSettingsUi ??= CreateDefaultSettingsUI();
-                _defaultSettingsUi.OnGUI();
+                if (AagSettings == null)
+                {
+                    _defaultSettingsUi ??= CreateDefaultSettingsUI();
+                    _defaultSettingsUi.OnGUI();
+                }
+                else
+                {
+                    _ignoreAssetsFileUi ??= CreateIgnoreAssetsFileUI();
+                    _ignoreAssetsFileUi.OnGUI();
+
+                    _groupCreatorUi ??= CreateSubgraphUI();
+                    _groupCreatorUi.OnGUI();
+
+                    _processGroupsUi ??= CreateGroupLayoutUI();
+                    _processGroupsUi.OnGUI();
                 
-                _ignoreAssetsFileUi ??= CreateIgnoreAssetsFileUI();
-                _ignoreAssetsFileUi.OnGUI();
+                    _addressableGroupsUi ??= CreateAddressableGroupsUI();
+                    _addressableGroupsUi.OnGUI();
 
-                _groupCreatorUi ??= CreateSubgraphUI();
-                _groupCreatorUi.OnGUI();
-
-                _processGroupsUi ??= CreateGroupLayoutUI();
-                _processGroupsUi.OnGUI();
-                
-                _addressableGroupsUi ??= CreateAddressableGroupsUI();
-                _addressableGroupsUi.OnGUI();
-
-                _postProcessingUi ??= CreatePostProcessingUI();
-                _postProcessingUi.OnGUI();
+                    _postProcessingUi ??= CreatePostProcessingUI();
+                    _postProcessingUi.OnGUI();
+                }
             }
             EditorGUILayout.EndScrollView();
         }

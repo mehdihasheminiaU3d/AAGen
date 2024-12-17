@@ -132,7 +132,15 @@ namespace AAGen.Editor.DependencyGraph
             var inputFilterRule = ScriptableObject.CreateInstance<IgnoreAssetByPathRule>();
             inputFilterRule._IgnoreOnlySourceNodes = true;
             inputFilterRule._IgnorePathsExcept = new List<string> { "Assets/" };
-            inputFilterRule._IgnorePaths = new List<string> { "/Editor/" };
+            inputFilterRule._IgnorePaths = new List<string>
+            {
+                "/Editor/",
+                "Assets/AddressableAssetsData",
+                "Assets/StreamingAssets",
+                "Assets/Resources",
+                "Assets/Plugins",
+                "Assets/Gizmos",
+            };
             AssetDatabase.CreateAsset(inputFilterRule, inputFilterRulePath);
             AssetDatabase.SaveAssets();
             return inputFilterRule;
