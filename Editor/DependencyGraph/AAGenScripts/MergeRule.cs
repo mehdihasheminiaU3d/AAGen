@@ -9,9 +9,9 @@ namespace AAGen.Editor.DependencyGraph
     internal abstract class MergeRule : ScriptableObject
     {
         [SerializeField]
-        private CategoryId _OriginCategory;
+        public CategoryId _OriginCategory;
         [SerializeField]
-        private CategoryId _DestinationCategory;
+        public CategoryId _DestinationCategory;
 
         public CategoryId OriginCategory => _OriginCategory;
         public CategoryId DestinationCategory => _DestinationCategory;

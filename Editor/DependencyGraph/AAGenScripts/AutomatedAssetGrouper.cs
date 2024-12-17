@@ -14,6 +14,7 @@ namespace AAGen.Editor.DependencyGraph
 
         private DependencyGraph _dependencyGraph;
 
+        private EditorUiGroup _defaultSettingsUi;
         private EditorUiGroup _ignoreAssetsFileUi;
         private EditorUiGroup _groupCreatorUi;
         private EditorUiGroup _processGroupsUi;
@@ -24,7 +25,7 @@ namespace AAGen.Editor.DependencyGraph
 
         private DependencyGraphLoaderUi _dependencyGraphLoader;
         
-        public AagSettings AagSettings { get; private set; }
+        public AagSettings AagSettings { get; set; }
         private EditorPersistentValue<string> _settingsAssetPath = new (null, "EPK_AAG_SettingsPath");
 
         private void OnEnable()
@@ -63,6 +64,9 @@ namespace AAGen.Editor.DependencyGraph
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(position.height));
             {
+                _defaultSettingsUi ??= CreateDefaultSettingsUI();
+                _defaultSettingsUi.OnGUI();
+                
                 _ignoreAssetsFileUi ??= CreateIgnoreAssetsFileUI();
                 _ignoreAssetsFileUi.OnGUI();
 
@@ -82,6 +86,21 @@ namespace AAGen.Editor.DependencyGraph
         }
 
         #region UI-Group Factory Methods
+        
+        private EditorUiGroup CreateDefaultSettingsUI()
+        {
+            var uiGroup = new EditorUiGroup
+            {
+                FoldoutLabel = "Default Settings",
+                UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
+                               EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
+                               EditorUiGroup.UIVisibilityFlag.ShowButton1 ,
+                HelpText = "Sets up the project and creates a default settings object"
+            };
+            var processor = new DefaultSystemSetupCreator(_dependencyGraph, uiGroup, this);
+            uiGroup.ButtonAction = processor.CreateDefaultSettingsFiles;
+            return uiGroup;
+        }
 
         private EditorUiGroup CreateIgnoreAssetsFileUI()
         {

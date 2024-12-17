@@ -10,7 +10,7 @@ namespace AAGen.Editor.DependencyGraph
     {
         [SerializeField,
          Tooltip("Ignores the specified nodes in the rule only if they're source nodes")]
-        private bool _IgnoreOnlySourceNodes = true;
+        public bool _IgnoreOnlySourceNodes = true;
 
         public bool IgnoreOnlySourceNodes => _IgnoreOnlySourceNodes;
 

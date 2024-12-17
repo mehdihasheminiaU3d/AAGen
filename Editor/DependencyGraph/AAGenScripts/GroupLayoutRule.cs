@@ -10,14 +10,14 @@ namespace AAGen.Editor.DependencyGraph
     {
         [SerializeField,
         Tooltip("The category to which this rule applies")]
-        CategoryId _CategoryId;
+        public CategoryId _CategoryId;
 
         [SerializeField, Min(1f),
          Tooltip("Uncompressed size in megabytes")]
         private float _MaxSize = 10;
 
         [SerializeField]
-        private AddressableAssetGroupTemplate _AddressableAssetGroupTemplate;
+        public AddressableAssetGroupTemplate _AddressableAssetGroupTemplate;
 
         public CategoryId CategoryId => _CategoryId;
 
