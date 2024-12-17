@@ -1,0 +1,51 @@
+﻿using System.Collections.Generic;
+using UnityEditor;
+
+namespace AAGen.Editor.DependencyGraph
+{
+    /// <summary>
+    /// Listens to editor events and monitors asset changes (such as importation, deletion, renaming, etc.) and records the number of changes.
+    /// The recorded value can be used by other editor tools to validate the recency of the Dependency Graph.
+    /// </summary>
+    internal class AssetChangeDetectorService : AssetPostprocessor
+    {
+        private static EditorPersistentValue<int> _changeCount = new (0, "EPK_AssetChangeStatus");
+        public static bool HasChanges => _changeCount.Value > 0;
+        public static bool HasMajorChanges => _changeCount.Value > DependencyGraphSettings.MajorChangeThreshold;
+        
+        private static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
+        {
+            _changeCount.Value += CountAssetChanges(imported, deleted, moved, movedFrom);
+        }
+
+        private static int CountAssetChanges(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
+        {
+            var currentChanges = new HashSet<string>();
+
+            foreach (string asset in imported)
+            {
+                if (!DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                    currentChanges.Add(asset);
+            }
+
+            foreach (string asset in deleted)
+            {
+                if (!DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                    currentChanges.Add(asset);
+            }
+
+            foreach (string asset in moved)
+            {
+                if (movedFrom.Length > 0 || !DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                    currentChanges.Add(asset);
+            }
+
+            return currentChanges.Count;
+        }
+        
+        public static void ResetChangeCount()
+        {
+            _changeCount.Value = 0;
+        }
+    }
+}

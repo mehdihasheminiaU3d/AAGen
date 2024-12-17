@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5fd6b81e52848c9af9f6062115a3fd9, type: 3}
+  m_Name: SingleSources-Group Layout Rule
+  m_EditorClassIdentifier: 
+  _CategoryId: 5
+  _MaxSize: 10
+  _AddressableAssetGroupTemplate: {fileID: 11400000, guid: f90916559535de248b7422fb2a24306b, type: 2}

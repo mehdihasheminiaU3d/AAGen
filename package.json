@@ -1,0 +1,15 @@
+{
+  "name": "com.unity.aagen",
+  "version": "0.1.0",
+  "displayName": "Automated Addressable Group Generator",
+  "description": "Automates the creation of optimized Addressable Groups based on direct asset dependencies, ensuring a duplicate-free structure for seamless integration across projects.",
+  "unity": "2021.3",
+  "author": {
+    "name": "Mehdi Hasheminia"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "",
+    "com.unity.addressables": "",
+    "com.unity.editorcoroutines": ""
+  }
+}
