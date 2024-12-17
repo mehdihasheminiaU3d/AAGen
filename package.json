@@ -8,8 +8,8 @@
     "name": "Mehdi Hasheminia"
   },
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "",
-    "com.unity.addressables": "",
-    "com.unity.editorcoroutines": ""
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.addressables": "1.22.3",
+    "com.unity.editorcoroutines": "1.0.0"
   }
 }
