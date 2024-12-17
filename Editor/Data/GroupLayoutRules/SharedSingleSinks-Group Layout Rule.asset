@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _CategoryId: 4
   _MaxSize: 10
-  _AddressableAssetGroupTemplate: {fileID: 11400000, guid: f10baccc10f48e74c9c20276dc0864ca, type: 2}
+  _AddressableAssetGroupTemplate: {fileID: 11400000, guid: 3e66d43ab7519564e8499e20180b8231,
+    type: 2}
