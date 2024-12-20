@@ -154,7 +154,7 @@ namespace AAGen.Editor.DependencyGraph
             {
                 "Assets/AddressableAssetsData",
                 "Assets/StreamingAssets",
-                "Assets/Resources",
+                "/Resources/",
                 "Assets/Gizmos"
             };
             inputFilterRule._DontIgnorePaths = new List<string>();

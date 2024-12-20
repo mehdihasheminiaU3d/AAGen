@@ -9,24 +9,37 @@ namespace AAGen.Editor.DependencyGraph
         [MenuItem("Tools/Dependency Graph/Automated Asset Grouper", priority = 300)]
         public static void ShowWindow()
         {
-            GetWindow<AutomatedAssetGrouper>("Automated Asset Grouper");
+            var window = GetWindow<AutomatedAssetGrouper>("Automated Asset Grouper");
+            window.minSize = new Vector2(600, 400); 
         }
 
-        private DependencyGraph _dependencyGraph;
+        DependencyGraph _dependencyGraph;
 
-        private EditorUiGroup _defaultSettingsUi;
-        private EditorUiGroup _ignoreAssetsFileUi;
-        private EditorUiGroup _groupCreatorUi;
-        private EditorUiGroup _processGroupsUi;
-        private EditorUiGroup _addressableGroupsUi;
-        private EditorUiGroup _postProcessingUi;
-
-        private Vector2 _scrollPosition;
-
-        private DependencyGraphLoaderUi _dependencyGraphLoader;
+        EditorUiGroup _defaultSettingsUi;
+        EditorUiGroup _ignoreAssetsFileUi;
+        EditorUiGroup _groupCreatorUi;
+        EditorUiGroup _processGroupsUi;
+        EditorUiGroup _addressableGroupsUi;
+        EditorUiGroup _postProcessingUi;
+        
+        bool m_AdvancedModeActive;
+        Vector2 _scrollPosition;
+        DependencyGraphLoaderUi _dependencyGraphLoader;
         
         public AagSettings AagSettings { get; set; }
-        private EditorPersistentValue<string> _settingsAssetPath = new (null, "EPK_AAG_SettingsPath");
+        EditorPersistentValue<string> _settingsAssetPath = new (null, "EPK_AAG_SettingsPath");
+
+        GUIStyle m_SmallTextStyle;
+
+        const string k_BoxStyleName = "Box";
+        const string k_QuickButtonLabel = "Process Dependencies and Generate Addressable Groups";
+        const int k_QuickButtonWidth = 450;
+        const int k_QuickButtonHeight = 30;
+        const string k_ModeButtonAdvancedLabel = "Switch to advanced mode";
+        const string k_ModeButtonQuickLabel = "Switch to quick mode";
+        const int k_ModeButtonWidth = 160;
+        const int k_ModeButtonHeight = 20;
+        const float k_Space = 10f;
 
         private void OnEnable()
         {
@@ -52,6 +65,50 @@ namespace AAGen.Editor.DependencyGraph
 
         private void OnGUI()
         {
+            if (m_AdvancedModeActive)
+            {
+                DrawModeToggleButton();
+                GUILayout.Space(k_Space);
+                DrawAdvancedContainer();
+            }
+            else
+            {
+                DrawQuickContainer();
+                GUILayout.Space(k_Space);
+                DrawModeToggleButton();
+            }
+        }
+
+        void DrawQuickContainer()
+        {
+            GUILayout.BeginVertical(k_BoxStyleName);
+            GUILayout.Space(k_Space);
+
+            if(AagSettings!=null)
+            {
+                DrawCentered(() =>
+                {
+                    AagSettings = (AagSettings)EditorGUILayout.ObjectField(AagSettings, typeof(AagSettings), false,
+                        GUILayout.Width(k_QuickButtonWidth));
+                }, k_QuickButtonWidth);
+            }
+
+            GUILayout.Space(k_Space / 2f);
+
+            DrawCentered(() =>
+            {
+                if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
+                {
+                    Debug.Log("Do all");
+                }
+            }, k_QuickButtonWidth);
+
+            GUILayout.Space(k_Space);
+            GUILayout.EndVertical();
+        }
+
+        void DrawAdvancedContainer()
+        {
             _dependencyGraphLoader ??= new DependencyGraphLoaderUi();
             _dependencyGraphLoader.OnGUI();
             _dependencyGraph = _dependencyGraphLoader.DependencyGraph;
@@ -59,8 +116,9 @@ namespace AAGen.Editor.DependencyGraph
                 return;
 
             AagSettings = (AagSettings)EditorGUILayout.ObjectField("Settings", AagSettings, typeof(AagSettings), false);
-            
-            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(position.height));
+
+            float scrollViewHeight = position.height - GUILayoutUtility.GetLastRect().yMax; // Y position after top elements
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(scrollViewHeight));
             {
                 if (AagSettings == null)
                 {
@@ -77,7 +135,7 @@ namespace AAGen.Editor.DependencyGraph
 
                     _processGroupsUi ??= CreateGroupLayoutUI();
                     _processGroupsUi.OnGUI();
-                
+
                     _addressableGroupsUi ??= CreateAddressableGroupsUI();
                     _addressableGroupsUi.OnGUI();
 
@@ -87,6 +145,22 @@ namespace AAGen.Editor.DependencyGraph
             }
             EditorGUILayout.EndScrollView();
         }
+
+        void DrawModeToggleButton()
+        {
+            m_SmallTextStyle ??= new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 11,
+                alignment = TextAnchor.MiddleCenter
+            };
+            
+            string label = m_AdvancedModeActive ? k_ModeButtonQuickLabel : k_ModeButtonAdvancedLabel;
+            if (GUILayout.Button(label, m_SmallTextStyle, GUILayout.MaxWidth(k_ModeButtonWidth), GUILayout.Height(k_ModeButtonHeight)))
+            {
+                m_AdvancedModeActive = !m_AdvancedModeActive;
+            }
+        }
+        
 
         #region UI-Group Factory Methods
         
@@ -185,6 +259,28 @@ namespace AAGen.Editor.DependencyGraph
             uiGroup.ButtonAction = processor.Execute;
             return uiGroup;
         }
+        #endregion
+
+        #region Util
+
+        /// <summary>
+        /// Draws GUI elements centered horizontally within the available width.
+        /// </summary>
+        /// <param name="drawAction">Action that contains GUI drawing logic.</param>
+        /// <param name="elementWidth">Width of the element to center.</param>
+        private void DrawCentered(Action drawAction, float elementWidth)
+        {
+            float padding = (position.width - elementWidth) / 2;
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(padding);
+    
+            drawAction.Invoke(); // Execute the drawing logic
+    
+            GUILayout.Space(padding);
+            GUILayout.EndHorizontal();
+        }
+
         #endregion
     }
 }
