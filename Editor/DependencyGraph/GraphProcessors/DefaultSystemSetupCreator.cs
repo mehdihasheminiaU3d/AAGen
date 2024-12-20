@@ -17,10 +17,11 @@ namespace AAGen.Editor.DependencyGraph
         public DefaultSystemSetupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, AutomatedAssetGrouper parentUi) : base(dependencyGraph, uiGroup)
         {
             _parentUi = parentUi;
+            
         }
         
         private AutomatedAssetGrouper _parentUi;
-        EditorJobGroup _sequence;
+        public EditorJobGroup _sequence;
         
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
         const string DefaultSettingsName = "AddressableAssetSettings";
@@ -46,6 +47,8 @@ namespace AAGen.Editor.DependencyGraph
                 Debug.Log("Addressables settings not found. Creating new Addressables settings...");
                 settings = CreateDefaultAddressableSettings();
             }
+            
+            Debug.Log("InitializeAddressables1");
         }
         
         static AddressableAssetSettings CreateDefaultAddressableSettings()
@@ -122,8 +125,8 @@ namespace AAGen.Editor.DependencyGraph
             finally
             {
                 AssetDatabase.StopAssetEditing();
-                
                 AssetDatabase.Refresh();
+                Debug.Log("step 2 Default settings is created");
             }
         }
 

@@ -17,8 +17,8 @@ namespace AAGen.Editor.DependencyGraph
         }
         
         public DependencyGraph DependencyGraph { get; private set; }
-        private bool _loadingInProgress;
-        private bool _fileExists;
+        bool _loadingInProgress;
+        bool _fileExists;
 
         public override void OnGUI()
         {
@@ -31,7 +31,7 @@ namespace AAGen.Editor.DependencyGraph
             base.OnGUI();
         }
 
-        private void UpdateUIVisibility()
+        void UpdateUIVisibility()
         {
             UIVisibility = 0;
 
@@ -65,7 +65,7 @@ namespace AAGen.Editor.DependencyGraph
             }
         }
         
-        private void LoadDependencyGraph()
+        void LoadDependencyGraph()
         {
             if (_loadingInProgress)
                 return;
@@ -81,7 +81,7 @@ namespace AAGen.Editor.DependencyGraph
                 }));
         }
 
-        private void UnloadLoadDependencyGraph()
+        void UnloadLoadDependencyGraph()
         {
             DependencyGraph = null;
         }

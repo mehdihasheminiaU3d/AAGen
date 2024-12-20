@@ -84,7 +84,7 @@ namespace AAGen.Editor.DependencyGraph
             GUILayout.BeginVertical(k_BoxStyleName);
             GUILayout.Space(k_Space);
 
-            if(AagSettings!=null)
+            if (AagSettings != null)
             {
                 DrawCentered(() =>
                 {
@@ -99,7 +99,7 @@ namespace AAGen.Editor.DependencyGraph
             {
                 if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
                 {
-                    Debug.Log("Do all");
+                    new QuickButtonSequence(AagSettings,this).Execute();
                 }
             }, k_QuickButtonWidth);
 
@@ -160,7 +160,6 @@ namespace AAGen.Editor.DependencyGraph
                 m_AdvancedModeActive = !m_AdvancedModeActive;
             }
         }
-        
 
         #region UI-Group Factory Methods
         
