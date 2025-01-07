@@ -24,16 +24,15 @@ namespace AAGen.Editor.DependencyGraph
 
         public void Execute()
         {
-            
             m_Sequence.AddJob(new ActionJob(Init, nameof(Init)));
             m_Sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
+            m_Sequence.AddJob(new ActionJob(PreProcess, nameof(PreProcess)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
         
         void Init()
         {
-            
         }
 
         IEnumerator LoadDependencyGraph()
@@ -50,7 +49,6 @@ namespace AAGen.Editor.DependencyGraph
                 {
                     m_DependencyGraph = dependencyGraph;
                     m_LoadingInProgress = false;
-                    Debug.Log("load dependency graph completed");
                 }));
         }
         
@@ -62,6 +60,12 @@ namespace AAGen.Editor.DependencyGraph
                 processor.CreateDefaultSettingsFiles();
                 m_Sequence.AddJob(processor._sequence);
             }
+        }
+
+        void PreProcess()
+        {
+            var preProcessingFilter = new PreProcessingFilter(m_DependencyGraph, null, m_ParentUi);
+            preProcessingFilter.SaveIgnoredAssetsToFile();
         }
     }
 }
