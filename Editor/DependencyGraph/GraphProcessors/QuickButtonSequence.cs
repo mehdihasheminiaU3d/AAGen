@@ -30,6 +30,8 @@ namespace AAGen.Editor.DependencyGraph
             m_Sequence.AddJob(new ActionJob(PreProcess, nameof(PreProcess)));
             m_Sequence.AddJob(new ActionJob(Subgraphs, nameof(Subgraphs)));
             m_Sequence.AddJob(new ActionJob(GroupLayout, nameof(GroupLayout)));
+            m_Sequence.AddJob(new ActionJob(AddressableGroup, nameof(AddressableGroup)));
+            m_Sequence.AddJob(new ActionJob(PostProcess, nameof(PostProcess)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
         
@@ -80,6 +82,18 @@ namespace AAGen.Editor.DependencyGraph
         {
             var groupLayoutProcessor = new GroupLayoutProcessor(m_DependencyGraph, null, m_ParentUi);
             groupLayoutProcessor.Execute();
+        }
+
+        void AddressableGroup()
+        {
+            var processor = new AddressableGroupCreator(m_DependencyGraph, null);
+            processor.Execute();
+        }
+        
+        void PostProcess()
+        {
+            var processor = new PostProcessor(m_DependencyGraph, null);
+            processor.Execute();
         }
     }
 }

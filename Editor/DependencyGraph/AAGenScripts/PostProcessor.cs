@@ -71,7 +71,8 @@ namespace AAGen.Editor.DependencyGraph
         
         private void DisplayResultsOnUi()
         {
-            _uiGroup.OutputText = _result;
+            if (_uiGroup != null)
+                _uiGroup.OutputText = _result;
         }
     }
 }
