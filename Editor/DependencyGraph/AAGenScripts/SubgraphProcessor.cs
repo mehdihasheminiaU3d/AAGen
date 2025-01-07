@@ -94,6 +94,9 @@ namespace AAGen.Editor.DependencyGraph
       
         private void DisplayResultsOnUi()
         {
+            if (_uiGroup == null)
+                return;
+            
             _result += $"Total subgraphs = {_allSubgraphs.Count} \n";
 
             //File extension statistics

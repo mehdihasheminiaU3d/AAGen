@@ -28,6 +28,7 @@ namespace AAGen.Editor.DependencyGraph
             m_Sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
             m_Sequence.AddJob(new ActionJob(PreProcess, nameof(PreProcess)));
+            m_Sequence.AddJob(new ActionJob(Subgraphs, nameof(Subgraphs)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
         
@@ -66,6 +67,12 @@ namespace AAGen.Editor.DependencyGraph
         {
             var preProcessingFilter = new PreProcessingFilter(m_DependencyGraph, null, m_ParentUi);
             preProcessingFilter.SaveIgnoredAssetsToFile();
+        }
+
+        void Subgraphs()
+        {
+            var subgraphProcessor = new SubgraphProcessor(m_DependencyGraph, null);
+            subgraphProcessor.Execute();
         }
     }
 }
