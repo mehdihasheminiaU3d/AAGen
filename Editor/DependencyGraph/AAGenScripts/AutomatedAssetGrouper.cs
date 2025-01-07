@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -190,7 +191,7 @@ namespace AAGen.Editor.DependencyGraph
                 HelpText = "Filters out unwanted assets (e.g., project settings) based on input filtering rules defined in the settings"
             };
             var processor = new PreProcessingFilter(_dependencyGraph, uiGroup, this);
-            uiGroup.ButtonAction = processor.SaveIgnoredAssetsToFile;
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.SaveIgnoredAssetsToFile());
             return uiGroup;
         }
 
@@ -205,7 +206,7 @@ namespace AAGen.Editor.DependencyGraph
                 HelpText = "Identifies subgraphs, which are collections of nodes sharing the same source set, to serve as the base unit for processing"
             };
             var processor = new SubgraphProcessor(_dependencyGraph, uiGroup);
-            uiGroup.ButtonAction = processor.Execute;
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
 
@@ -222,7 +223,7 @@ namespace AAGen.Editor.DependencyGraph
 
             };
             var processor = new GroupLayoutProcessor(_dependencyGraph, uiGroup, this);
-            uiGroup.ButtonAction = processor.Execute;
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
 
@@ -238,7 +239,7 @@ namespace AAGen.Editor.DependencyGraph
                 HelpText = "Creates addressable asset groups based on the defined group layout"
             };
             var processor = new AddressableGroupCreator(_dependencyGraph, uiGroup);
-            uiGroup.ButtonAction = processor.Execute;
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
         
@@ -255,7 +256,7 @@ namespace AAGen.Editor.DependencyGraph
 
             };
             var processor = new PostProcessor(_dependencyGraph, uiGroup);
-            uiGroup.ButtonAction = processor.Execute;
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
         #endregion

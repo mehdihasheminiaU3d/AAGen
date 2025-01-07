@@ -27,14 +27,14 @@ namespace AAGen.Editor.DependencyGraph
         private Dictionary<string, GroupLayoutInfo> _groupLayout;
         private string _result;
         
-        public void Execute()
+        public IEnumerator Execute()
         {
             _sequence = new EditorJobGroup(nameof(AddressableGroupCreator));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
             _sequence.AddJob(new CoroutineJob(LoadGroupLayoutFromFile, nameof(LoadGroupLayoutFromFile)));
             _sequence.AddJob(new CoroutineJob(CreateAddressableGroups, nameof(CreateAddressableGroups)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
 
         protected override void Init()

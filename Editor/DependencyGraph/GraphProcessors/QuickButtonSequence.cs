@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
-using UnityEngine;
 
 namespace AAGen.Editor.DependencyGraph
 {
@@ -27,11 +26,11 @@ namespace AAGen.Editor.DependencyGraph
             m_Sequence.AddJob(new ActionJob(Init, nameof(Init)));
             m_Sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
-            m_Sequence.AddJob(new ActionJob(PreProcess, nameof(PreProcess)));
-            m_Sequence.AddJob(new ActionJob(Subgraphs, nameof(Subgraphs)));
-            m_Sequence.AddJob(new ActionJob(GroupLayout, nameof(GroupLayout)));
-            m_Sequence.AddJob(new ActionJob(AddressableGroup, nameof(AddressableGroup)));
-            m_Sequence.AddJob(new ActionJob(PostProcess, nameof(PostProcess)));
+            m_Sequence.AddJob(new CoroutineJob(PreProcess, nameof(PreProcess)));
+            m_Sequence.AddJob(new CoroutineJob(Subgraphs, nameof(Subgraphs)));
+            m_Sequence.AddJob(new CoroutineJob(GroupLayout, nameof(GroupLayout)));
+            m_Sequence.AddJob(new CoroutineJob(AddressableGroup, nameof(AddressableGroup)));
+            m_Sequence.AddJob(new CoroutineJob(PostProcess, nameof(PostProcess)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
         
@@ -66,34 +65,34 @@ namespace AAGen.Editor.DependencyGraph
             }
         }
 
-        void PreProcess()
+        IEnumerator PreProcess()
         {
             var preProcessingFilter = new PreProcessingFilter(m_DependencyGraph, null, m_ParentUi);
-            preProcessingFilter.SaveIgnoredAssetsToFile();
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessingFilter.SaveIgnoredAssetsToFile());
         }
 
-        void Subgraphs()
+        IEnumerator Subgraphs()
         {
             var subgraphProcessor = new SubgraphProcessor(m_DependencyGraph, null);
-            subgraphProcessor.Execute();
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(subgraphProcessor.Execute());
         }
 
-        void GroupLayout()
+        IEnumerator GroupLayout()
         {
             var groupLayoutProcessor = new GroupLayoutProcessor(m_DependencyGraph, null, m_ParentUi);
-            groupLayoutProcessor.Execute();
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(groupLayoutProcessor.Execute());
         }
 
-        void AddressableGroup()
+        IEnumerator AddressableGroup()
         {
             var processor = new AddressableGroupCreator(m_DependencyGraph, null);
-            processor.Execute();
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
         }
         
-        void PostProcess()
+        IEnumerator PostProcess()
         {
             var processor = new PostProcessor(m_DependencyGraph, null);
-            processor.Execute();
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
         }
     }
 }

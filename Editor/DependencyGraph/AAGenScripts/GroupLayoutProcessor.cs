@@ -68,7 +68,7 @@ namespace AAGen.Editor.DependencyGraph
         private Category _singleSources;
         private Category _ExclusiveToSingleSource;
         
-        public void Execute()
+        public IEnumerator Execute()
         {
             startTime = EditorApplication.timeSinceStartup;
             _result = null;
@@ -96,7 +96,7 @@ namespace AAGen.Editor.DependencyGraph
             _sequence.AddJob(new CoroutineJob(SaveGroupLayout, nameof(SaveGroupLayout)));
             _sequence.AddJob(new ActionJob(Verify, nameof(Verify)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
         
         protected override void Init()

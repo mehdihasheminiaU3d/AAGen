@@ -20,13 +20,13 @@ namespace AAGen.Editor.DependencyGraph
         private AddressableAssetSettings _addressableSettings;
         private EditorJobGroup _sequence;
 
-        public void Execute()
+        public IEnumerator Execute()
         {
             _sequence = new EditorJobGroup(nameof(AddressableGroupCreator));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
             _sequence.AddJob(new CoroutineJob(RemoveEmptyAddressableGroups, nameof(RemoveEmptyAddressableGroups)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
 
         protected override void Init()

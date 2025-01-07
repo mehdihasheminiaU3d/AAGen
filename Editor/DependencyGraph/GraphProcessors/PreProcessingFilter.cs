@@ -26,7 +26,7 @@ namespace AAGen.Editor.DependencyGraph
         private HashSet<AssetNode> _ignoredAssets;
         private string _result;
         
-        public void SaveIgnoredAssetsToFile()
+        public IEnumerator SaveIgnoredAssetsToFile()
         {
             _sequence = new EditorJobGroup(nameof(GraphInfoProcessor));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
@@ -35,7 +35,7 @@ namespace AAGen.Editor.DependencyGraph
             _sequence.AddJob(new CoroutineJob(IgnoreExclusiveDependencies, nameof(IgnoreExclusiveDependencies)));
             _sequence.AddJob(new CoroutineJob(SaveToFile, nameof(SaveToFile)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
         
         protected override void Init()
@@ -51,6 +51,10 @@ namespace AAGen.Editor.DependencyGraph
             if (_uiGroup != null)
             {
                 _uiGroup.OutputText = _result;
+            }
+            else
+            {
+                Debug.Log($"Preprocessing completed!");
             }
 
             _transposedGraph = null;
