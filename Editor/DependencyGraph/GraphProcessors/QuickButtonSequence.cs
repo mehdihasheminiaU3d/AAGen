@@ -29,6 +29,7 @@ namespace AAGen.Editor.DependencyGraph
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
             m_Sequence.AddJob(new ActionJob(PreProcess, nameof(PreProcess)));
             m_Sequence.AddJob(new ActionJob(Subgraphs, nameof(Subgraphs)));
+            m_Sequence.AddJob(new ActionJob(GroupLayout, nameof(GroupLayout)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
         
@@ -73,6 +74,12 @@ namespace AAGen.Editor.DependencyGraph
         {
             var subgraphProcessor = new SubgraphProcessor(m_DependencyGraph, null);
             subgraphProcessor.Execute();
+        }
+
+        void GroupLayout()
+        {
+            var groupLayoutProcessor = new GroupLayoutProcessor(m_DependencyGraph, null, m_ParentUi);
+            groupLayoutProcessor.Execute();
         }
     }
 }
