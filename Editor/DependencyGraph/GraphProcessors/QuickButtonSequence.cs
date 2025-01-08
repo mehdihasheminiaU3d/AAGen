@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
+using UnityEngine;
 
 namespace AAGen.Editor.DependencyGraph
 {
@@ -24,6 +25,7 @@ namespace AAGen.Editor.DependencyGraph
         public void Execute()
         {
             m_Sequence.AddJob(new ActionJob(Init, nameof(Init)));
+            m_Sequence.AddJob(new CoroutineJob(GenerateDependencyGraph, nameof(GenerateDependencyGraph)));
             m_Sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
             m_Sequence.AddJob(new CoroutineJob(PreProcess, nameof(PreProcess)));
@@ -38,6 +40,13 @@ namespace AAGen.Editor.DependencyGraph
         {
         }
 
+        IEnumerator GenerateDependencyGraph()
+        {
+            var dependencyGraphGenerator = new DependencyGraphGenerator();
+            dependencyGraphGenerator.Start();
+            yield return new WaitUntil(() => !dependencyGraphGenerator.InProgress);
+        }
+        
         IEnumerator LoadDependencyGraph()
         {
             if (m_LoadingInProgress)
