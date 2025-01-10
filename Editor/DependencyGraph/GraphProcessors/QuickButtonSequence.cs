@@ -63,15 +63,12 @@ namespace AAGen.Editor.DependencyGraph
                     m_LoadingInProgress = false;
                 }));
         }
-        
+
         void AddDefaultSettingsSequence()
         {
-            if(m_Settings == null)
-            {
-                var processor = new DefaultSystemSetupCreator(m_DependencyGraph, null, m_ParentUi);
-                processor.CreateDefaultSettingsFiles();
-                m_Sequence.AddJob(processor._sequence);
-            }
+            var processor = new DefaultSystemSetupCreator(m_DependencyGraph, null, m_ParentUi);
+            processor.CreateDefaultSettingsFiles();
+            m_Sequence.AddJob(processor._sequence);
         }
 
         IEnumerator PreProcess()

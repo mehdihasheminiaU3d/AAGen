@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using AAGen.Runtime;
@@ -7,7 +6,6 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
 
 namespace AAGen.Editor.DependencyGraph
@@ -17,10 +15,9 @@ namespace AAGen.Editor.DependencyGraph
         public DefaultSystemSetupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, AutomatedAssetGrouper parentUi) : base(dependencyGraph, uiGroup)
         {
             _parentUi = parentUi;
-            
         }
         
-        private AutomatedAssetGrouper _parentUi;
+        AutomatedAssetGrouper _parentUi;
         public EditorJobGroup _sequence;
         
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
@@ -30,61 +27,40 @@ namespace AAGen.Editor.DependencyGraph
         
         public void CreateDefaultSettingsFiles()
         {
-            _sequence = new EditorJobGroup(nameof(GraphInfoProcessor));
-            _sequence.AddJob(new ActionJob(Init, nameof(Init)));
-            _sequence.AddJob(new ActionJob(InitializeAddressables, nameof(InitializeAddressables)));
-            _sequence.AddJob(new ActionJob(CreateDefaultSettingsFile, nameof(CreateDefaultSettingsFile)));
+            _sequence = new EditorJobGroup(nameof(DefaultSystemSetupCreator));
+            _sequence.AddJob(new ActionJob(CreateDefaultAddressableSettings, nameof(CreateDefaultAddressableSettings)));
+            _sequence.AddJob(new ActionJob(CreateDefaultToolSettings, nameof(CreateDefaultToolSettings)));
             EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
         
-        void InitializeAddressables()
+        void CreateDefaultAddressableSettings()
         {
-            // Step 1: Check if Addressables Settings exist
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-
-            if (settings == null)
-            {
-                Debug.Log("Addressables settings not found. Creating new Addressables settings...");
-                settings = CreateDefaultAddressableSettings();
-            }
+            if (AddressableAssetSettingsDefaultObject.Settings != null) 
+                return; //the default addressable asset settings already created
             
-            Debug.Log("InitializeAddressables1");
-        }
-        
-        static AddressableAssetSettings CreateDefaultAddressableSettings()
-        {
-            // Ensure directory exists
-            if (!Directory.Exists(DefaultSettingsPath))
-            {
-                Directory.CreateDirectory(DefaultSettingsPath);
-            }
+            EnsureDirectoryExists(DefaultSettingsPath);
 
             // Create Addressable settings
-            AddressableAssetSettings settings = AddressableAssetSettings.Create(
-                DefaultSettingsPath, DefaultSettingsName, true, true
-            );
-
-            // Add a default group
-            var group = settings.CreateGroup("Default Local Group", false, false, true, null, //<---------Is this needed?
-                typeof(ContentUpdateGroupSchema), typeof(BundledAssetGroupSchema));
-            settings.DefaultGroup = group;
-
-            Debug.Log("Addressables settings created at: " + DefaultSettingsPath);
-            return settings;
+            AddressableAssetSettings settings = AddressableAssetSettings.Create(DefaultSettingsPath, DefaultSettingsName, true, true);
+            AddressableAssetSettingsDefaultObject.Settings = settings;
+            
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            
+            Debug.Log("Default addressable assets settings created at: " + DefaultSettingsPath);
         }
 
-        void CreateDefaultSettingsFile()
+        void CreateDefaultToolSettings()
         {
+            if (_parentUi.AagSettings != null)
+                return; //the default tool settings already created
+            
+            EnsureDirectoryExists(DefaultAagenSettingsFolder);
+            
             try
             {
                 AssetDatabase.StartAssetEditing();
-
-                // Ensure directory exists
-                if (!Directory.Exists(DefaultAagenSettingsFolder))
-                {
-                    Directory.CreateDirectory(DefaultAagenSettingsFolder);
-                }
-
+                
                 var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagSettings)}.asset");
                 var aagSettings = ScriptableObject.CreateInstance<AagSettings>();
                 
@@ -113,7 +89,7 @@ namespace AAGen.Editor.DependencyGraph
                     CreateGroupLayoutRule(CategoryId.SingleSources, defaultGroupTemplate)
                 };
 
-                AssetDatabase.CreateAsset(aagSettings, settingsFilePath); //<--- ToDo: Overwrite notification!
+                AssetDatabase.CreateAsset(aagSettings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting!
                 AssetDatabase.SaveAssets();
                 
                 _parentUi.AagSettings = aagSettings;
@@ -126,7 +102,6 @@ namespace AAGen.Editor.DependencyGraph
             {
                 AssetDatabase.StopAssetEditing();
                 AssetDatabase.Refresh();
-                Debug.Log("step 2 Default settings is created");
             }
         }
 
@@ -209,6 +184,12 @@ namespace AAGen.Editor.DependencyGraph
             // Assuming the first template is the default one
             var defaultTemplate = templates[0];
             return defaultTemplate as AddressableAssetGroupTemplate;
+        }
+        
+        static void EnsureDirectoryExists(string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
         }
     }
 }
