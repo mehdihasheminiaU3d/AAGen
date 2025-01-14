@@ -17,6 +17,9 @@ namespace AAGen.Editor.DependencyGraph
             public const string AAGenRootMenuPath = Root;
             public const string AAGenMenuPath = AAGenRootMenuPath + PackageName;
             
+            public const string AAGenRootProjectSettingsPath = "Project/";
+            public const string AAGenProjectSettingsPath = AAGenRootProjectSettingsPath + PackageShortName;
+            
             public const int DependencyGraphMenuPriority = 200;
             public const string DependencyGraphRootMenuPath = Root + "Dependency Graph/";
         }
