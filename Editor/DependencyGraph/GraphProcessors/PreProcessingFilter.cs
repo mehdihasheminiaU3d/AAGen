@@ -17,7 +17,7 @@ namespace AAGen.Editor.DependencyGraph
             _parentUi = parentUi;
         }
         
-        private static string _filePath => Path.Combine(DependencyGraphConstants.FolderPath, "IgnoredAssets.txt");
+        private static string _filePath => Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
 
         private AutomatedAssetGrouper _parentUi;
         private DependencyGraph _transposedGraph;

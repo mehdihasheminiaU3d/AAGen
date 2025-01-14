@@ -44,7 +44,7 @@ namespace AAGen.Editor.DependencyGraph
                 ResetToDefault();
 
             GUILayout.Space(10);
-            EditorGUILayout.LabelField("File Path:", DependencyGraphConstants.DependencyGraphFilePath);
+            EditorGUILayout.LabelField("File Path:", Constants.DependencyGraphFilePath);
             if (GUILayout.Button("Delete File"))
             {
                 DeleteFiles();
@@ -52,7 +52,7 @@ namespace AAGen.Editor.DependencyGraph
 
             if (GUILayout.Button("Locate Files"))
             {
-                LocateFolder(DependencyGraphConstants.FolderPath);
+                LocateFolder(Constants.FolderPath);
             }
 
             GUILayout.Space(20);
@@ -117,8 +117,8 @@ namespace AAGen.Editor.DependencyGraph
             {
                 try
                 {
-                    if (File.Exists(DependencyGraphConstants.DependencyGraphFilePath))
-                        File.Delete(DependencyGraphConstants.DependencyGraphFilePath);
+                    if (File.Exists(Constants.DependencyGraphFilePath))
+                        File.Delete(Constants.DependencyGraphFilePath);
                 }
                 catch
                 {

@@ -7,7 +7,7 @@ namespace AAGen.Editor.DependencyGraph
 {
     internal class AutomatedAssetGrouper : EditorWindow
     {
-        [MenuItem("Tools/Dependency Graph/Automated Asset Grouper", priority = 300)]
+        [MenuItem(Constants.Menus.AAGenMenuPath, priority = Constants.Menus.AAGenMenuPriority)]
         public static void ShowWindow()
         {
             var window = GetWindow<AutomatedAssetGrouper>("Automated Asset Grouper");

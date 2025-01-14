@@ -20,7 +20,7 @@ namespace AAGen.Editor.DependencyGraph
         public AddressableGroupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup) 
             : base(dependencyGraph, uiGroup) {}
         
-        private static string _filePath => Path.Combine(DependencyGraphConstants.FolderPath, "GroupLayout.txt");
+        private static string _filePath => Path.Combine(Constants.FolderPath, "GroupLayout.txt");
 
         private EditorJobGroup _sequence;
         private AddressableAssetSettings _addressableSettings; 

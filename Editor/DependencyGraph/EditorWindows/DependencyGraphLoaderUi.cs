@@ -22,7 +22,7 @@ namespace AAGen.Editor.DependencyGraph
 
         public override void OnGUI()
         {
-            _fileExists = File.Exists(DependencyGraphConstants.DependencyGraphFilePath);
+            _fileExists = File.Exists(Constants.DependencyGraphFilePath);
             
             if(!_fileExists)
                 UnloadLoadDependencyGraph();
@@ -70,7 +70,7 @@ namespace AAGen.Editor.DependencyGraph
             if (_loadingInProgress)
                 return;
             
-            string filePath = DependencyGraphConstants.DependencyGraphFilePath;
+            string filePath = Constants.DependencyGraphFilePath;
             _loadingInProgress = true;
             
             EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.LoadFromFileAsync<DependencyGraph>(filePath,

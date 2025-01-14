@@ -46,8 +46,8 @@ namespace AAGen.Editor.DependencyGraph
             _parentUi = parentUi;
         }
         
-        private static string _inputFilePath => Path.Combine(DependencyGraphConstants.FolderPath, "Subgraphs.txt");
-        private static string _groupLayoutFilePath => Path.Combine(DependencyGraphConstants.FolderPath, "GroupLayout.txt");
+        private static string _inputFilePath => Path.Combine(Constants.FolderPath, "Subgraphs.txt");
+        private static string _groupLayoutFilePath => Path.Combine(Constants.FolderPath, "GroupLayout.txt");
         
         private EditorJobGroup _sequence;
         private AutomatedAssetGrouper _parentUi;
@@ -163,7 +163,7 @@ namespace AAGen.Editor.DependencyGraph
         
         private IEnumerator LoadIgnoredAssetsList()
         {
-            string ignoredFilePath = Path.Combine(DependencyGraphConstants.FolderPath, "IgnoredAssets.txt");
+            string ignoredFilePath = Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
         
             yield return DependencyGraphUtil.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
                 (data) => { _ignoredAssets = data; });

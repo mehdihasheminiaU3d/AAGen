@@ -52,7 +52,7 @@ namespace AAGen.Editor.DependencyGraph
             if (m_LoadingInProgress)
                 yield break;
 
-            string filePath = DependencyGraphConstants.DependencyGraphFilePath;
+            string filePath = Constants.DependencyGraphFilePath;
             m_LoadingInProgress = true;
 
             EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.LoadFromFileAsync<DependencyGraph>(

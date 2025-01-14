@@ -11,7 +11,7 @@ namespace AAGen.Editor.DependencyGraph
     /// </summary>
     internal class DependencyGraphGenerator
     {
-        private string _filePath => DependencyGraphConstants.DependencyGraphFilePath;
+        private string _filePath => Constants.DependencyGraphFilePath;
 
         private bool _isCancelled;
         private EditorUiGroup _uiGroup;
