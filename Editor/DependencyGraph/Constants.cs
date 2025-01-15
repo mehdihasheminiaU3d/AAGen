@@ -23,6 +23,12 @@ namespace AAGen.Editor.DependencyGraph
             public const int DependencyGraphMenuPriority = 200;
             public const string DependencyGraphRootMenuPath = Root + "Dependency Graph/";
         }
+
+        public static class FilePaths
+        {
+            public const string DefaultBootScene = "Assets/AAGen Scenes/boot.unity";
+            public static string ScenePreprocess => Path.Combine(FolderPath, "ScenePreprocess.txt");
+        }
         
         public static string FolderPath => Path.Combine(Application.persistentDataPath, "DependencyGraph");
         public static string DependencyGraphFilePath => Path.Combine(FolderPath, "DependencyGraph.txt");

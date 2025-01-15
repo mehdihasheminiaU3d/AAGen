@@ -18,10 +18,12 @@ namespace AAGen.Editor.DependencyGraph
 
         EditorUiGroup _defaultSettingsUi;
         EditorUiGroup _ignoreAssetsFileUi;
+        EditorUiGroup m_ScenePreprocessorUi;
         EditorUiGroup _groupCreatorUi;
         EditorUiGroup _processGroupsUi;
         EditorUiGroup _addressableGroupsUi;
         EditorUiGroup _postProcessingUi;
+        EditorUiGroup m_ScenePostprocessorUi;
         
         bool m_AdvancedModeActive;
         Vector2 _scrollPosition;
@@ -128,6 +130,9 @@ namespace AAGen.Editor.DependencyGraph
                 }
                 else
                 {
+                    m_ScenePreprocessorUi ??= CreateScenePreprocessorUI();
+                    m_ScenePreprocessorUi.OnGUI();
+                    
                     _ignoreAssetsFileUi ??= CreateIgnoreAssetsFileUI();
                     _ignoreAssetsFileUi.OnGUI();
 
@@ -142,6 +147,9 @@ namespace AAGen.Editor.DependencyGraph
 
                     _postProcessingUi ??= CreatePostProcessingUI();
                     _postProcessingUi.OnGUI();
+                    
+                    m_ScenePostprocessorUi ??= CreateScenePostprocessorUI();
+                    m_ScenePostprocessorUi.OnGUI();
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -176,6 +184,21 @@ namespace AAGen.Editor.DependencyGraph
             };
             var processor = new DefaultSystemSetupCreator(_dependencyGraph, uiGroup, this);
             uiGroup.ButtonAction = processor.CreateDefaultSettingsFiles;
+            return uiGroup;
+        }
+        
+        EditorUiGroup CreateScenePreprocessorUI()
+        {
+            var uiGroup = new EditorUiGroup
+            {
+                FoldoutLabel = "Scene Preprocessing",
+                UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
+                               EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
+                               EditorUiGroup.UIVisibilityFlag.ShowButton1 ,
+                HelpText = "Removes \"scenes-in-build\" from \"build settings\" to prevent possible duplications"
+            };
+            var processor = new PreProcessingScenes(_dependencyGraph, uiGroup);
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
 
@@ -239,6 +262,23 @@ namespace AAGen.Editor.DependencyGraph
                 HelpText = "Creates addressable asset groups based on the defined group layout"
             };
             var processor = new AddressableGroupCreator(_dependencyGraph, uiGroup);
+            uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
+            return uiGroup;
+        }
+        
+        private EditorUiGroup CreateScenePostprocessorUI()
+        {
+            var uiGroup = new EditorUiGroup
+            {
+                FoldoutLabel = "Scene Postprocessing",
+                UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
+                               EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
+                               EditorUiGroup.UIVisibilityFlag.ShowButton1 |
+                               EditorUiGroup.UIVisibilityFlag.ShowOutput,
+                HelpText = "Adds a boot scene and sets it up to load the next scene using addressable API"
+
+            };
+            var processor = new PostProcessScenes(_dependencyGraph, uiGroup);
             uiGroup.ButtonAction = () => EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
             return uiGroup;
         }
