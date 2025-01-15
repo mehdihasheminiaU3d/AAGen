@@ -31,10 +31,12 @@ namespace AAGen.Editor.DependencyGraph
             
             foreach (var scene in EditorBuildSettings.scenes) //Record in the same order
             {
-                // ToDo: Should we skip the scenes that are disabled and not included in the build? 
+                //ToDo: Do we need to record all? We'll only use the scene at index = 0
                 m_ScenesInBuild.Add(scene.path);
             }
 
+            //Remove all from build settings
+            // ToDo: Should we skip the scenes that are disabled and not included in the build? 
             EditorBuildSettings.scenes = null;
         }
 

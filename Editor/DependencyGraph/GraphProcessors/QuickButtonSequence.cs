@@ -28,10 +28,12 @@ namespace AAGen.Editor.DependencyGraph
             m_Sequence.AddJob(new CoroutineJob(GenerateDependencyGraph, nameof(GenerateDependencyGraph)));
             m_Sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
             m_Sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
+            m_Sequence.AddJob(new CoroutineJob(PreProcessScenes, nameof(PreProcessScenes)));
             m_Sequence.AddJob(new CoroutineJob(PreProcess, nameof(PreProcess)));
             m_Sequence.AddJob(new CoroutineJob(Subgraphs, nameof(Subgraphs)));
             m_Sequence.AddJob(new CoroutineJob(GroupLayout, nameof(GroupLayout)));
             m_Sequence.AddJob(new CoroutineJob(AddressableGroup, nameof(AddressableGroup)));
+            m_Sequence.AddJob(new CoroutineJob(PostProcessScenes, nameof(PostProcessScenes)));
             m_Sequence.AddJob(new CoroutineJob(PostProcess, nameof(PostProcess)));
             EditorCoroutineUtility.StartCoroutineOwnerless(m_Sequence.Run());
         }
@@ -70,6 +72,13 @@ namespace AAGen.Editor.DependencyGraph
             processor.CreateDefaultSettingsFiles();
             m_Sequence.AddJob(processor._sequence);
         }
+        
+        IEnumerator PreProcessScenes()
+        {
+            var preProcessing = new PreProcessingScenes(m_DependencyGraph, null);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessing.Execute());
+        }
+
 
         IEnumerator PreProcess()
         {
@@ -92,6 +101,12 @@ namespace AAGen.Editor.DependencyGraph
         IEnumerator AddressableGroup()
         {
             var processor = new AddressableGroupCreator(m_DependencyGraph, null);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
+        }
+        
+        IEnumerator PostProcessScenes()
+        {
+            var processor = new PostProcessScenes(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
         }
         

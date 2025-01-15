@@ -37,7 +37,7 @@ namespace AAGen.Editor.DependencyGraph
             yield return DependencyGraphUtil.LoadFromFileAsync<List<string>>(scenePreprocessFilePath,
                 (data) =>
                 {
-                    if (data != null)
+                    if (data is { Count: > 0 })
                     {
                         m_OriginalBootScene = data[0];
                     }
@@ -106,7 +106,7 @@ namespace AAGen.Editor.DependencyGraph
 
             if (string.IsNullOrEmpty(scenePath))
             {
-                Debug.LogError($"Scene path is empty");
+                Debug.LogWarning($"original boot scene path not found!");
                 return;
             }
             
