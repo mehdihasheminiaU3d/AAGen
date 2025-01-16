@@ -120,7 +120,7 @@ namespace AAGen.Editor.DependencyGraph
 
             AagSettings = (AagSettings)EditorGUILayout.ObjectField("Settings", AagSettings, typeof(AagSettings), false);
 
-            float scrollViewHeight = position.height - GUILayoutUtility.GetLastRect().yMax; // Y position after top elements
+            float scrollViewHeight = position.height - GUILayoutUtility.GetLastRect().yMax - 150f; // Y position after top elements
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(scrollViewHeight));
             {
                 if (AagSettings == null)
