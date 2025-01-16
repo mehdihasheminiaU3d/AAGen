@@ -45,7 +45,7 @@ namespace AAGen.Editor.DependencyGraph
         {
             var startTime = EditorApplication.timeSinceStartup;
             
-            List<AddressableAssetGroup> groups = _addressableSettings.groups.Where(group => !group.ReadOnly && group.entries.Count == 0).ToList();
+            List<AddressableAssetGroup> groups = _addressableSettings.groups.Where(CanRemoveGroup).ToList();
             if (ShouldUpdateUi)
                 yield return null;
 
@@ -67,6 +67,13 @@ namespace AAGen.Editor.DependencyGraph
             }
             
             Debug.Log($"Empty groups removed in t={EditorApplication.timeSinceStartup - startTime:F2}s");
+
+            bool CanRemoveGroup(AddressableAssetGroup group)
+            {
+                return group.entries.Count == 0 && 
+                       !group.ReadOnly && 
+                       group != _addressableSettings.DefaultGroup;
+            }
         }
         
         private void DisplayResultsOnUi()
