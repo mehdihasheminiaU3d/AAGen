@@ -20,13 +20,13 @@ namespace AAGen.Editor.DependencyGraph
         private AddressableAssetSettings _addressableSettings;
         private EditorJobGroup _sequence;
 
-        public void Execute()
+        public IEnumerator Execute()
         {
             _sequence = new EditorJobGroup(nameof(AddressableGroupCreator));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
             _sequence.AddJob(new CoroutineJob(RemoveEmptyAddressableGroups, nameof(RemoveEmptyAddressableGroups)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
 
         protected override void Init()
@@ -45,7 +45,7 @@ namespace AAGen.Editor.DependencyGraph
         {
             var startTime = EditorApplication.timeSinceStartup;
             
-            List<AddressableAssetGroup> groups = _addressableSettings.groups.Where(group => !group.ReadOnly && group.entries.Count == 0).ToList();
+            List<AddressableAssetGroup> groups = _addressableSettings.groups.Where(CanRemoveGroup).ToList();
             if (ShouldUpdateUi)
                 yield return null;
 
@@ -67,11 +67,19 @@ namespace AAGen.Editor.DependencyGraph
             }
             
             Debug.Log($"Empty groups removed in t={EditorApplication.timeSinceStartup - startTime:F2}s");
+
+            bool CanRemoveGroup(AddressableAssetGroup group)
+            {
+                return group.entries.Count == 0 && 
+                       !group.ReadOnly && 
+                       group != _addressableSettings.DefaultGroup;
+            }
         }
         
         private void DisplayResultsOnUi()
         {
-            _uiGroup.OutputText = _result;
+            if (_uiGroup != null)
+                _uiGroup.OutputText = _result;
         }
     }
 }

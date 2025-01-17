@@ -150,7 +150,7 @@ namespace AAGen.Editor.DependencyGraph
             return false;
         }
 
-        private static void EnsureDirectoryExist(string filePath)
+        public static void EnsureDirectoryExist(string filePath) //ToDo: Add to a shared util Class
         {
             string directoryPath = Path.GetDirectoryName(filePath);
             

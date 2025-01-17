@@ -1,6 +1,6 @@
 {
   "name": "com.unity.aagen",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Automated Addressable Group Generator",
   "description": "Automates the creation of optimized Addressable Groups based on direct asset dependencies, ensuring a duplicate-free structure for seamless integration across projects.",
   "unity": "2021.3",

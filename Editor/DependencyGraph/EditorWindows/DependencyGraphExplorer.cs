@@ -7,7 +7,7 @@ namespace AAGen.Editor.DependencyGraph
     /// </summary>
     internal class DependencyGraphExplorer : EditorWindow
     {
-        [MenuItem("Tools/Dependency Graph/Explore" ,  priority = 200)]
+        [MenuItem(Constants.Menus.DependencyGraphRootMenuPath + "Explore" ,  priority = Constants.Menus.DependencyGraphMenuPriority + 1)]
         public static void ShowWindow()
         {
             GetWindow<DependencyGraphExplorer>("Explore DependencyGraph");

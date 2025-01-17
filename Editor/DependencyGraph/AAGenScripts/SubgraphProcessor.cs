@@ -20,7 +20,7 @@ namespace AAGen.Editor.DependencyGraph
         public SubgraphProcessor(DependencyGraph dependencyGraph, EditorUiGroup uiGroup) 
             : base(dependencyGraph, uiGroup) {}
         
-        private static string _filePath => Path.Combine(DependencyGraphConstants.FolderPath, "Subgraphs.txt");
+        private static string _filePath => Path.Combine(Constants.FolderPath, "Subgraphs.txt");
         
         private Category _allSubgraphs;
         private DependencyGraph _transposedGraph;
@@ -30,7 +30,7 @@ namespace AAGen.Editor.DependencyGraph
         
         private string _result;
         
-        public void Execute()
+        public IEnumerator Execute()
         {
             _sequence = new EditorJobGroup(nameof(SubgraphProcessor));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
@@ -39,7 +39,7 @@ namespace AAGen.Editor.DependencyGraph
             _sequence.AddJob(new CoroutineJob(SaveSubgraphsToFile, nameof(SaveSubgraphsToFile)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
             _sequence.AddJob(new ActionJob(FreeMemory, nameof(FreeMemory)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
 
         protected override void Init()
@@ -94,6 +94,12 @@ namespace AAGen.Editor.DependencyGraph
       
         private void DisplayResultsOnUi()
         {
+            if (_uiGroup == null)
+            {
+                Debug.Log($"Subgrahs generation completed!");
+                return;
+            }
+            
             _result += $"Total subgraphs = {_allSubgraphs.Count} \n";
 
             //File extension statistics
@@ -141,7 +147,7 @@ namespace AAGen.Editor.DependencyGraph
         
         private IEnumerator LoadIgnoredAssetsList()
         {
-            string ignoredFilePath = Path.Combine(DependencyGraphConstants.FolderPath, "IgnoredAssets.txt");
+            string ignoredFilePath = Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
         
             yield return DependencyGraphUtil.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
                 (data) => { _ignoredAssets = data; });

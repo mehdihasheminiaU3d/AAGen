@@ -4,7 +4,7 @@ namespace AAGen.Editor.DependencyGraph
 {
     internal class DependencyGraphGeneratorWindow : EditorWindow
     {
-        [MenuItem("Tools/Dependency Graph/Generate",  priority = 100)]
+        [MenuItem(Constants.Menus.DependencyGraphRootMenuPath + "Generate",  priority = Constants.Menus.DependencyGraphMenuPriority)]
         public static void ShowWindow()
         {
             GetWindow<DependencyGraphGeneratorWindow>("Generate DependencyGraph");

@@ -17,12 +17,12 @@ namespace AAGen.Editor.DependencyGraph
         }
         
         public DependencyGraph DependencyGraph { get; private set; }
-        private bool _loadingInProgress;
-        private bool _fileExists;
+        bool _loadingInProgress;
+        bool _fileExists;
 
         public override void OnGUI()
         {
-            _fileExists = File.Exists(DependencyGraphConstants.DependencyGraphFilePath);
+            _fileExists = File.Exists(Constants.DependencyGraphFilePath);
             
             if(!_fileExists)
                 UnloadLoadDependencyGraph();
@@ -31,7 +31,7 @@ namespace AAGen.Editor.DependencyGraph
             base.OnGUI();
         }
 
-        private void UpdateUIVisibility()
+        void UpdateUIVisibility()
         {
             UIVisibility = 0;
 
@@ -65,12 +65,12 @@ namespace AAGen.Editor.DependencyGraph
             }
         }
         
-        private void LoadDependencyGraph()
+        void LoadDependencyGraph()
         {
             if (_loadingInProgress)
                 return;
             
-            string filePath = DependencyGraphConstants.DependencyGraphFilePath;
+            string filePath = Constants.DependencyGraphFilePath;
             _loadingInProgress = true;
             
             EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.LoadFromFileAsync<DependencyGraph>(filePath,
@@ -81,7 +81,7 @@ namespace AAGen.Editor.DependencyGraph
                 }));
         }
 
-        private void UnloadLoadDependencyGraph()
+        void UnloadLoadDependencyGraph()
         {
             DependencyGraph = null;
         }

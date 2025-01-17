@@ -7,7 +7,7 @@ namespace AAGen.Editor.DependencyGraph
     /// </summary>
     internal class DependencyGraphDiagnostics : EditorWindow
     {
-        [MenuItem("Tools/Dependency Graph/Diagnostics",  priority = 201)]
+        [MenuItem(Constants.Menus.DependencyGraphRootMenuPath + "Diagnostics",  priority = Constants.Menus.DependencyGraphMenuPriority + 2)]
         public static void ShowWindow()
         {
             GetWindow<DependencyGraphDiagnostics>("Diagnostic tools for DependencyGraph");

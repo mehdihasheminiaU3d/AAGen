@@ -11,13 +11,16 @@ namespace AAGen.Editor.DependencyGraph
     /// </summary>
     internal class DependencyGraphGenerator
     {
-        private string _filePath => DependencyGraphConstants.DependencyGraphFilePath;
+        private string _filePath => Constants.DependencyGraphFilePath;
 
         private bool _isCancelled;
         private EditorUiGroup _uiGroup;
+        
+        public bool InProgress { get; private set; }
 
         public void Start()
         {
+            InProgress = true;
             ResetProgressBar();
             CreateGraph();
         }
@@ -99,12 +102,14 @@ namespace AAGen.Editor.DependencyGraph
         {
             ResetProgressBar();
             AssetChangeDetectorService.ResetChangeCount();
+            InProgress = false;
         }
 
         private void OnFailure(string msg)
         {
             ResetProgressBar();
             Debug.LogError($"Dependency graph isn't created. Reason : {msg}");
+            InProgress = false;
         }
         
         private void AddAssetToGraph(DependencyGraph dependencyGraph, string assetPath)

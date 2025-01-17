@@ -20,21 +20,21 @@ namespace AAGen.Editor.DependencyGraph
         public AddressableGroupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup) 
             : base(dependencyGraph, uiGroup) {}
         
-        private static string _filePath => Path.Combine(DependencyGraphConstants.FolderPath, "GroupLayout.txt");
+        private static string _filePath => Path.Combine(Constants.FolderPath, "GroupLayout.txt");
 
         private EditorJobGroup _sequence;
         private AddressableAssetSettings _addressableSettings; 
         private Dictionary<string, GroupLayoutInfo> _groupLayout;
         private string _result;
         
-        public void Execute()
+        public IEnumerator Execute()
         {
             _sequence = new EditorJobGroup(nameof(AddressableGroupCreator));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
             _sequence.AddJob(new CoroutineJob(LoadGroupLayoutFromFile, nameof(LoadGroupLayoutFromFile)));
             _sequence.AddJob(new CoroutineJob(CreateAddressableGroups, nameof(CreateAddressableGroups)));
             _sequence.AddJob(new ActionJob(DisplayResultsOnUi, nameof(DisplayResultsOnUi)));
-            EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
 
         protected override void Init()
@@ -155,7 +155,8 @@ namespace AAGen.Editor.DependencyGraph
         
         void DisplayResultsOnUi()
         {
-            _uiGroup.OutputText = _result;
+            if (_uiGroup != null)
+                _uiGroup.OutputText = _result;
         }
     }
 }
