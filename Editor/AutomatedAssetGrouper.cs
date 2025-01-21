@@ -3,7 +3,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class AutomatedAssetGrouper : EditorWindow
     {

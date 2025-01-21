@@ -8,7 +8,7 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// A processor that analyzes dependency graph data and diagnoses potential duplicates of addressable assets

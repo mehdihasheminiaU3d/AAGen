@@ -4,7 +4,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor
+namespace AAGen
 {
     /// <summary>
     /// Provides functionality for persisting values in the Unity editor using EditorPrefs.

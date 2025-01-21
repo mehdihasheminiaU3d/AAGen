@@ -8,7 +8,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class PreProcessingFilter : DependencyGraphProcessor 
     {
@@ -28,7 +28,7 @@ namespace AAGen.Editor.DependencyGraph
         
         public IEnumerator SaveIgnoredAssetsToFile()
         {
-            _sequence = new EditorJobGroup(nameof(GraphInfoProcessor));
+            _sequence = new EditorJobGroup(nameof(PreProcessingFilter));
             _sequence.AddJob(new ActionJob(Init, nameof(Init)));
             _sequence.AddJob(new CoroutineJob(IgnoreByInputRules, nameof(IgnoreByInputRules)));
             _sequence.AddJob(new CoroutineJob(IgnoreUnsupportedAssets, nameof(IgnoreUnsupportedAssets)));

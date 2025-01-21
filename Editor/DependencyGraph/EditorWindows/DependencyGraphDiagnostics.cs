@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// An editor window that hosts tools for diagnosing asset inefficiencies based on dependency graph data.

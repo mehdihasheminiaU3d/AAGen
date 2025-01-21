@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     [CreateAssetMenu(menuName = "Dependency Graph/Automated Asset Grouping/" + nameof(AssetNameMergeRule))]
     internal class AssetNameMergeRule : MergeRule

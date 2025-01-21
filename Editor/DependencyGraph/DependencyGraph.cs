@@ -2,7 +2,7 @@
 using AAGen.Runtime;
 using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// A graph that encapsulates asset relationship data.

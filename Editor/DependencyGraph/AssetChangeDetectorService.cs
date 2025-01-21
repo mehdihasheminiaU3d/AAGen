@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Listens to editor events and monitors asset changes (such as importation, deletion, renaming, etc.) and records the number of changes.
@@ -11,7 +11,7 @@ namespace AAGen.Editor.DependencyGraph
     {
         private static EditorPersistentValue<int> _changeCount = new (0, "EPK_AssetChangeStatus");
         public static bool HasChanges => _changeCount.Value > 0;
-        public static bool HasMajorChanges => _changeCount.Value > DependencyGraphSettings.MajorChangeThreshold;
+        public static bool HasMajorChanges => _changeCount.Value > ProjectSettingsProvider.MajorChangeThreshold;
         
         private static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     [CreateAssetMenu(menuName = "Dependency Graph/Automated Asset Grouping/" + nameof(IgnoreTestScenes))]
     internal class IgnoreTestScenes : InputFilterRule

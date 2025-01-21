@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Contains data and logic to merge subgraphs, reducing their overall number and ultimately decreasing the number of addressable groups

@@ -6,7 +6,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal static class DependencyGraphUtil
     {
@@ -143,8 +143,8 @@ namespace AAGen.Editor.DependencyGraph
                 extension.Equals(".asmref", StringComparison.OrdinalIgnoreCase))
                 return true; 
             
-            if (DependencyGraphSettings.DebugMode &&
-                !assetPath.Contains(DependencyGraphSettings.DebugRootFolder, StringComparison.OrdinalIgnoreCase))
+            if (ProjectSettingsProvider.DebugMode &&
+                !assetPath.Contains(ProjectSettingsProvider.DebugRootFolder, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;

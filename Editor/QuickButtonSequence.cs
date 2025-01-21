@@ -3,7 +3,7 @@ using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class QuickButtonSequence
     {

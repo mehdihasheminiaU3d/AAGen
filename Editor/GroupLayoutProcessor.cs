@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class Category : Dictionary<int, SubgraphInfo>
     {

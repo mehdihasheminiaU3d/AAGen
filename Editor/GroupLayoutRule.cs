@@ -1,7 +1,7 @@
 ﻿using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Contains data and logic to create group layouts for a category. If the category is not locked, it also breaks it into smaller chunks.

@@ -4,7 +4,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Generates a dependency graph and stores it on disk.
@@ -37,7 +37,7 @@ namespace AAGen.Editor.DependencyGraph
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             DependencyGraph dependencyGraph = new DependencyGraph();
 
-            var targetFrameTime = DependencyGraphSettings.TargetEditorFrameTime;
+            var targetFrameTime = ProjectSettingsProvider.TargetEditorFrameTime;
 
             for (int i = 0; i < assetPaths.Length; i++)
             {

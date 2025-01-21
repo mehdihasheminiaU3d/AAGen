@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Represents a graph node containing asset data.
@@ -43,7 +43,7 @@ namespace AAGen.Editor.DependencyGraph
         
         public override string ToString()
         {
-            bool isDebug = DependencyGraphSettings.DebugMode;
+            bool isDebug = ProjectSettingsProvider.DebugMode;
             var debugInfo = AssetPath;
             return isDebug ? $"{Guid.ToString()}|{debugInfo}" : Guid.ToString(); 
         }

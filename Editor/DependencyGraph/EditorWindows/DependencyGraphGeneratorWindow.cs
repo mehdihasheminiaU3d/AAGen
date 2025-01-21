@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class DependencyGraphGeneratorWindow : EditorWindow
     {

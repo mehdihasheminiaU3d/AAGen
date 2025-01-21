@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Logic and data to define a rule to filter out unwanted assets

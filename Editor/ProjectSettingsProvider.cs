@@ -3,9 +3,9 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
-    public static class DependencyGraphSettings
+    public static class ProjectSettingsProvider
     {
         [SettingsProvider]
         static SettingsProvider CreateSettingsProvider()

@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class PostProcessScenes : DependencyGraphProcessor
     {

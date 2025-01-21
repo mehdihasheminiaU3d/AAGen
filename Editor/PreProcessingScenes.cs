@@ -5,7 +5,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal class PreProcessingScenes : DependencyGraphProcessor 
     {
@@ -18,7 +18,7 @@ namespace AAGen.Editor.DependencyGraph
         
         public IEnumerator Execute()
         {
-            m_Sequence = new EditorJobGroup(nameof(GraphInfoProcessor));
+            m_Sequence = new EditorJobGroup(nameof(PreProcessingScenes));
             m_Sequence.AddJob(new ActionJob(Init, nameof(Init)));
             m_Sequence.AddJob(new ActionJob(RecordScenesInBuild, nameof(RecordScenesInBuild)));
             m_Sequence.AddJob(new CoroutineJob(SaveToFile, nameof(SaveToFile)));

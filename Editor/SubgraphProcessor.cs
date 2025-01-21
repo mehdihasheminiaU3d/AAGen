@@ -6,7 +6,7 @@ using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     //Nodes of a graph with identical set of sources
     internal class SubgraphInfo

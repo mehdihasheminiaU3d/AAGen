@@ -1,12 +1,11 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     internal static class Constants
     {
         public const string PackageShortName = "AAGen"; 
-        public const string PackageFullName = "Automated Addressable Asset Grouping Tool";
         public const string PackageName = "Automated Addressable Grouping Tool";
 
         public static class Menus
@@ -22,6 +21,11 @@ namespace AAGen.Editor.DependencyGraph
             
             public const int DependencyGraphMenuPriority = 200;
             public const string DependencyGraphRootMenuPath = Root + "Dependency Graph/";
+        }
+
+        public static class ContextMenus
+        {
+            public const string Root = "AAGen/";
         }
 
         public static class FilePaths

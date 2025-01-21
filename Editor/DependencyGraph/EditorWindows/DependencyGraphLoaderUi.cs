@@ -2,7 +2,7 @@
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// A UI group that provides an interface for loading the dependency graph from disk.

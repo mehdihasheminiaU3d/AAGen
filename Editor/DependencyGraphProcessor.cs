@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEditor;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
     /// <summary>
     /// Serves as a base class for graph processors. Graph processors encapsulate functionality to analyze and extract specific
@@ -68,7 +68,7 @@ namespace AAGen.Editor.DependencyGraph
         {
             get
             {
-                if (EditorApplication.timeSinceStartup - _iterationStartTime > DependencyGraphSettings.TargetEditorFrameTime)
+                if (EditorApplication.timeSinceStartup - _iterationStartTime > ProjectSettingsProvider.TargetEditorFrameTime)
                 {
                     _iterationStartTime = EditorApplication.timeSinceStartup;
                     return true;

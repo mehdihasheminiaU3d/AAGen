@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace AAGen.Editor.DependencyGraph
+namespace AAGen
 {
-    [CreateAssetMenu(menuName = "Dependency Graph/Automated Asset Grouping/Settings")]
+    [CreateAssetMenu(menuName = Constants.ContextMenus.Root + "Settings")]
     internal class AagSettings : ScriptableObject
     {
         public List<InputFilterRule> _InputFilterRules;
