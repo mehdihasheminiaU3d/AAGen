@@ -2,7 +2,7 @@
   "name": "com.unity.aagen",
   "version": "0.1.1",
   "displayName": "Automated Addressable Group Generator",
-  "description": "Automates the creation of optimized Addressable Groups based on direct asset dependencies, ensuring a duplicate-free structure for seamless integration across projects.",
+  "description": "AAGen is a Unity Editor tool designed to automatically generate optimized addressable groups based on asset dependencies, simplifying asset management and improving performance.",
   "unity": "2021.3",
   "author": {
     "name": "Mehdi Hasheminia"
