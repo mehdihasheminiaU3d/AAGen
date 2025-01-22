@@ -3,7 +3,7 @@ using System.Linq;
 using AAGen.Shared;
 using UnityEditor;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// Serves as a base class for graph processors. Graph processors encapsulate functionality to analyze and extract specific

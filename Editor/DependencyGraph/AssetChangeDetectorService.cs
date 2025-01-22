@@ -2,7 +2,7 @@
 using AAGen.Shared;
 using UnityEditor;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// Listens to editor events and monitors asset changes (such as importation, deletion, renaming, etc.) and records the number of changes.

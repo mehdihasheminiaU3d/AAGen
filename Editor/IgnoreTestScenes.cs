@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AAGen.AssetDependencies;
 using UnityEngine;
 
 namespace AAGen

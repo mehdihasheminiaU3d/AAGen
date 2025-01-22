@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using AAGen.Shared;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// An editor window that hosts tools for exploring asset dependencies using dependency graph data.

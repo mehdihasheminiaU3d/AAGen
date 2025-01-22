@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AAGen.Runtime;
 using AAGen.Shared;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// A processor that analyzes dependency graph data and extracts useful information from it.

@@ -1,4 +1,5 @@
 ﻿using System;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;

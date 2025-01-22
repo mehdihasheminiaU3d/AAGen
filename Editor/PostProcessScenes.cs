@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AAGen.AssetDependencies;
 using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;

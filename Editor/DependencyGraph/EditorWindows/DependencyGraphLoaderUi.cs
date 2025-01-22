@@ -3,7 +3,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using AAGen.Shared;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// A UI group that provides an interface for loading the dependency graph from disk.

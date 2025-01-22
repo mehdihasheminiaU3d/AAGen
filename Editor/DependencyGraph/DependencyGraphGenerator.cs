@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using AAGen.Shared;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// Generates a dependency graph and stores it on disk.

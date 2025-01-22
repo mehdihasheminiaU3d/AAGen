@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using UnityEditor;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// Represents a graph node containing asset data.
