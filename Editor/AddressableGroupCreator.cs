@@ -52,7 +52,7 @@ namespace AAGen
         
         private IEnumerator LoadGroupLayoutFromFile()
         {
-            yield return DependencyGraphUtil.LoadFromFileAsync<Dictionary<string, GroupLayoutInfo>>(_filePath,
+            yield return FileUtils.LoadFromFileAsync<Dictionary<string, GroupLayoutInfo>>(_filePath,
                 (data) =>
                 {
                     _groupLayout = data;

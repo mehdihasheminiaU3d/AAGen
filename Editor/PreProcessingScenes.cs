@@ -44,7 +44,7 @@ namespace AAGen
         IEnumerator SaveToFile()
         {
             var filePath = Constants.FilePaths.ScenePreprocess;
-            yield return DependencyGraphUtil.SaveToFileAsync(m_ScenesInBuild, filePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(m_ScenesInBuild, filePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($"Failed to save {filePath}!");

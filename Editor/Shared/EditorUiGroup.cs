@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace AAGen
+namespace AAGen.Shared
 {
     /// <summary>
     /// A generic collection of UI components that can be customized using a flag system.

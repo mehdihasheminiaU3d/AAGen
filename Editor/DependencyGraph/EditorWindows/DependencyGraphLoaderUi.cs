@@ -74,7 +74,7 @@ namespace AAGen
             string filePath = Constants.DependencyGraphFilePath;
             _loadingInProgress = true;
             
-            EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.LoadFromFileAsync<DependencyGraph>(filePath,
+            EditorCoroutineUtility.StartCoroutineOwnerless(FileUtils.LoadFromFileAsync<DependencyGraph>(filePath,
                 (dependencyGraph) =>
                 {
                     DependencyGraph = dependencyGraph;

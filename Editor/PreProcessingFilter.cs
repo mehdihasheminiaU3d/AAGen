@@ -144,7 +144,7 @@ namespace AAGen
         
         private IEnumerator SaveToFile()
         {
-            yield return DependencyGraphUtil.SaveToFileAsync(_ignoredAssets, _filePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(_ignoredAssets, _filePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($">>> Failed to save ignored assets!");

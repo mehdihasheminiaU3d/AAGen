@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AAGen.Shared;
 using UnityEditor;
 
 namespace AAGen
@@ -24,19 +25,19 @@ namespace AAGen
 
             foreach (string asset in imported)
             {
-                if (!DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                if (!FileUtils.ShouldIgnoreAsset(asset))
                     currentChanges.Add(asset);
             }
 
             foreach (string asset in deleted)
             {
-                if (!DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                if (!FileUtils.ShouldIgnoreAsset(asset))
                     currentChanges.Add(asset);
             }
 
             foreach (string asset in moved)
             {
-                if (movedFrom.Length > 0 || !DependencyGraphUtil.ShouldIgnoreAsset(asset))
+                if (movedFrom.Length > 0 || !FileUtils.ShouldIgnoreAsset(asset))
                     currentChanges.Add(asset);
             }
 

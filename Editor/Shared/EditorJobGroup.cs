@@ -4,7 +4,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen
+namespace AAGen.Shared
 {
     /// <summary>
     /// A job group for the editor with the ability to display progress.

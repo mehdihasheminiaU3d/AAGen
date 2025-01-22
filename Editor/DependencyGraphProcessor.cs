@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AAGen.Shared;
 using UnityEditor;
 
 namespace AAGen

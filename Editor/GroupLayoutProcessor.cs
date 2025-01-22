@@ -158,7 +158,7 @@ namespace AAGen
         
         private IEnumerator LoadAllSubgraphsFromFile()
         {
-            yield return DependencyGraphUtil.LoadFromFileAsync<Category>(_inputFilePath,
+            yield return FileUtils.LoadFromFileAsync<Category>(_inputFilePath,
                 (data) => { _allSubgraphs = data; });
         }
         
@@ -166,7 +166,7 @@ namespace AAGen
         {
             string ignoredFilePath = Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
         
-            yield return DependencyGraphUtil.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
+            yield return FileUtils.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
                 (data) => { _ignoredAssets = data; });
         }
         
@@ -232,7 +232,7 @@ namespace AAGen
         
         private IEnumerator SaveGroupLayout()
         {
-            yield return DependencyGraphUtil.SaveToFileAsync(_groupLayout, _groupLayoutFilePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(_groupLayout, _groupLayoutFilePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($">>> Failed to save {_groupLayoutFilePath}");

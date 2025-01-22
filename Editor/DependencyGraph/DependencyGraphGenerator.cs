@@ -71,7 +71,7 @@ namespace AAGen
                 return;
             }
 
-            EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.SaveToFileAsync(dependencyGraph,
+            EditorCoroutineUtility.StartCoroutineOwnerless(FileUtils.SaveToFileAsync(dependencyGraph,
                 _filePath, success =>
                 {
                     if (success)
@@ -115,7 +115,7 @@ namespace AAGen
         
         private void AddAssetToGraph(DependencyGraph dependencyGraph, string assetPath)
         {
-            if (DependencyGraphUtil.ShouldIgnoreAsset(assetPath))
+            if (FileUtils.ShouldIgnoreAsset(assetPath))
                 return;
 
             var dependencies = AssetDatabase.GetDependencies(assetPath, false);
@@ -128,7 +128,7 @@ namespace AAGen
 
             foreach (var dependency in dependencies)
             {
-                if (DependencyGraphUtil.ShouldIgnoreAsset(dependency))
+                if (FileUtils.ShouldIgnoreAsset(dependency))
                     continue;
 
                 dependencyGraph.AddEdge(assetPath, dependency);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using AAGen.Runtime;
+using AAGen.Shared;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;

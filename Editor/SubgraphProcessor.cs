@@ -139,7 +139,7 @@ namespace AAGen
         
         private IEnumerator SaveSubgraphsToFile()
         {
-            yield return DependencyGraphUtil.SaveToFileAsync(_allSubgraphs, _filePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(_allSubgraphs, _filePath, (success) =>
             {
                 if (!success)
                     OnError($">>> Subgraphs failed to Save!");
@@ -150,7 +150,7 @@ namespace AAGen
         {
             string ignoredFilePath = Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
         
-            yield return DependencyGraphUtil.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
+            yield return FileUtils.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
                 (data) => { _ignoredAssets = data; });
         }
         
