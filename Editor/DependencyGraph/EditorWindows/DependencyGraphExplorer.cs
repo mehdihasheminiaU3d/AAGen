@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using AAGen.Shared;
 
 namespace AAGen
 {

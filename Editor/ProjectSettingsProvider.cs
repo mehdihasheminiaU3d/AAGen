@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {

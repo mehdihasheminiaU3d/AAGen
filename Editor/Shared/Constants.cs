@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace AAGen
+namespace AAGen.Shared
 {
     internal static class Constants
     {

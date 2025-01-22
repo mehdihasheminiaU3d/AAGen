@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using AAGen.Shared;
 
 namespace AAGen
 {

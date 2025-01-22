@@ -5,6 +5,7 @@ using System.Linq;
 using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {
