@@ -8,14 +8,14 @@ namespace AAGen
     internal class QuickButtonSequence
     {
         AutomatedAssetGrouper m_ParentUi;
-        AagSettings m_Settings;
+        AagenSettings m_Settings;
         
         DependencyGraph m_DependencyGraph;
         EditorJobGroup m_Sequence;
 
         bool m_LoadingInProgress = false;
 
-        public QuickButtonSequence(AagSettings settings,  AutomatedAssetGrouper parentUi)
+        public QuickButtonSequence(AagenSettings settings,  AutomatedAssetGrouper parentUi)
         {
             m_ParentUi = parentUi;
             m_Settings = settings;

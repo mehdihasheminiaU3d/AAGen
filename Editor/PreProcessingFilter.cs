@@ -69,7 +69,7 @@ namespace AAGen
             {
                 var node = allNodes[i];
                 
-                foreach (var inputFilterRule in _parentUi.AagSettings._InputFilterRules)
+                foreach (var inputFilterRule in _parentUi.Settings._InputFilterRules)
                 {
 
                     if (inputFilterRule.IgnoreOnlySourceNodes)
@@ -132,7 +132,7 @@ namespace AAGen
         
         private IEnumerator IgnoreExclusiveDependencies()
         {
-            _result = $"{_ignoredAssets.Count} assets will be ignored by AAG";
+            _result = $"{_ignoredAssets.Count} assets will be ignored by AAGen";
             yield break;
         }
         

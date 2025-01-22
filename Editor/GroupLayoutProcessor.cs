@@ -81,13 +81,13 @@ namespace AAGen
             _sequence.AddJob(new CoroutineJob(CategorizeSubgraphs, nameof(CategorizeSubgraphs)));
             _sequence.AddJob(new ActionJob(PrintCategories, nameof(PrintCategories)));
 
-            foreach (var mergeRule in _parentUi.AagSettings._MergeRules)
+            foreach (var mergeRule in _parentUi.Settings._MergeRules)
             {
                 _sequence.AddJob(new CoroutineJob(() => MoveSubgraphsByRule(mergeRule), mergeRule.GetType().Name));
                 _sequence.AddJob(new ActionJob(PrintCategories, nameof(PrintCategories)));
             }
 
-            foreach (var groupLayoutRule in _parentUi.AagSettings._GroupLayoutRules)
+            foreach (var groupLayoutRule in _parentUi.Settings._GroupLayoutRules)
             {
                 _sequence.AddJob(new CoroutineJob(() => AddToGroupLayoutByRule(groupLayoutRule), nameof(AddToGroupLayoutByRule)));
                 _sequence.AddJob(new CoroutineJob(SaveGroupLayout, nameof(SaveGroupLayout)));

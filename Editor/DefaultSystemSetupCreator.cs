@@ -52,7 +52,7 @@ namespace AAGen
 
         void CreateDefaultToolSettings()
         {
-            if (_parentUi.AagSettings != null)
+            if (_parentUi.Settings != null)
                 return; //the default tool settings already created
             
             EnsureDirectoryExists(DefaultAagenSettingsFolder);
@@ -61,16 +61,16 @@ namespace AAGen
             {
                 AssetDatabase.StartAssetEditing();
                 
-                var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagSettings)}.asset");
-                var aagSettings = ScriptableObject.CreateInstance<AagSettings>();
+                var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagenSettings)}.asset");
+                var settings = ScriptableObject.CreateInstance<AagenSettings>();
                 
-                aagSettings._InputFilterRules = new List<InputFilterRule>
+                settings._InputFilterRules = new List<InputFilterRule>
                 {
                     CreateDefaultInputRule(),
                     CreateHardIgnoreInputRule()
                 };
 
-                aagSettings._MergeRules = new List<MergeRule>
+                settings._MergeRules = new List<MergeRule>
                 {
                     CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedAssets),
                     CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedSingles),
@@ -78,7 +78,7 @@ namespace AAGen
                 };
 
                 var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
-                aagSettings._GroupLayoutRules = new List<GroupLayoutRule>
+                settings._GroupLayoutRules = new List<GroupLayoutRule>
                 {
                     CreateGroupLayoutRule(CategoryId.ExclusiveToSingleSource, defaultGroupTemplate),
                     CreateGroupLayoutRule(CategoryId.Hierarchies, defaultGroupTemplate),
@@ -89,10 +89,10 @@ namespace AAGen
                     CreateGroupLayoutRule(CategoryId.SingleSources, defaultGroupTemplate)
                 };
 
-                AssetDatabase.CreateAsset(aagSettings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting!
+                AssetDatabase.CreateAsset(settings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting!
                 AssetDatabase.SaveAssets();
                 
-                _parentUi.AagSettings = aagSettings;
+                _parentUi.Settings = settings;
             }
             catch (Exception e)
             {
