@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AAGen.AssetDependencies;
 using AAGen.Runtime;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
@@ -9,6 +10,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -34,7 +36,7 @@ namespace AAGen
         {
             string scenePreprocessFilePath = Constants.FilePaths.ScenePreprocess;
 
-            yield return DependencyGraphUtil.LoadFromFileAsync<List<string>>(scenePreprocessFilePath,
+            yield return FileUtils.LoadFromFileAsync<List<string>>(scenePreprocessFilePath,
                 (data) =>
                 {
                     if (data is { Count: > 0 })
@@ -59,7 +61,7 @@ namespace AAGen
             
             var filePath = Constants.FilePaths.DefaultBootScene;
             
-            DependencyGraphUtil.EnsureDirectoryExist(filePath);
+            FileUtils.EnsureDirectoryExist(filePath);
 
             // Step 4: Save the scene to the chosen path
             bool saveResult = EditorSceneManager.SaveScene(newScene, filePath);

@@ -1,7 +1,9 @@
 ﻿using System;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -29,7 +31,7 @@ namespace AAGen
         Vector2 _scrollPosition;
         DependencyGraphLoaderUi _dependencyGraphLoader;
         
-        public AagSettings AagSettings { get; set; }
+        public AagenSettings Settings { get; set; }
         EditorPersistentValue<string> _settingsAssetPath = new (null, "EPK_AAG_SettingsPath");
 
         GUIStyle m_SmallTextStyle;
@@ -49,15 +51,15 @@ namespace AAGen
             var assetPath = _settingsAssetPath.Value;
             if (!string.IsNullOrEmpty(assetPath))
             {
-                AagSettings = AssetDatabase.LoadAssetAtPath<AagSettings>(assetPath);
+                Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(assetPath);
             }
         }
 
         private void OnDisable()
         {
-            if (AagSettings != null)
+            if (Settings != null)
             {
-                string assetPath = AssetDatabase.GetAssetPath(AagSettings);
+                string assetPath = AssetDatabase.GetAssetPath(Settings);
                 _settingsAssetPath.Value = assetPath;
             }
             else
@@ -87,11 +89,11 @@ namespace AAGen
             GUILayout.BeginVertical(k_BoxStyleName);
             GUILayout.Space(k_Space);
 
-            if (AagSettings != null)
+            if (Settings != null)
             {
                 DrawCentered(() =>
                 {
-                    AagSettings = (AagSettings)EditorGUILayout.ObjectField(AagSettings, typeof(AagSettings), false,
+                    Settings = (AagenSettings)EditorGUILayout.ObjectField(Settings, typeof(AagenSettings), false,
                         GUILayout.Width(k_QuickButtonWidth));
                 }, k_QuickButtonWidth);
             }
@@ -102,7 +104,7 @@ namespace AAGen
             {
                 if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
                 {
-                    new QuickButtonSequence(AagSettings,this).Execute();
+                    new QuickButtonSequence(Settings,this).Execute();
                 }
             }, k_QuickButtonWidth);
 
@@ -118,12 +120,12 @@ namespace AAGen
             if (_dependencyGraph == null)
                 return;
 
-            AagSettings = (AagSettings)EditorGUILayout.ObjectField("Settings", AagSettings, typeof(AagSettings), false);
+            Settings = (AagenSettings)EditorGUILayout.ObjectField("Settings", Settings, typeof(AagenSettings), false);
 
             float scrollViewHeight = position.height - GUILayoutUtility.GetLastRect().yMax - 150f; // Y position after top elements
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(scrollViewHeight));
             {
-                if (AagSettings == null)
+                if (Settings == null)
                 {
                     _defaultSettingsUi ??= CreateDefaultSettingsUI();
                     _defaultSettingsUi.OnGUI();

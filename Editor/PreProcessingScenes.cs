@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using AAGen.Runtime;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -43,7 +44,7 @@ namespace AAGen
         IEnumerator SaveToFile()
         {
             var filePath = Constants.FilePaths.ScenePreprocess;
-            yield return DependencyGraphUtil.SaveToFileAsync(m_ScenesInBuild, filePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(m_ScenesInBuild, filePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($"Failed to save {filePath}!");

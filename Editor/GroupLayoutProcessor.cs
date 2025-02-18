@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AAGen.Runtime;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Profiling;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -81,13 +82,13 @@ namespace AAGen
             _sequence.AddJob(new CoroutineJob(CategorizeSubgraphs, nameof(CategorizeSubgraphs)));
             _sequence.AddJob(new ActionJob(PrintCategories, nameof(PrintCategories)));
 
-            foreach (var mergeRule in _parentUi.AagSettings._MergeRules)
+            foreach (var mergeRule in _parentUi.Settings._MergeRules)
             {
                 _sequence.AddJob(new CoroutineJob(() => MoveSubgraphsByRule(mergeRule), mergeRule.GetType().Name));
                 _sequence.AddJob(new ActionJob(PrintCategories, nameof(PrintCategories)));
             }
 
-            foreach (var groupLayoutRule in _parentUi.AagSettings._GroupLayoutRules)
+            foreach (var groupLayoutRule in _parentUi.Settings._GroupLayoutRules)
             {
                 _sequence.AddJob(new CoroutineJob(() => AddToGroupLayoutByRule(groupLayoutRule), nameof(AddToGroupLayoutByRule)));
                 _sequence.AddJob(new CoroutineJob(SaveGroupLayout, nameof(SaveGroupLayout)));
@@ -157,7 +158,7 @@ namespace AAGen
         
         private IEnumerator LoadAllSubgraphsFromFile()
         {
-            yield return DependencyGraphUtil.LoadFromFileAsync<Category>(_inputFilePath,
+            yield return FileUtils.LoadFromFileAsync<Category>(_inputFilePath,
                 (data) => { _allSubgraphs = data; });
         }
         
@@ -165,7 +166,7 @@ namespace AAGen
         {
             string ignoredFilePath = Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
         
-            yield return DependencyGraphUtil.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
+            yield return FileUtils.LoadFromFileAsync<HashSet<AssetNode>>(ignoredFilePath,
                 (data) => { _ignoredAssets = data; });
         }
         
@@ -231,7 +232,7 @@ namespace AAGen
         
         private IEnumerator SaveGroupLayout()
         {
-            yield return DependencyGraphUtil.SaveToFileAsync(_groupLayout, _groupLayoutFilePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(_groupLayout, _groupLayoutFilePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($">>> Failed to save {_groupLayoutFilePath}");

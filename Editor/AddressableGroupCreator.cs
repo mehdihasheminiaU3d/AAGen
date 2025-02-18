@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using AAGen.Runtime;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -51,7 +52,7 @@ namespace AAGen
         
         private IEnumerator LoadGroupLayoutFromFile()
         {
-            yield return DependencyGraphUtil.LoadFromFileAsync<Dictionary<string, GroupLayoutInfo>>(_filePath,
+            yield return FileUtils.LoadFromFileAsync<Dictionary<string, GroupLayoutInfo>>(_filePath,
                 (data) =>
                 {
                     _groupLayout = data;

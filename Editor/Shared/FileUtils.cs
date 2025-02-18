@@ -6,9 +6,9 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace AAGen
+namespace AAGen.Shared
 {
-    internal static class DependencyGraphUtil
+    internal static class FileUtils
     {
         public static void SaveToFile(string filePath, string data)
         {

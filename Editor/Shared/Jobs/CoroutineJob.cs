@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace AAGen.Runtime
+namespace AAGen.Shared
 {
     public class CoroutineJob : IJob
     {

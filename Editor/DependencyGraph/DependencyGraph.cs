@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AAGen.Runtime;
+using AAGen.Shared;
 using UnityEditor;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// A graph that encapsulates asset relationship data.

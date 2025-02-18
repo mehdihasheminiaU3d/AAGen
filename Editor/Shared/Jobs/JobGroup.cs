@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace AAGen.Runtime
+namespace AAGen.Shared
 {
     public abstract class JobGroup : IJob
     {

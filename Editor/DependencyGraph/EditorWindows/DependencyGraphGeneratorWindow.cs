@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
+using AAGen.Shared;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     internal class DependencyGraphGeneratorWindow : EditorWindow
     {

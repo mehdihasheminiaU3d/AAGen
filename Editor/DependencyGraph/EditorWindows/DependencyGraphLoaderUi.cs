@@ -1,8 +1,9 @@
 ﻿using System.IO;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using AAGen.Shared;
 
-namespace AAGen
+namespace AAGen.AssetDependencies
 {
     /// <summary>
     /// A UI group that provides an interface for loading the dependency graph from disk.
@@ -73,7 +74,7 @@ namespace AAGen
             string filePath = Constants.DependencyGraphFilePath;
             _loadingInProgress = true;
             
-            EditorCoroutineUtility.StartCoroutineOwnerless(DependencyGraphUtil.LoadFromFileAsync<DependencyGraph>(filePath,
+            EditorCoroutineUtility.StartCoroutineOwnerless(FileUtils.LoadFromFileAsync<DependencyGraph>(filePath,
                 (dependencyGraph) =>
                 {
                     DependencyGraph = dependencyGraph;

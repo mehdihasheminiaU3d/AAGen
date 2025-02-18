@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using AAGen.AssetDependencies;
+using UnityEngine;
 
 namespace AAGen
 {

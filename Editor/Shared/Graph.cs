@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AAGen.Runtime
+namespace AAGen.Shared
 {
     /// <summary>
     /// Represents a graph structure for managing and processing nodes and edges.

@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AAGen.Runtime;
+using AAGen.AssetDependencies;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using AAGen.Shared;
 
 namespace AAGen
 {
@@ -69,7 +70,7 @@ namespace AAGen
             {
                 var node = allNodes[i];
                 
-                foreach (var inputFilterRule in _parentUi.AagSettings._InputFilterRules)
+                foreach (var inputFilterRule in _parentUi.Settings._InputFilterRules)
                 {
 
                     if (inputFilterRule.IgnoreOnlySourceNodes)
@@ -132,7 +133,7 @@ namespace AAGen
         
         private IEnumerator IgnoreExclusiveDependencies()
         {
-            _result = $"{_ignoredAssets.Count} assets will be ignored by AAG";
+            _result = $"{_ignoredAssets.Count} assets will be ignored by AAGen";
             yield break;
         }
         
@@ -143,7 +144,7 @@ namespace AAGen
         
         private IEnumerator SaveToFile()
         {
-            yield return DependencyGraphUtil.SaveToFileAsync(_ignoredAssets, _filePath, (success) =>
+            yield return FileUtils.SaveToFileAsync(_ignoredAssets, _filePath, (success) =>
             {
                 if(!success)
                     Debug.LogError($">>> Failed to save ignored assets!");
