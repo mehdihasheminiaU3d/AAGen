@@ -19,9 +19,13 @@ When the AAGen window opens, it defaults to Quick Mode, a one-click solution to 
 ## Status
 ⚠️ **Under Development**: This repository is currently in the development phase and not ready for production use.
 
+## Documentation
+- Introductory Guide : [Link](https://docs.google.com/document/d/1EWuvrttQIKcIeIJvLuVkujtJQVETHVSZBYUjIjknP0k/edit?usp=sharing)
+- Comprehensive Guide : [Link](https://docs.google.com/document/d/1zlxPaWpsz85uIXgAWt22gKm0-s3JAUpuQPgtKvNgW7I/edit?usp=sharing)
+- Slides : [Link](https://docs.google.com/presentation/d/1JahSS4w8OH3YEE9U0892XtTAs01BTSP74OpIbsy1lKQ/edit?usp=sharing)
 
 ## Requirements
-- Unity 2021.3 or higher
+- Unity 2021.3 (Not yet tested on Unity 6)
   
 
 ## License
