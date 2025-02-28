@@ -23,7 +23,7 @@ When the AAGen window opens, it defaults to Quick Mode, a one-click solution to 
 
 ## Tested Unity Versions
 - Unity 6 (6000.0)
-- Unity 2021.3  
+- Unity 2022.3  
 
 ## License
 **All Rights Reserved**  
