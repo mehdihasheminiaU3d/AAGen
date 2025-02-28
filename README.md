@@ -12,7 +12,7 @@ To add AAGen to your Unity project:
 
 
 ## Quick Mode
-When the AAGen window opens, it defaults to Quick Mode, a one-click solution to analyze your project and generate addressable groups. To start, press the large action button.
+When the AAGen window opens (Tools > Automated Addressable Grouping Tool), it defaults to Quick Mode, a one-click solution to analyze your project and generate addressable groups. To start, press the large action button.
 
 ![Screenshot 2025-01-17 130756](https://github.com/user-attachments/assets/0d374c4f-6623-4884-94b7-f7a7bc33b5e3)
 
