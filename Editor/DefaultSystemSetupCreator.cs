@@ -13,18 +13,20 @@ namespace AAGen
 {
     internal class DefaultSystemSetupCreator : DependencyGraphProcessor
     {
-        public DefaultSystemSetupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, AutomatedAssetGrouper parentUi) : base(dependencyGraph, uiGroup)
+        public DefaultSystemSetupCreator(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, ISettingsHolderWindow parentUi) : base(dependencyGraph, uiGroup)
         {
             _parentUi = parentUi;
         }
         
-        AutomatedAssetGrouper _parentUi;
+        ISettingsHolderWindow _parentUi;
         public EditorJobGroup _sequence;
         
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
         const string DefaultSettingsName = "AddressableAssetSettings";
         
         const string DefaultAagenSettingsFolder = "Assets/AddressableAssetsData/AAGen/";
+
+        public AagenSettings Settings => _parentUi.Settings;
         
         public void CreateDefaultSettingsFiles()
         {

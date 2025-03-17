@@ -7,7 +7,12 @@ using AAGen.Shared;
 
 namespace AAGen
 {
-    internal class AutomatedAssetGrouper : EditorWindow
+    internal interface ISettingsHolderWindow
+    {
+        AagenSettings Settings { get; set; }
+    }
+    
+    internal class AutomatedAssetGrouper : EditorWindow, ISettingsHolderWindow
     {
         [MenuItem(Constants.Menus.AAGenMenuPath, priority = Constants.Menus.AAGenMenuPriority)]
         public static void ShowWindow()

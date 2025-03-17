@@ -41,7 +41,7 @@ namespace AAGen
     
     internal class GroupLayoutProcessor : DependencyGraphProcessor
     {
-        public GroupLayoutProcessor(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, AutomatedAssetGrouper parentUi)
+        public GroupLayoutProcessor(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, ISettingsHolderWindow parentUi)
             : base(dependencyGraph, uiGroup)
         {
             _parentUi = parentUi;
@@ -51,7 +51,7 @@ namespace AAGen
         private static string _groupLayoutFilePath => Path.Combine(Constants.FolderPath, "GroupLayout.txt");
         
         private EditorJobGroup _sequence;
-        private AutomatedAssetGrouper _parentUi;
+        private ISettingsHolderWindow _parentUi;
         private string _result;
         private DependencyGraph _transposedGraph;
         private HashSet<AssetNode> _ignoredAssets;

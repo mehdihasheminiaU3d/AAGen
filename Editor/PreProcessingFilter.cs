@@ -13,14 +13,14 @@ namespace AAGen
 {
     internal class PreProcessingFilter : DependencyGraphProcessor 
     {
-        public PreProcessingFilter(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, AutomatedAssetGrouper parentUi) : base(dependencyGraph, uiGroup)
+        public PreProcessingFilter(DependencyGraph dependencyGraph, EditorUiGroup uiGroup, ISettingsHolderWindow parentUi) : base(dependencyGraph, uiGroup)
         {
             _parentUi = parentUi;
         }
         
         private static string _filePath => Path.Combine(Constants.FolderPath, "IgnoredAssets.txt");
 
-        private AutomatedAssetGrouper _parentUi;
+        private ISettingsHolderWindow _parentUi;
         private DependencyGraph _transposedGraph;
         private EditorJobGroup _sequence;
         private List<string> _ignoredFolders;
