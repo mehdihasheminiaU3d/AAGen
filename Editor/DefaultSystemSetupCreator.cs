@@ -25,14 +25,19 @@ namespace AAGen
         const string DefaultSettingsName = "AddressableAssetSettings";
         
         const string DefaultAagenSettingsFolder = "Assets/AddressableAssetsData/AAGen/";
-
-        public AagenSettings Settings => _parentUi.Settings;
         
-        public void CreateDefaultSettingsFiles()
+
+        public EditorJobGroup CreateSequence()
         {
             _sequence = new EditorJobGroup(nameof(DefaultSystemSetupCreator));
             _sequence.AddJob(new ActionJob(CreateDefaultAddressableSettings, nameof(CreateDefaultAddressableSettings)));
             _sequence.AddJob(new ActionJob(CreateDefaultToolSettings, nameof(CreateDefaultToolSettings)));
+            return _sequence;
+        }
+        
+        public void CreateDefaultSettingsFiles()
+        {
+            _sequence = CreateSequence();
             EditorCoroutineUtility.StartCoroutineOwnerless(_sequence.Run());
         }
         
@@ -51,6 +56,57 @@ namespace AAGen
             AssetDatabase.Refresh();
             
             Debug.Log("Default addressable assets settings created at: " + DefaultSettingsPath);
+        }
+
+        public void CreateDefaultSettingsFileAtPath(string path)
+        {
+            CreateDefaultAddressableSettings();
+            
+            EnsureDirectoryExists(DefaultAagenSettingsFolder);
+            
+            try
+            {
+                AssetDatabase.StartAssetEditing();
+                
+                var settings = ScriptableObject.CreateInstance<AagenSettings>();
+                
+                settings._InputFilterRules = new List<InputFilterRule>
+                {
+                    CreateDefaultInputRule(),
+                    CreateHardIgnoreInputRule()
+                };
+
+                settings._MergeRules = new List<MergeRule>
+                {
+                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedAssets),
+                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedSingles),
+                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedSingleSinks)
+                };
+
+                var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
+                settings._GroupLayoutRules = new List<GroupLayoutRule>
+                {
+                    CreateGroupLayoutRule(CategoryId.ExclusiveToSingleSource, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.Hierarchies, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.SharedAssets, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.SharedSingles, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.SharedSingleSinks, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.SingleAssets, defaultGroupTemplate),
+                    CreateGroupLayoutRule(CategoryId.SingleSources, defaultGroupTemplate)
+                };
+
+                AssetDatabase.CreateAsset(settings, path); //<--- ToDo: should we notify users about the file overwriting!
+                AssetDatabase.SaveAssets();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.Refresh();
+            }
         }
 
         void CreateDefaultToolSettings()

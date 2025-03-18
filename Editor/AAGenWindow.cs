@@ -63,14 +63,14 @@ namespace AAGen
             GUILayout.BeginVertical(k_BoxStyleName);
             GUILayout.Space(k_Space);
 
-            if (Settings != null)
-            {
+            // if (Settings != null)
+            // {
                 DrawCentered(() =>
                 {
                     Settings = (AagenSettings)EditorGUILayout.ObjectField(Settings, typeof(AagenSettings), false,
                         GUILayout.Width(k_QuickButtonWidth));
                 }, k_QuickButtonWidth);
-            }
+            // }
 
             GUILayout.Space(k_Space);
 
@@ -78,7 +78,7 @@ namespace AAGen
             {
                 if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
                 {
-                    Execute();
+                    EditorCoroutineUtility.StartCoroutineOwnerless(Execute());
                 }
             }, k_QuickButtonWidth);
 
@@ -86,24 +86,51 @@ namespace AAGen
             GUILayout.EndVertical();
         }
         
-        void Execute() 
+        IEnumerator Execute()
         {
+            m_DefaultSystemSetupCreator = new DefaultSystemSetupCreator(m_DependencyGraph, null, this);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(m_DefaultSystemSetupCreator.CreateSequence().Run());
+            //Wait for the settings to be found/created
+            
             var sequence = new EditorJobGroup(nameof(QuickButtonSequence));
-            sequence.AddJob(new ActionJob(AddDefaultSettingsSequence, nameof(AddDefaultSettingsSequence)));
-            sequence.AddJob(new ActionJob(Init, nameof(Init)));
-            sequence.AddJob(new CoroutineJob(GenerateDependencyGraph, nameof(GenerateDependencyGraph)));
+            
+            sequence.AddJob(new ActionJob(Setup, nameof(Setup)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
+                sequence.AddJob(new CoroutineJob(GenerateDependencyGraph, nameof(GenerateDependencyGraph)));
+
             sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
-            sequence.AddJob(new CoroutineJob(PreProcessScenes, nameof(PreProcessScenes)));
-            sequence.AddJob(new CoroutineJob(PreProcess, nameof(PreProcess)));
-            sequence.AddJob(new CoroutineJob(Subgraphs, nameof(Subgraphs)));
-            sequence.AddJob(new CoroutineJob(GroupLayout, nameof(GroupLayout)));
-            sequence.AddJob(new CoroutineJob(AddressableGroup, nameof(AddressableGroup)));
-            sequence.AddJob(new CoroutineJob(PostProcessScenes, nameof(PostProcessScenes)));
-            sequence.AddJob(new CoroutineJob(PostProcess, nameof(PostProcess)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.RemoveScenesFromBuildProfile))
+                sequence.AddJob(new CoroutineJob(RemoveScenesFromBuildProfile, nameof(RemoveScenesFromBuildProfile)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetIntakeFilter))
+                sequence.AddJob(new CoroutineJob(GenerateIntakeFilter, nameof(GenerateIntakeFilter)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateSubGraphs))
+                sequence.AddJob(new CoroutineJob(GenerateSubgraphs, nameof(GenerateSubgraphs)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateGroupLayout))
+                sequence.AddJob(new CoroutineJob(GenerateGroupLayout, nameof(GenerateGroupLayout)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateAddressableGroups))
+                sequence.AddJob(new CoroutineJob(GenerateAddressableGroup, nameof(GenerateAddressableGroup)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.RemoveScenesFromBuildProfile))
+                sequence.AddJob(new CoroutineJob(AddAndSetupBootScene, nameof(AddAndSetupBootScene)));
+
+            if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
+                sequence.AddJob(new CoroutineJob(Cleanup, nameof(Cleanup)));
+            
+            sequence.AddJob(new ActionJob(TearDown, nameof(TearDown)));
             EditorCoroutineUtility.StartCoroutineOwnerless(sequence.Run());
         }
         
-        void Init()
+        void Setup()
+        {
+        }
+
+        void TearDown()
         {
         }
         
@@ -111,6 +138,7 @@ namespace AAGen
         {
             m_DefaultSystemSetupCreator = new DefaultSystemSetupCreator(m_DependencyGraph, null, this);
             m_DefaultSystemSetupCreator.CreateDefaultSettingsFiles();
+            Log(LogLevelID.Info, $"{nameof(AddDefaultSettingsSequence)} Completed");
         }
 
         IEnumerator GenerateDependencyGraph()
@@ -118,6 +146,7 @@ namespace AAGen
             var dependencyGraphGenerator = new DependencyGraphGenerator();
             dependencyGraphGenerator.Start();
             yield return new WaitUntil(() => !dependencyGraphGenerator.InProgress);
+            Log(LogLevelID.Info, $"{nameof(GenerateDependencyGraph)} Completed");
         }
         
         IEnumerator LoadDependencyGraph()
@@ -134,49 +163,57 @@ namespace AAGen
                 {
                     m_DependencyGraph = dependencyGraph;
                     m_LoadingInProgress = false;
+                    Log(LogLevelID.Info, $"{nameof(LoadDependencyGraph)} Completed");
                 }));
         }
         
-        IEnumerator PreProcessScenes()
+        IEnumerator RemoveScenesFromBuildProfile()
         {
             var preProcessing = new PreProcessingScenes(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessing.Execute());
+            Log(LogLevelID.Info, $"{nameof(RemoveScenesFromBuildProfile)} Completed");
         }
         
-        IEnumerator PreProcess()
+        IEnumerator GenerateIntakeFilter()
         {
             var preProcessingFilter = new PreProcessingFilter(m_DependencyGraph, null, this);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessingFilter.SaveIgnoredAssetsToFile());
+            Log(LogLevelID.Info, $"{nameof(GenerateIntakeFilter)} Completed");
         }
 
-        IEnumerator Subgraphs()
+        IEnumerator GenerateSubgraphs()
         {
             var subgraphProcessor = new SubgraphProcessor(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(subgraphProcessor.Execute());
+            Log(LogLevelID.Info, $"{nameof(GenerateSubgraphs)} Completed");
         }
 
-        IEnumerator GroupLayout()
+        IEnumerator GenerateGroupLayout()
         {
             var groupLayoutProcessor = new GroupLayoutProcessor(m_DependencyGraph, null, this);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(groupLayoutProcessor.Execute());
+            Log(LogLevelID.Info, $"{nameof(GenerateGroupLayout)} Completed");
         }
 
-        IEnumerator AddressableGroup()
+        IEnumerator GenerateAddressableGroup()
         {
             var processor = new AddressableGroupCreator(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
+            Log(LogLevelID.Info, $"{nameof(GenerateAddressableGroup)} Completed");
         }
         
-        IEnumerator PostProcessScenes()
+        IEnumerator AddAndSetupBootScene()
         {
             var processor = new PostProcessScenes(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
+            Log(LogLevelID.Info, $"{nameof(AddAndSetupBootScene)} Completed");
         }
         
-        IEnumerator PostProcess()
+        IEnumerator Cleanup()
         {
             var processor = new PostProcessor(m_DependencyGraph, null);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
+            Log(LogLevelID.Info, $"{nameof(Cleanup)} Completed");
         }
         
         /// <summary>
@@ -195,6 +232,20 @@ namespace AAGen
     
             GUILayout.Space(padding);
             GUILayout.EndHorizontal();
+        }
+
+        void Log(LogLevelID logLevel, string message)
+        {
+            if (logLevel == LogLevelID.OnlyErrors)
+            {
+                Debug.LogError($"{GetType().Name}: {message}");
+                return;
+            }
+
+            if (logLevel <= Settings.LogLevel)
+            {
+                Debug.Log($"{GetType().Name}: {message}");
+            }
         }
     }
 }

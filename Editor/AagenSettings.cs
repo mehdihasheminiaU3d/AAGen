@@ -6,35 +6,42 @@ using AAGen.Shared;
 namespace AAGen
 {
     [Flags]
-    public enum ProcessingStepId
+    public enum ProcessingStepID
     {
         GenerateDependencyGraph = 1 << 0,
-        RemoveBuildProfileScenes = 1 << 1,
+        RemoveScenesFromBuildProfile = 1 << 1,
         AssetIntakeFilter = 1 << 2,
         GenerateSubGraphs = 1 << 3,
         GenerateGroupLayout = 1 << 4,
-        Cleanup = 1 << 5
+        GenerateAddressableGroups = 1 << 5,
+        Cleanup = 1 << 6
     }
 
-    public enum LogLevel
+    public enum LogLevelID
     {
-        Error,
-        Developer,
+        OnlyErrors = 0,  //Only unexpected errors
+        Info       = 1,  //Detailed informational messages
+        Developer  = 2   //Extremely detailed messages
     }
 
     [CreateAssetMenu(menuName = Constants.ContextMenus.Root + "Settings")]
     internal class AagenSettings : ScriptableObject
     {
+        [Header("Process")]
         [SerializeField]
-        ProcessingStepId m_ProcessingSteps = (ProcessingStepId)~0;
-
-        public LogLevel m_LogLevel;
-
-        public bool m_RunInBackground;
-        
-        [Space]
+        ProcessingStepID m_ProcessingSteps = (ProcessingStepID)~0;
+        [SerializeField]
+        bool m_RunInBackground;
+        [Header("Rules")]
         public List<InputFilterRule> _InputFilterRules;
         public List<MergeRule> _MergeRules;
         public List<GroupLayoutRule> _GroupLayoutRules;
+        [Space]
+        [SerializeField]
+        LogLevelID m_LogLevel = LogLevelID.OnlyErrors;
+
+        public ProcessingStepID ProcessingSteps => m_ProcessingSteps;
+        public LogLevelID LogLevel => m_LogLevel;
+        public bool RunInBackground => m_RunInBackground;
     }
 }
