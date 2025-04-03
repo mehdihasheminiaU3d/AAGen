@@ -78,7 +78,8 @@ namespace AAGen
             {
                 if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
                 {
-                    EditorCoroutineUtility.StartCoroutineOwnerless(Execute());
+                    // EditorCoroutineUtility.StartCoroutineOwnerless(Execute());
+                    ExecuteBlocking();
                 }
             }, k_QuickButtonWidth);
 
@@ -125,7 +126,43 @@ namespace AAGen
             sequence.AddJob(new ActionJob(TearDown, nameof(TearDown)));
             EditorCoroutineUtility.StartCoroutineOwnerless(sequence.Run());
         }
+
+        // NodeProcessor m_NodeProcessor;
+        // void PrepareBlocking()
+        // {
+        //     var root = new SampleNode("Start") { Name = "Root" };
+        //     var child1 = new SampleNode("Hello") { Name = "Child1" };
+        //     var child2 = new SampleNode("World") { Name = "Child2" };
+        //     var child3 = new SampleNode("End") { Name = "Child3" }; //<---Check if you can convert to this system
+        //
+        //     root.AddChild(child1);
+        //     root.AddChild(child2);
+        //     child2.AddChild(child3);
+        //
+        //     m_NodeProcessor = new NodeProcessor();
+        //     m_NodeProcessor.SetRoot(root);
+        // }
         
+        void ExecuteBlocking()
+        {
+            // PrepareBlocking();
+            var defaultSystemSetupCreatorProcessor = new DefaultSystemSetupCreatorProcessor();
+            defaultSystemSetupCreatorProcessor.Init();
+            
+            int progress = 0;
+            int count = defaultSystemSetupCreatorProcessor.RemainingProcessCount;
+            while (defaultSystemSetupCreatorProcessor.RemainingProcessCount > 0)
+            {
+                if (EditorUtility.DisplayCancelableProgressBar("Cancelable", "Doing some work...", (float)progress / count))
+                    break;
+                
+                defaultSystemSetupCreatorProcessor.Process();
+                progress++;
+            }
+
+            EditorUtility.ClearProgressBar();
+        }
+
         void Setup()
         {
         }
