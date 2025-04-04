@@ -127,36 +127,37 @@ namespace AAGen
             EditorCoroutineUtility.StartCoroutineOwnerless(sequence.Run());
         }
 
-        // NodeProcessor m_NodeProcessor;
-        // void PrepareBlocking()
-        // {
-        //     var root = new SampleNode("Start") { Name = "Root" };
-        //     var child1 = new SampleNode("Hello") { Name = "Child1" };
-        //     var child2 = new SampleNode("World") { Name = "Child2" };
-        //     var child3 = new SampleNode("End") { Name = "Child3" }; //<---Check if you can convert to this system
-        //
-        //     root.AddChild(child1);
-        //     root.AddChild(child2);
-        //     child2.AddChild(child3);
-        //
-        //     m_NodeProcessor = new NodeProcessor();
-        //     m_NodeProcessor.SetRoot(root);
-        // }
+        DataContainer m_DataContainer = new DataContainer();
         
         void ExecuteBlocking()
         {
-            // PrepareBlocking();
-            var defaultSystemSetupCreatorProcessor = new DefaultSystemSetupCreatorProcessor();
-            defaultSystemSetupCreatorProcessor.Init();
+            var mainProcessor = new NodeProcessor();
+            var root = new SampleNode("Root");
+            {
+                root.AddChild(new DefaultSystemSetupCreatorProcessor().Root);
+                root.AddChild(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
+                // root.AddChild(new SampleNode("LoadDependencyGraph"));
+                // root.AddChild(new SampleNode("RemoveScenesFromBuildProfile"));
+                // root.AddChild(new SampleNode("GenerateIntakeFilter"));
+                // root.AddChild(new SampleNode("GenerateSubgraphs"));
+                // root.AddChild(new SampleNode("GenerateGroupLayout"));
+                // root.AddChild(new SampleNode("GenerateAddressableGroup"));
+                // root.AddChild(new SampleNode("AddAndSetupBootScene"));
+                // root.AddChild(new SampleNode("Cleanup"));
+            }
+            mainProcessor.SetRoot(root);
+
+            var progressBarTitle = "AAGen";
+            var progressBarInfo = "Processing Assets...";
             
             int progress = 0;
-            int count = defaultSystemSetupCreatorProcessor.RemainingProcessCount;
-            while (defaultSystemSetupCreatorProcessor.RemainingProcessCount > 0)
+            int count = mainProcessor.RemainingProcessCount;
+            while (mainProcessor.RemainingProcessCount > 0)
             {
-                if (EditorUtility.DisplayCancelableProgressBar("Cancelable", "Doing some work...", (float)progress / count))
+                if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
                     break;
                 
-                defaultSystemSetupCreatorProcessor.Process();
+                mainProcessor.UpdateProcess();
                 progress++;
             }
 

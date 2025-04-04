@@ -7,7 +7,7 @@ namespace AAGen.AssetDependencies
     /// <summary>
     /// A graph that encapsulates asset relationship data.
     /// </summary>
-    internal class DependencyGraph : Graph<AssetNode>
+    public class DependencyGraph : Graph<AssetNode>
     {
         public DependencyGraph() {}
 

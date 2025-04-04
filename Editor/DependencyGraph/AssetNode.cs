@@ -11,7 +11,7 @@ namespace AAGen.AssetDependencies
     /// </summary>
     [Serializable]
     [TypeConverter(typeof(AssetNodeTypeConverter))]
-    internal class AssetNode : IEquatable<AssetNode>
+    public class AssetNode : IEquatable<AssetNode>
     {
         public AssetNode(GUID guid) //no default ctor since it has no meaning without guid
         {

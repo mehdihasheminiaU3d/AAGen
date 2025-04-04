@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using AAGen.AssetDependencies;
 using UnityEngine;
 
 namespace AAGen
@@ -39,14 +40,22 @@ namespace AAGen
     public class NodeProcessor 
     {
         Queue<ProcessingNode> m_ProcessingQueue = new Queue<ProcessingNode>();
+        ProcessingNode m_Root;
 
         public void SetRoot(ProcessingNode root)
         {
+            if (root == null)
+            {
+                Debug.LogError($"Root node cannot be null!");
+                return;
+            }
+            
+            m_Root = root;
             m_ProcessingQueue.Clear();
             EnqueueRecursive(root);
         }
 
-        private void EnqueueRecursive(ProcessingNode node)
+        void EnqueueRecursive(ProcessingNode node)
         {
             if (node == null) return;
 
@@ -54,10 +63,12 @@ namespace AAGen
             foreach (var child in node.Children)
                 EnqueueRecursive(child);
         }
-
+        
         public int RemainingProcessCount => m_ProcessingQueue.Count;
 
-        public void Process()
+        public ProcessingNode Root => m_Root;
+
+        public void UpdateProcess()
         {
             var currentUnit = m_ProcessingQueue.Dequeue();
             currentUnit.Process();
@@ -78,5 +89,10 @@ namespace AAGen
         {
             m_Action?.Invoke();
         }
+    }
+
+    public class DataContainer
+    {
+        public DependencyGraph m_DependencyGraph;
     }
 }

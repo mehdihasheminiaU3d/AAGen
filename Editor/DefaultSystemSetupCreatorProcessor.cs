@@ -2,7 +2,7 @@ namespace AAGen
 {
     internal class DefaultSystemSetupCreatorProcessor : NodeProcessor
     {
-        public void Init()
+        public DefaultSystemSetupCreatorProcessor()
         {
             var defaultSetupCreator = new DefaultSetupCreatorCore();
             
