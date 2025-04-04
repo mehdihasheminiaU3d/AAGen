@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class DefaultSetupCreator 
+    internal class DefaultSetupCreatorCore 
     {
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
         const string DefaultSettingsName = "AddressableAssetSettings";

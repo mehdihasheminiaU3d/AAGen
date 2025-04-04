@@ -4,7 +4,7 @@ namespace AAGen
     {
         public void Init()
         {
-            var defaultSetupCreator = new DefaultSetupCreator();
+            var defaultSetupCreator = new DefaultSetupCreatorCore();
             
             var root = new ProcessingUnit(null) { Name = "Root" };
             var child1 = new ProcessingUnit(defaultSetupCreator.CreateDefaultAddressableSettings) { Name = "CreateDefaultAddressableSettings" };

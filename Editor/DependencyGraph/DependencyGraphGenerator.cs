@@ -33,6 +33,8 @@ namespace AAGen.AssetDependencies
 
         private void CreateGraph()
         {
+            //<----Continue adding core + processor to the end and test the system
+            
             StartProgressBar("Generate Dependency Graph");
 
             var assetPaths = AssetDatabase.GetAllAssetPaths();
