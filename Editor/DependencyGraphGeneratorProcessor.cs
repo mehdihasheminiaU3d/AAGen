@@ -6,36 +6,27 @@ namespace AAGen
 {
     internal class DependencyGraphGeneratorProcessor : NodeProcessor
     {
+        DataContainer m_DataContainer;
+        
         public DependencyGraphGeneratorProcessor(DataContainer dataContainer)
         {
-            dataContainer.m_DependencyGraph = new DependencyGraph();
+            m_DataContainer = dataContainer;
+            m_DataContainer.m_DependencyGraph = new DependencyGraph();
             
             var root = new ProcessingUnit(null) { Name = "Root" };
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
             {
-                root.AddChild(new AssetProcessingUnit(dataContainer.m_DependencyGraph, assetPath));
+                root.AddChild(new ProcessingUnit(() => AddAssetToDependencyGraph(assetPath)));
             }
             
             SetRoot(root); 
         }
-    }
-    
-    public class AssetProcessingUnit : ProcessingNode
-    {
-        readonly DependencyGraph m_DependencyGraph;
-        readonly string m_AssetPath;
 
-        public AssetProcessingUnit(DependencyGraph dependencyGraph, string assetPath)
+        void AddAssetToDependencyGraph(string assetPath)
         {
-            m_DependencyGraph = dependencyGraph;
-            m_AssetPath = assetPath;
-        }
-
-        protected override void OnProcess()
-        {
-            DependencyGraphGeneratorCore.AddAssetToGraph(m_DependencyGraph, m_AssetPath);
+            DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.m_DependencyGraph, assetPath);
         }
     }
 }

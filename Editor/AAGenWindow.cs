@@ -166,6 +166,8 @@ namespace AAGen
             EditorUtility.ClearProgressBar();
             
             //----------------------------------------------( Phase 2 )-------------------------------------------------
+            // Even for creating the processing jobs and before doing any actual processing, we need the dependency graph.
+            // So we have to do things in two pahses. First preparations and generation of the dependency graph and then processing.
             
             var groupingGraphProcessor = new NodeProcessor();
             var groupingRoot = new SampleNode("Dependency Graph Root");
