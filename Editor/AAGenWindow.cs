@@ -53,6 +53,11 @@ namespace AAGen
             }
         }
 
+        void LoadSettingsFile()
+        {
+            Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(m_DataContainer.SettingsFilePath);
+        }
+
         void OnGUI()
         {
             DrawQuickContainer();
@@ -127,37 +132,64 @@ namespace AAGen
             EditorCoroutineUtility.StartCoroutineOwnerless(sequence.Run());
         }
 
-        DataContainer m_DataContainer = new DataContainer();
+        DataContainer m_DataContainer;
         
         void ExecuteBlocking()
         {
-            var mainProcessor = new NodeProcessor();
-            var root = new SampleNode("Root");
+            m_DataContainer = new DataContainer();
+            
+            var dependencyGraphProcessor = new NodeProcessor();
+            var dependencyGraphRoot = new SampleNode("Dependency Graph Root");
             {
-                root.AddChild(new DefaultSystemSetupCreatorProcessor().Root);
-                root.AddChild(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
+                dependencyGraphRoot.AddChild(new DefaultSystemSetupCreatorProcessor(m_DataContainer).Root);
+                dependencyGraphRoot.AddChild(new ProcessingUnit(LoadSettingsFile));
+                dependencyGraphRoot.AddChild(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
                 // root.AddChild(new SampleNode("LoadDependencyGraph"));
                 // root.AddChild(new SampleNode("RemoveScenesFromBuildProfile"));
-                // root.AddChild(new SampleNode("GenerateIntakeFilter"));
-                // root.AddChild(new SampleNode("GenerateSubgraphs"));
-                // root.AddChild(new SampleNode("GenerateGroupLayout"));
-                // root.AddChild(new SampleNode("GenerateAddressableGroup"));
-                // root.AddChild(new SampleNode("AddAndSetupBootScene"));
-                // root.AddChild(new SampleNode("Cleanup"));
             }
-            mainProcessor.SetRoot(root);
+            dependencyGraphProcessor.SetRoot(dependencyGraphRoot);
 
-            var progressBarTitle = "AAGen";
+            var progressBarTitle = "Dependency Graph 1/2";
             var progressBarInfo = "Processing Assets...";
             
             int progress = 0;
-            int count = mainProcessor.RemainingProcessCount;
-            while (mainProcessor.RemainingProcessCount > 0)
+            int count = dependencyGraphProcessor.RemainingProcessCount;
+            while (dependencyGraphProcessor.RemainingProcessCount > 0)
             {
                 if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
                     break;
                 
-                mainProcessor.UpdateProcess();
+                dependencyGraphProcessor.UpdateProcess();
+                progress++;
+            }
+
+            EditorUtility.ClearProgressBar();
+            
+            //----------------------------------------------( Phase 2 )-------------------------------------------------
+            
+            var groupingGraphProcessor = new NodeProcessor();
+            var groupingRoot = new SampleNode("Dependency Graph Root");
+            {
+                groupingRoot.AddChild(new IntakeFilterProcessor(m_DataContainer).Root);
+                // groupingRoot.AddChild(new SampleNode("GenerateSubgraphs"));
+                // groupingRoot.AddChild(new SampleNode("GenerateGroupLayout"));
+                // groupingRoot.AddChild(new SampleNode("GenerateAddressableGroup"));
+                // groupingRoot.AddChild(new SampleNode("AddAndSetupBootScene"));
+                // groupingRoot.AddChild(new SampleNode("Cleanup"));
+            }
+            groupingGraphProcessor.SetRoot(groupingRoot);
+
+            progressBarTitle = "Grouping 2/2";
+            progressBarInfo = "Processing Assets...";
+            
+            progress = 0;
+            count = groupingGraphProcessor.RemainingProcessCount;
+            while (groupingGraphProcessor.RemainingProcessCount > 0)
+            {
+                if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
+                    break;
+                
+                groupingGraphProcessor.UpdateProcess();
                 progress++;
             }
 

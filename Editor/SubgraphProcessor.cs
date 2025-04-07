@@ -10,7 +10,7 @@ using AAGen.Shared;
 namespace AAGen
 {
     //Nodes of a graph with identical set of sources
-    internal class SubgraphInfo
+    public class SubgraphInfo
     {
         public bool IsShared; 
         public HashSet<AssetNode> Nodes = new HashSet<AssetNode>();

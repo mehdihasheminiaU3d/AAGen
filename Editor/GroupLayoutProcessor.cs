@@ -28,7 +28,7 @@ namespace AAGen
         public List<AssetNode> Nodes = new List<AssetNode>();
     }
 
-    internal enum CategoryId
+    public enum CategoryId
     {
         Hierarchies,
         SingleAssets,

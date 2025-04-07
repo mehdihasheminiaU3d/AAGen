@@ -6,7 +6,7 @@ namespace AAGen
     /// <summary>
     /// Contains data and logic to merge subgraphs, reducing their overall number and ultimately decreasing the number of addressable groups
     /// </summary>
-    internal abstract class MergeRule : ScriptableObject
+    public abstract class MergeRule : ScriptableObject
     {
         [SerializeField]
         public CategoryId _OriginCategory;

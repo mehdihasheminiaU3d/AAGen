@@ -6,7 +6,7 @@ namespace AAGen
     /// <summary>
     /// Contains data and logic to create group layouts for a category. If the category is not locked, it also breaks it into smaller chunks.
     /// </summary>
-    internal abstract class GroupLayoutRule : ScriptableObject
+    public abstract class GroupLayoutRule : ScriptableObject
     {
         [SerializeField,
         Tooltip("The category to which this rule applies")]

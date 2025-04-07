@@ -94,5 +94,10 @@ namespace AAGen
     public class DataContainer
     {
         public DependencyGraph m_DependencyGraph;
+
+        public string SettingsFilePath;
+        public AagenSettings Settings;
+
+        public HashSet<AssetNode> IgnoredAssets;
     }
 }

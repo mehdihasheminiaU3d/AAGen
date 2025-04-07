@@ -25,7 +25,7 @@ namespace AAGen
     }
 
     [CreateAssetMenu(menuName = Constants.ContextMenus.Root + "Settings")]
-    internal class AagenSettings : ScriptableObject
+    public class AagenSettings : ScriptableObject
     {
         [Header("Process")]
         [SerializeField]
