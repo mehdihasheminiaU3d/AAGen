@@ -94,10 +94,14 @@ namespace AAGen
     public class DataContainer
     {
         public DependencyGraph m_DependencyGraph;
+        public DependencyGraph m_TransposedGraph;
 
         public string SettingsFilePath;
         public AagenSettings Settings;
 
         public HashSet<AssetNode> IgnoredAssets;
+
+        public Category _allSubgraphs;
+        public Dictionary<int, HashSet<AssetNode>> _subgraphSources;
     }
 }

@@ -11,7 +11,7 @@ namespace AAGen
         {
             m_DataContainer = dataContainer;
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
-            m_TransposedGraph = new DependencyGraph(dataContainer.m_DependencyGraph.GetTransposedGraph());
+            
             
             var root = new ProcessingUnit(null) { Name = "Root" };
             
@@ -21,7 +21,7 @@ namespace AAGen
             SetRoot(root);
         }
         
-        DependencyGraph m_TransposedGraph;
+        
         DataContainer m_DataContainer;
         
         //---------------------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace AAGen
         
         bool IsSource(AssetNode node)
         {
-            return m_TransposedGraph.GetNeighbors(node).Count == 0;
+            return m_DataContainer.m_TransposedGraph.GetNeighbors(node).Count == 0;
         }
         
         //----------------------------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@ namespace AAGen
             {
                 root.AddChild(new ProcessingUnit(() => AddAssetToDependencyGraph(assetPath)));
             }
+            root.AddChild(new ProcessingUnit(CalculateTransposedGraph));
             
             SetRoot(root); 
         }
@@ -27,6 +28,11 @@ namespace AAGen
         void AddAssetToDependencyGraph(string assetPath)
         {
             DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.m_DependencyGraph, assetPath);
+        }
+
+        void CalculateTransposedGraph()
+        {
+            m_DataContainer.m_TransposedGraph = new DependencyGraph(m_DataContainer.m_DependencyGraph.GetTransposedGraph());
         }
     }
 }

@@ -154,26 +154,38 @@ namespace AAGen
             
             int progress = 0;
             int count = dependencyGraphProcessor.RemainingProcessCount;
-            while (dependencyGraphProcessor.RemainingProcessCount > 0)
-            {
-                if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
-                    break;
-                
-                dependencyGraphProcessor.UpdateProcess();
-                progress++;
-            }
 
-            EditorUtility.ClearProgressBar();
+            try
+            {
+                while (dependencyGraphProcessor.RemainingProcessCount > 0)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo,
+                            (float)progress / count))
+                        break;
+
+                    dependencyGraphProcessor.UpdateProcess();
+                    progress++;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
             
             //----------------------------------------------( Phase 2 )-------------------------------------------------
             // Even for creating the processing jobs and before doing any actual processing, we need the dependency graph.
-            // So we have to do things in two pahses. First preparations and generation of the dependency graph and then processing.
+            // So we have to do things in two phases. First preparations and generation of the dependency graph and then processing.
             
             var groupingGraphProcessor = new NodeProcessor();
             var groupingRoot = new SampleNode("Dependency Graph Root");
             {
                 groupingRoot.AddChild(new IntakeFilterProcessor(m_DataContainer).Root);
-                // groupingRoot.AddChild(new SampleNode("GenerateSubgraphs"));
+                groupingRoot.AddChild(new SubgraphNodeProcessor(m_DataContainer).Root);
                 // groupingRoot.AddChild(new SampleNode("GenerateGroupLayout"));
                 // groupingRoot.AddChild(new SampleNode("GenerateAddressableGroup"));
                 // groupingRoot.AddChild(new SampleNode("AddAndSetupBootScene"));
@@ -186,16 +198,27 @@ namespace AAGen
             
             progress = 0;
             count = groupingGraphProcessor.RemainingProcessCount;
-            while (groupingGraphProcessor.RemainingProcessCount > 0)
+            
+            try
             {
-                if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
-                    break;
+                while (groupingGraphProcessor.RemainingProcessCount > 0)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
+                        break;
                 
-                groupingGraphProcessor.UpdateProcess();
-                progress++;
+                    groupingGraphProcessor.UpdateProcess();
+                    progress++;
+                }
             }
-
-            EditorUtility.ClearProgressBar();
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
         }
 
         void Setup()
