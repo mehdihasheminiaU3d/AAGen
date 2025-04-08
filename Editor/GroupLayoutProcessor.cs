@@ -22,7 +22,7 @@ namespace AAGen
     }
     
     [Serializable]
-    internal class GroupLayoutInfo
+    public class GroupLayoutInfo
     {
         public string TemplateName;
         public List<AssetNode> Nodes = new List<AssetNode>();

@@ -10,7 +10,6 @@ namespace AAGen
         public SubgraphNodeProcessor(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
-            m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             
             var root = new ProcessingUnit(null) { Name = "Root" };
             

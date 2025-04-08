@@ -103,5 +103,7 @@ namespace AAGen
 
         public Category _allSubgraphs;
         public Dictionary<int, HashSet<AssetNode>> _subgraphSources;
+
+        public Dictionary<string, GroupLayoutInfo> _groupLayout;
     }
 }

@@ -141,7 +141,7 @@ namespace AAGen
             var dependencyGraphProcessor = new NodeProcessor();
             var dependencyGraphRoot = new SampleNode("Dependency Graph Root");
             {
-                dependencyGraphRoot.AddChild(new DefaultSystemSetupCreatorProcessor(m_DataContainer).Root);
+                dependencyGraphRoot.AddChild(new DefaultSystemSetupCreatorProcessor(m_DataContainer).Root); 
                 dependencyGraphRoot.AddChild(new ProcessingUnit(LoadSettingsFile));
                 dependencyGraphRoot.AddChild(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
                 // root.AddChild(new SampleNode("LoadDependencyGraph"));
@@ -177,6 +177,8 @@ namespace AAGen
                 EditorUtility.ClearProgressBar();
             }
             
+            //Do the same for all of them. All need their own progress
+            
             //----------------------------------------------( Phase 2 )-------------------------------------------------
             // Even for creating the processing jobs and before doing any actual processing, we need the dependency graph.
             // So we have to do things in two phases. First preparations and generation of the dependency graph and then processing.
@@ -186,7 +188,7 @@ namespace AAGen
             {
                 groupingRoot.AddChild(new IntakeFilterProcessor(m_DataContainer).Root);
                 groupingRoot.AddChild(new SubgraphNodeProcessor(m_DataContainer).Root);
-                // groupingRoot.AddChild(new SampleNode("GenerateGroupLayout"));
+                groupingRoot.AddChild(new GroupLayoutNodeProcessor(m_DataContainer).Root); //<-- No refinement for group layouts
                 // groupingRoot.AddChild(new SampleNode("GenerateAddressableGroup"));
                 // groupingRoot.AddChild(new SampleNode("AddAndSetupBootScene"));
                 // groupingRoot.AddChild(new SampleNode("Cleanup"));
