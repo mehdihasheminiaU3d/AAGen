@@ -1,24 +1,19 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AAGen.AssetDependencies;
-using AAGen.Shared;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace AAGen
 {
-    internal class GroupLayoutNodeProcessor : NodeProcessor
+    internal class GroupLayoutCommandProcessor : CommandProcessor
     {
-        public GroupLayoutNodeProcessor(DataContainer dataContainer)
+        public GroupLayoutCommandProcessor(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             
             m_DataContainer._groupLayout = new Dictionary<string, GroupLayoutInfo>();
             
-            var root = new ProcessingUnit(null) { Name = "root" };
             
             //one subgraph maps to one group
             foreach (var pair in m_DataContainer._allSubgraphs)
@@ -26,10 +21,10 @@ namespace AAGen
                 var hash = pair.Key;
                 var subgraph = pair.Value;
                 var templateName = m_DataContainer.Settings._GroupLayoutRules[0].TemplateName; //<--------only one for now
-                root.AddChild(new ProcessingUnit(() => CreateGroupLayout(hash, subgraph, templateName)));
+                AddCommand(new ProcessingUnit(() => CreateGroupLayout(hash, subgraph, templateName)));
             }
             
-            SetRoot(root);
+            EnqueueCommands();
         }
         
         DataContainer m_DataContainer;

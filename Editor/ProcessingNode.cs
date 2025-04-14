@@ -8,7 +8,7 @@ namespace AAGen
 {
     public abstract class ProcessingNode
     {
-        public string Name { get; set; }
+        public string Info { get; set; }
         public List<ProcessingNode> Children { get; } = new List<ProcessingNode>();
 
         public void AddChild(ProcessingNode child)
@@ -21,38 +21,19 @@ namespace AAGen
         public void Process() => OnProcess();
     }
     
-    public class SampleNode : ProcessingNode
+    /// <summary>
+    /// Node-based command processor
+    /// </summary>
+    public class CommandProcessor
     {
-        private string _message;
+        public string Title { get; set; }
+        readonly Queue<ProcessingNode> m_ProcessingQueue = new Queue<ProcessingNode>();
+        readonly ProcessingNode m_Root = new ProcessingUnit();
 
-        public SampleNode(string message)
+        public void EnqueueCommands()
         {
-            _message = message;
-        }
-
-        protected override void OnProcess()
-        {
-            Thread.Sleep(1000);
-            Debug.Log($"[{Name}] {_message}");
-        }
-    }
-    
-    public class NodeProcessor 
-    {
-        Queue<ProcessingNode> m_ProcessingQueue = new Queue<ProcessingNode>();
-        ProcessingNode m_Root;
-
-        public void SetRoot(ProcessingNode root)
-        {
-            if (root == null)
-            {
-                Debug.LogError($"Root node cannot be null!");
-                return;
-            }
-            
-            m_Root = root;
             m_ProcessingQueue.Clear();
-            EnqueueRecursive(root);
+            EnqueueRecursive(m_Root);
         }
 
         void EnqueueRecursive(ProcessingNode node)
@@ -64,14 +45,20 @@ namespace AAGen
                 EnqueueRecursive(child);
         }
         
-        public int RemainingProcessCount => m_ProcessingQueue.Count;
+        public int RemainingCommandCount => m_ProcessingQueue.Count;
 
         public ProcessingNode Root => m_Root;
 
-        public void UpdateProcess()
+        public string ExecuteNextCommand()
         {
             var currentUnit = m_ProcessingQueue.Dequeue();
             currentUnit.Process();
+            return currentUnit.Info;
+        }
+
+        public void AddCommand(ProcessingNode node)
+        {
+            Root.AddChild(node);
         }
     }
     
@@ -79,6 +66,11 @@ namespace AAGen
     public class ProcessingUnit : ProcessingNode
     {
         readonly Action m_Action;
+        
+        public ProcessingUnit()
+        {
+            m_Action = null;
+        }
         
         public ProcessingUnit(Action action)
         {

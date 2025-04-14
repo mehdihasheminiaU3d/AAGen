@@ -8,19 +8,19 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class DefaultSystemSetupCreatorProcessor : NodeProcessor
+    internal class DefaultSystemSetupCreatorProcessor : CommandProcessor
     {
         public DefaultSystemSetupCreatorProcessor(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             
-            var root = new ProcessingUnit(null) { Name = "Root" };
-            var child1 = new ProcessingUnit(CreateDefaultAddressableSettings) { Name = "CreateDefaultAddressableSettings" };
-            var child2 = new ProcessingUnit(CreateDefaultToolSettings) { Name = "CreateDefaultToolSettings" };
+          
+            var child1 = new ProcessingUnit(CreateDefaultAddressableSettings) { Info = "CreateDefaultAddressableSettings" };
+            var child2 = new ProcessingUnit(CreateDefaultToolSettings) { Info = "CreateDefaultToolSettings" };
             
-            root.AddChild(child1);
-            root.AddChild(child2);
-            SetRoot(root);
+            AddCommand(child1);
+            AddCommand(child2);
+            EnqueueCommands();
         }
 
         DataContainer m_DataContainer;

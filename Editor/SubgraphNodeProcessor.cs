@@ -5,24 +5,22 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphNodeProcessor : NodeProcessor
+    internal class SubgraphCommandProcessor : CommandProcessor
     {
-        public SubgraphNodeProcessor(DataContainer dataContainer)
+        public SubgraphCommandProcessor(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             
-            var root = new ProcessingUnit(null) { Name = "Root" };
+            AddCommand(CreateSubgraphs());
             
-            root.AddChild(CreateSubgraphs());
-            
-            SetRoot(root);
+            EnqueueCommands();
         }
         
         DataContainer m_DataContainer;
         
         ProcessingUnit CreateSubgraphs()
         {
-            var root = new ProcessingUnit(null) { Name = "SubgraphNodeProcessor" };
+            var root = new ProcessingUnit(null) { Info = "SubgraphNodeProcessor" };
             
             m_DataContainer._allSubgraphs = new Category();
             m_DataContainer._subgraphSources = new Dictionary<int, HashSet<AssetNode>>();

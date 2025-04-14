@@ -5,20 +5,17 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class IntakeFilterProcessor : NodeProcessor 
+    internal class IntakeFilterProcessor : CommandProcessor //<--- inheritance needed?
     {
         public IntakeFilterProcessor(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             
-            
-            var root = new ProcessingUnit(null) { Name = "Root" };
-            
-            root.AddChild(IgnoreByInputRules());
-            root.AddChild(IgnoreUnsupportedAssets());
-            root.AddChild(new ProcessingUnit(AddBuiltinScenesToIgnoredList));
-            SetRoot(root);
+            AddCommand(IgnoreByInputRules());
+            AddCommand(IgnoreUnsupportedAssets());
+            AddCommand(new ProcessingUnit(AddBuiltinScenesToIgnoredList));
+            EnqueueCommands();
         }
         
         
@@ -28,7 +25,7 @@ namespace AAGen
         
         ProcessingUnit IgnoreByInputRules()
         {
-            var root = new ProcessingUnit(null) { Name = "IgnoreByInputRules" };
+            var root = new ProcessingUnit(null) { Info = "IgnoreByInputRules" };
             
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
@@ -66,7 +63,7 @@ namespace AAGen
 
         ProcessingUnit IgnoreUnsupportedAssets()
         {
-            var root = new ProcessingUnit(null) { Name = "IgnoreUnsupportedAssets" };
+            var root = new ProcessingUnit(null) { Info = "IgnoreUnsupportedAssets" };
             
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)

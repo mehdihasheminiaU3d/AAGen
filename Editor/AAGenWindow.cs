@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using AAGen.AssetDependencies;
 using AAGen.Shared;
 using Unity.EditorCoroutines.Editor;
@@ -57,6 +58,13 @@ namespace AAGen
         {
             Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(m_DataContainer.SettingsFilePath);
         }
+        
+        void HeavyOperation(int arg)
+        {
+            Thread.Sleep(200);
+            if (arg % 10 == 0)
+                Debug.Log($"heavy operation {arg} completed");
+        }
 
         void OnGUI()
         {
@@ -84,7 +92,8 @@ namespace AAGen
                 if (GUILayout.Button(k_QuickButtonLabel, GUILayout.MinWidth(k_QuickButtonWidth), GUILayout.Height(k_QuickButtonHeight)))
                 {
                     // EditorCoroutineUtility.StartCoroutineOwnerless(Execute());
-                    ExecuteBlocking();
+                    EditorCoroutineUtility.StartCoroutineOwnerless(ExecuteNonBlocking2());
+                    // ExecuteBlocking2();
                 }
             }, k_QuickButtonWidth);
 
@@ -134,36 +143,204 @@ namespace AAGen
 
         DataContainer m_DataContainer;
         
+        IEnumerator ExecuteNonBlocking2()
+        {
+            //1- Prepare main processes
+            var processor1 = new CommandProcessor();
+            processor1.Title = "processor1";
+            for (int i = 0; i < 10; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor1.AddCommand(processingUnit);
+            }
+            processor1.EnqueueCommands();
+            
+            var processor2 = new CommandProcessor();
+            processor2.Title = "processor2";
+            for (int i = 0; i < 14; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor2.AddCommand(processingUnit);
+            }
+            processor2.EnqueueCommands();
+            
+            var processor3 = new CommandProcessor();
+            processor3.Title = "processor3";
+            for (int i = 0; i < 8; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor3.AddCommand(processingUnit);
+            }
+            processor3.EnqueueCommands();
+
+            CommandProcessor[] allCommandProcessors = new[] { processor1, processor2, processor3 };
+
+            
+            //2- execution loop
+
+            for (int i = 0; i < allCommandProcessors.Length; i++)
+            {
+                var currentProcessor = allCommandProcessors[i];
+
+                float progressStart = (float)i / allCommandProcessors.Length;
+                float progressEnd = (float)(i + 1) / allCommandProcessors.Length;
+
+                int progress = 0;
+                int totalCount = currentProcessor.RemainingCommandCount;
+
+                var progressBarTitle = currentProcessor.Title;
+                var progressBarInfo = "Processing ...";
+                
+                var progressId = Progress.Start(progressBarTitle);
+
+                while (currentProcessor.RemainingCommandCount > 0)
+                {
+                    var info = string.Empty;
+                    bool error = false;
+                    Exception exception = null;
+                    
+                    try
+                    {
+                        info = currentProcessor.ExecuteNextCommand();
+                    }
+                    catch (Exception e)
+                    {
+                        error = true;
+                        exception = e;
+                    }
+
+                    if (error)
+                    {
+                        Debug.LogError(exception.Message);
+                        Progress.Remove(progressId);
+                        yield break;
+                    }
+                    
+                    progress++;
+                    progressBarInfo = string.IsNullOrEmpty(info) ? progressBarInfo : info;
+
+                    var percentage = progressStart + ((float)progress / totalCount) * (progressEnd - progressStart);
+                    Progress.Report(progressId, percentage, progressBarInfo);
+                    yield return null;
+                }
+                
+                Progress.Remove(progressId);
+            }
+        }
+
+        void ExecuteBlocking2()
+        {
+            //1- Prepare main processes
+            var processor1 = new CommandProcessor();
+            processor1.Title = "processor1";
+            for (int i = 0; i < 10; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor1.AddCommand(processingUnit);
+            }
+            processor1.EnqueueCommands();
+            
+            var processor2 = new CommandProcessor();
+            processor2.Title = "processor2";
+            for (int i = 0; i < 14; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor2.AddCommand(processingUnit);
+            }
+            processor2.EnqueueCommands();
+            
+            var processor3 = new CommandProcessor();
+            processor3.Title = "processor3";
+            for (int i = 0; i < 8; i++)
+            {
+                var arg = i;
+                var processingUnit = new ProcessingUnit(() => HeavyOperation(arg));
+                processingUnit.Info = $"Unit {i}";
+                processor3.AddCommand(processingUnit);
+            }
+            processor3.EnqueueCommands();
+
+            CommandProcessor[] allCommandProcessors = new[] { processor1, processor2, processor3 };
+            
+            
+            //2- execution loop
+            try
+            {
+                for (int i = 0; i < allCommandProcessors.Length; i++)
+                {
+                    var currentProcessor = allCommandProcessors[i];
+
+                    float progressStart = (float)i / allCommandProcessors.Length;
+                    float progressEnd = (float)(i + 1) / allCommandProcessors.Length; 
+
+                    int progress = 0;
+                    int totalCount = currentProcessor.RemainingCommandCount;
+                    
+                    var progressBarTitle = currentProcessor.Title;
+                    var progressBarInfo = "Processing ...";
+                    
+                    while (currentProcessor.RemainingCommandCount > 0)
+                    {
+                        var info = currentProcessor.ExecuteNextCommand();
+                        progress++;
+                        
+                        progressBarInfo = string.IsNullOrEmpty(info) ? progressBarInfo : info;
+                        
+                        if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo,
+                                progressStart + ((float)progress / totalCount) * (progressEnd - progressStart))) 
+                            break;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+        }
+        
         void ExecuteBlocking()
         {
             m_DataContainer = new DataContainer();
             
-            var dependencyGraphProcessor = new NodeProcessor();
-            var dependencyGraphRoot = new SampleNode("Dependency Graph Root");
-            {
-                dependencyGraphRoot.AddChild(new DefaultSystemSetupCreatorProcessor(m_DataContainer).Root); 
-                dependencyGraphRoot.AddChild(new ProcessingUnit(LoadSettingsFile));
-                dependencyGraphRoot.AddChild(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
-                // root.AddChild(new SampleNode("LoadDependencyGraph"));
-                // root.AddChild(new SampleNode("RemoveScenesFromBuildProfile"));
-            }
-            dependencyGraphProcessor.SetRoot(dependencyGraphRoot);
+            var dependencyGraphProcessor = new CommandProcessor();
+            
+            dependencyGraphProcessor.AddCommand(new DefaultSystemSetupCreatorProcessor(m_DataContainer).Root); 
+            dependencyGraphProcessor.AddCommand(new ProcessingUnit(LoadSettingsFile));
+            dependencyGraphProcessor.AddCommand(new DependencyGraphGeneratorProcessor(m_DataContainer).Root);
+            // dependencyGraphProcessor.AddCommand(new SampleNode("LoadDependencyGraph"));
+            // dependencyGraphProcessor.AddCommand(new SampleNode("RemoveScenesFromBuildProfile"));
+            
+            dependencyGraphProcessor.EnqueueCommands();
 
             var progressBarTitle = "Dependency Graph 1/2";
             var progressBarInfo = "Processing Assets...";
             
             int progress = 0;
-            int count = dependencyGraphProcessor.RemainingProcessCount;
+            int count = dependencyGraphProcessor.RemainingCommandCount;
 
             try
             {
-                while (dependencyGraphProcessor.RemainingProcessCount > 0)
+                while (dependencyGraphProcessor.RemainingCommandCount > 0)
                 {
                     if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo,
                             (float)progress / count))
                         break;
 
-                    dependencyGraphProcessor.UpdateProcess();
+                    dependencyGraphProcessor.ExecuteNextCommand();
                     progress++;
                 }
             }
@@ -183,32 +360,31 @@ namespace AAGen
             // Even for creating the processing jobs and before doing any actual processing, we need the dependency graph.
             // So we have to do things in two phases. First preparations and generation of the dependency graph and then processing.
             
-            var groupingGraphProcessor = new NodeProcessor();
-            var groupingRoot = new SampleNode("Dependency Graph Root");
-            {
-                groupingRoot.AddChild(new IntakeFilterProcessor(m_DataContainer).Root);
-                groupingRoot.AddChild(new SubgraphNodeProcessor(m_DataContainer).Root);
-                groupingRoot.AddChild(new GroupLayoutNodeProcessor(m_DataContainer).Root); //<-- No refinement for group layouts
-                // groupingRoot.AddChild(new SampleNode("GenerateAddressableGroup"));
-                // groupingRoot.AddChild(new SampleNode("AddAndSetupBootScene"));
-                // groupingRoot.AddChild(new SampleNode("Cleanup"));
-            }
-            groupingGraphProcessor.SetRoot(groupingRoot);
+            var groupingGraphProcessor = new CommandProcessor();
+            
+            groupingGraphProcessor.AddCommand(new IntakeFilterProcessor(m_DataContainer).Root);
+            groupingGraphProcessor.AddCommand(new SubgraphCommandProcessor(m_DataContainer).Root);
+            groupingGraphProcessor.AddCommand(new GroupLayoutCommandProcessor(m_DataContainer).Root); //<-- No refinement for group layouts
+            // groupingGraphProcessor.AddCommand(new SampleNode("GenerateAddressableGroup"));
+            // groupingGraphProcessor.AddCommand(new SampleNode("AddAndSetupBootScene"));
+            // groupingGraphProcessor.AddCommand(new SampleNode("Cleanup"));
+            
+            groupingGraphProcessor.EnqueueCommands();
 
             progressBarTitle = "Grouping 2/2";
             progressBarInfo = "Processing Assets...";
             
             progress = 0;
-            count = groupingGraphProcessor.RemainingProcessCount;
+            count = groupingGraphProcessor.RemainingCommandCount;
             
             try
             {
-                while (groupingGraphProcessor.RemainingProcessCount > 0)
+                while (groupingGraphProcessor.RemainingCommandCount > 0)
                 {
                     if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
                         break;
                 
-                    groupingGraphProcessor.UpdateProcess();
+                    groupingGraphProcessor.ExecuteNextCommand();
                     progress++;
                 }
             }

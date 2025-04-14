@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class DependencyGraphGeneratorProcessor : NodeProcessor
+    internal class DependencyGraphGeneratorProcessor : CommandProcessor
     {
         DataContainer m_DataContainer;
         
@@ -13,16 +13,15 @@ namespace AAGen
             m_DataContainer = dataContainer;
             m_DataContainer.m_DependencyGraph = new DependencyGraph();
             
-            var root = new ProcessingUnit(null) { Name = "Root" };
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
             {
-                root.AddChild(new ProcessingUnit(() => AddAssetToDependencyGraph(assetPath)));
+                AddCommand(new ProcessingUnit(() => AddAssetToDependencyGraph(assetPath)));
             }
-            root.AddChild(new ProcessingUnit(CalculateTransposedGraph));
+            AddCommand(new ProcessingUnit(CalculateTransposedGraph));
             
-            SetRoot(root); 
+            EnqueueCommands(); 
         }
 
         void AddAssetToDependencyGraph(string assetPath)
