@@ -5,16 +5,16 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class IntakeFilterProcessor : CommandProcessor //<--- inheritance needed?
+    internal class IntakeFilterQueue : CommandQueue //<--- inheritance needed?
     {
-        public IntakeFilterProcessor(DataContainer dataContainer) 
+        public IntakeFilterQueue(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             
             AddCommand(IgnoreByInputRules());
             AddCommand(IgnoreUnsupportedAssets());
-            AddCommand(new ProcessingUnit(AddBuiltinScenesToIgnoredList));
+            AddCommand(new ActionCommand(AddBuiltinScenesToIgnoredList));
             EnqueueCommands();
         }
         
@@ -23,14 +23,14 @@ namespace AAGen
         
         //---------------------------------------------------------------------------------------------------------------
         
-        ProcessingUnit IgnoreByInputRules()
+        ActionCommand IgnoreByInputRules()
         {
-            var root = new ProcessingUnit(null) { Info = "IgnoreByInputRules" };
+            var root = new ActionCommand(null) { Info = "IgnoreByInputRules" };
             
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                root.AddChild(new ProcessingUnit(() => AddRuledFileToIgnoredList(node)));
+                root.AddChild(new ActionCommand(() => AddRuledFileToIgnoredList(node)));
             }
 
             return root;
@@ -61,14 +61,14 @@ namespace AAGen
         
         //----------------------------------------------------------------------------------------------------------------
 
-        ProcessingUnit IgnoreUnsupportedAssets()
+        ActionCommand IgnoreUnsupportedAssets()
         {
-            var root = new ProcessingUnit(null) { Info = "IgnoreUnsupportedAssets" };
+            var root = new ActionCommand(null) { Info = "IgnoreUnsupportedAssets" };
             
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                root.AddChild(new ProcessingUnit(() => AddUnsupportedFileToIgnoreAssets(node)));
+                root.AddChild(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
             }
 
             return root;

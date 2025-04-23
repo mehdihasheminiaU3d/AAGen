@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class GroupLayoutCommandProcessor : CommandProcessor
+    internal class GroupLayoutCommandQueue : CommandQueue
     {
-        public GroupLayoutCommandProcessor(DataContainer dataContainer)
+        public GroupLayoutCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             
@@ -21,7 +21,7 @@ namespace AAGen
                 var hash = pair.Key;
                 var subgraph = pair.Value;
                 var templateName = m_DataContainer.Settings._GroupLayoutRules[0].TemplateName; //<--------only one for now
-                AddCommand(new ProcessingUnit(() => CreateGroupLayout(hash, subgraph, templateName)));
+                AddCommand(new ActionCommand(() => CreateGroupLayout(hash, subgraph, templateName)));
             }
             
             EnqueueCommands();

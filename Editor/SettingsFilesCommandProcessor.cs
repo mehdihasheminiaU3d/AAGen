@@ -8,21 +8,9 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class DefaultSystemSetupCreatorQueue : CommandQueue
+    internal class SettingsFilesCommandProcessor 
     {
-        public DefaultSystemSetupCreatorQueue(DataContainer dataContainer)
-        {
-            m_DataContainer = dataContainer;
-            
-          
-            var child1 = new ActionCommand(CreateDefaultAddressableSettings) { Info = "CreateDefaultAddressableSettings" };
-            var child2 = new ActionCommand(CreateDefaultToolSettings) { Info = "CreateDefaultToolSettings" };
-            
-            AddCommand(child1);
-            AddCommand(child2);
-            EnqueueCommands();
-        }
-
+        
         DataContainer m_DataContainer;
             
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
@@ -30,11 +18,39 @@ namespace AAGen
         
         const string DefaultAagenSettingsFolder = "Assets/AddressableAssetsData/AAGen/";
 
+
+        public SettingsFilesCommandProcessor(DataContainer dataContainer)
+        {
+            m_DataContainer = dataContainer;
+        }
+
+        public CommandQueue GetCommands()
+        {
+            var commandQueue = new CommandQueue("Addressable Settings");
+            
+            commandQueue.AddCommand(new ActionCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings)));
+            commandQueue.AddCommand(new ActionCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings)));
+            
+            commandQueue.EnqueueCommands();
+
+            return commandQueue;
+        }
+
+        void FindOrCreateDefaultAddressableSettings()
+        {
+            if (AddressableSettingsExists()) 
+                return; //the default addressable asset settings already created
+
+            CreateDefaultAddressableSettings();
+        }
+
+        bool AddressableSettingsExists()
+        {
+            return AddressableAssetSettingsDefaultObject.Settings != null;
+        }
+
         void CreateDefaultAddressableSettings()
         {
-            if (AddressableAssetSettingsDefaultObject.Settings != null) 
-                return; //the default addressable asset settings already created
-            
             EnsureDirectoryExists(DefaultSettingsPath);
 
             // Create Addressable settings
@@ -45,6 +61,49 @@ namespace AAGen
             AssetDatabase.Refresh();
             
             Debug.Log("Default addressable assets settings created at: " + DefaultSettingsPath);
+        }
+
+        void FindOrCreateDefaultToolSettings()
+        {
+            //Settings is loaded
+            if (m_DataContainer.Settings != null)
+            {
+                Debug.Log($"Settings is loaded");
+                return;
+            }
+
+            //Settings exists but not loaded, ask the user to provide one
+            if (ToolSettingsExists())
+                throw new Exception($"Cannot find AAGen settings file");
+            
+            //If a settings file doesn't exists in the project, create one with default settings
+            CreateDefaultToolSettings();
+            Debug.Log($"CreateDefaultToolSettings");
+        }
+
+        bool ToolSettingsExists()
+        {
+            var allSettings = FindAllToolSettingsInstances();
+
+            return allSettings.Count > 0;
+        }
+        
+        static List<AagenSettings> FindAllToolSettingsInstances() 
+        {
+            List<AagenSettings> results = new List<AagenSettings>();
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(AagenSettings).Name}");
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                AagenSettings asset = AssetDatabase.LoadAssetAtPath<AagenSettings>(path);
+                if (asset != null)
+                {
+                    results.Add(asset);
+                }
+            }
+
+            return results;
         }
         
         void CreateDefaultToolSettings()

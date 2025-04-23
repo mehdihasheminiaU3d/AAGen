@@ -4,11 +4,11 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class DependencyGraphGeneratorProcessor : CommandProcessor
+    internal class DependencyGraphGeneratorQueue : CommandQueue
     {
         DataContainer m_DataContainer;
         
-        public DependencyGraphGeneratorProcessor(DataContainer dataContainer)
+        public DependencyGraphGeneratorQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             m_DataContainer.m_DependencyGraph = new DependencyGraph();
@@ -17,9 +17,9 @@ namespace AAGen
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
             {
-                AddCommand(new ProcessingUnit(() => AddAssetToDependencyGraph(assetPath)));
+                AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath)));
             }
-            AddCommand(new ProcessingUnit(CalculateTransposedGraph));
+            AddCommand(new ActionCommand(CalculateTransposedGraph));
             
             EnqueueCommands(); 
         }

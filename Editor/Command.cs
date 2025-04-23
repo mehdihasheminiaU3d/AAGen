@@ -1,34 +1,39 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using AAGen.AssetDependencies;
-using UnityEngine;
 
 namespace AAGen
 {
-    public abstract class ProcessingNode
+    public abstract class Command
     {
         public string Info { get; set; }
-        public List<ProcessingNode> Children { get; } = new List<ProcessingNode>();
+        public List<Command> Children { get; } = new List<Command>();
 
-        public void AddChild(ProcessingNode child)
+        public void AddChild(Command child)
         {
             if (child != null && !Children.Contains(child))
                 Children.Add(child);
         }
 
-        protected abstract void OnProcess();
-        public void Process() => OnProcess();
+        protected abstract void OnExecute();
+        public void Execute() => OnExecute();
     }
     
     /// <summary>
     /// Node-based command processor
     /// </summary>
-    public class CommandProcessor
+    public class CommandQueue
     {
+        public CommandQueue(){}
+
+        public CommandQueue(string title)
+        {
+            Title = title;
+        }
+        
         public string Title { get; set; }
-        readonly Queue<ProcessingNode> m_ProcessingQueue = new Queue<ProcessingNode>();
-        readonly ProcessingNode m_Root = new ProcessingUnit();
+        readonly Queue<Command> m_ProcessingQueue = new Queue<Command>();
+        readonly Command m_Root = new ActionCommand();
 
         public void EnqueueCommands()
         {
@@ -36,7 +41,7 @@ namespace AAGen
             EnqueueRecursive(m_Root);
         }
 
-        void EnqueueRecursive(ProcessingNode node)
+        void EnqueueRecursive(Command node)
         {
             if (node == null) return;
 
@@ -47,37 +52,42 @@ namespace AAGen
         
         public int RemainingCommandCount => m_ProcessingQueue.Count;
 
-        public ProcessingNode Root => m_Root;
+        public Command Root => m_Root;
 
         public string ExecuteNextCommand()
         {
             var currentUnit = m_ProcessingQueue.Dequeue();
-            currentUnit.Process();
+            currentUnit.Execute();
             return currentUnit.Info;
         }
 
-        public void AddCommand(ProcessingNode node)
+        public void AddCommand(Command node)
         {
             Root.AddChild(node);
         }
     }
     
-    //----------------------------------------
-    public class ProcessingUnit : ProcessingNode
+    public class ActionCommand : Command
     {
         readonly Action m_Action;
         
-        public ProcessingUnit()
+        public ActionCommand()
         {
             m_Action = null;
         }
         
-        public ProcessingUnit(Action action)
+        public ActionCommand(Action action)
         {
             m_Action = action;
         }
+        
+        public ActionCommand(Action action, string info)
+        {
+            m_Action = action;
+            Info = info;
+        }
 
-        protected override void OnProcess()
+        protected override void OnExecute()
         {
             m_Action?.Invoke();
         }

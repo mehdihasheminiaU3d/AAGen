@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphCommandProcessor : CommandProcessor
+    internal class SubgraphCommandQueue : CommandQueue
     {
-        public SubgraphCommandProcessor(DataContainer dataContainer)
+        public SubgraphCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             
@@ -18,9 +18,9 @@ namespace AAGen
         
         DataContainer m_DataContainer;
         
-        ProcessingUnit CreateSubgraphs()
+        ActionCommand CreateSubgraphs()
         {
-            var root = new ProcessingUnit(null) { Info = "SubgraphNodeProcessor" };
+            var root = new ActionCommand(null) { Info = "SubgraphNodeProcessor" };
             
             m_DataContainer._allSubgraphs = new Category();
             m_DataContainer._subgraphSources = new Dictionary<int, HashSet<AssetNode>>();
@@ -29,7 +29,7 @@ namespace AAGen
             
             foreach (var node in nodes)
             {
-                root.AddChild(new ProcessingUnit(() => TryAddNodeToSubgraph(node)));
+                root.AddChild(new ActionCommand(() => TryAddNodeToSubgraph(node)));
             }
             
             return root;
