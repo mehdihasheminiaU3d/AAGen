@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using AAGen.AssetDependencies;
 using AAGen.Shared;
@@ -33,6 +34,7 @@ namespace AAGen
         bool m_LoadingInProgress = false;
 
         bool m_IsProcessing = false;
+        DataContainer m_DataContainer;
         
         void OnEnable()
         {
@@ -70,11 +72,6 @@ namespace AAGen
 
         void OnGUI()
         {
-            DrawQuickContainer();
-        }
-        
-        void DrawQuickContainer()
-        {
             GUILayout.BeginVertical(k_BoxStyleName);
             GUILayout.Space(k_Space);
 
@@ -104,48 +101,6 @@ namespace AAGen
             GUILayout.EndVertical();
         }
         
-        // IEnumerator Execute() //<---------- flags
-        // {
-        //     m_DefaultSystemSetupCreator = new DefaultSystemSetupCreator(m_DependencyGraph, null, this);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(m_DefaultSystemSetupCreator.CreateSequence().Run());
-        //     //Wait for the settings to be found/created
-        //     
-        //     var sequence = new EditorJobGroup(nameof(QuickButtonSequence));
-        //     
-        //     sequence.AddJob(new ActionJob(Setup, nameof(Setup)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
-        //         sequence.AddJob(new CoroutineJob(GenerateDependencyGraph, nameof(GenerateDependencyGraph)));
-        //
-        //     sequence.AddJob(new CoroutineJob(LoadDependencyGraph, nameof(LoadDependencyGraph)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.RemoveScenesFromBuildProfile))
-        //         sequence.AddJob(new CoroutineJob(RemoveScenesFromBuildProfile, nameof(RemoveScenesFromBuildProfile)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetIntakeFilter))
-        //         sequence.AddJob(new CoroutineJob(GenerateIntakeFilter, nameof(GenerateIntakeFilter)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateSubGraphs))
-        //         sequence.AddJob(new CoroutineJob(GenerateSubgraphs, nameof(GenerateSubgraphs)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateGroupLayout))
-        //         sequence.AddJob(new CoroutineJob(GenerateGroupLayout, nameof(GenerateGroupLayout)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateAddressableGroups))
-        //         sequence.AddJob(new CoroutineJob(GenerateAddressableGroup, nameof(GenerateAddressableGroup)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.RemoveScenesFromBuildProfile))
-        //         sequence.AddJob(new CoroutineJob(AddAndSetupBootScene, nameof(AddAndSetupBootScene)));
-        //
-        //     if (Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
-        //         sequence.AddJob(new CoroutineJob(Cleanup, nameof(Cleanup)));
-        //     
-        //     sequence.AddJob(new ActionJob(TearDown, nameof(TearDown)));
-        //     EditorCoroutineUtility.StartCoroutineOwnerless(sequence.Run());
-        // }
-
-        DataContainer m_DataContainer;
-
         void InitializeDataContainer()
         {
             m_DataContainer = new DataContainer
@@ -155,7 +110,7 @@ namespace AAGen
             };
         }
         
-        CommandQueue[] InitializeCommands()
+        List<CommandQueue> InitializeCommands()
         {
             var processor1 = new CommandQueue();
             processor1.Title = "processor1";
@@ -168,40 +123,22 @@ namespace AAGen
             }
             processor1.EnqueueCommands();
             
-            var processor2 = new CommandQueue();
-            processor2.Title = "processor2";
-            for (int i = 0; i < 14; i++)
-            {
-                var arg = i;
-                var processingUnit = new ActionCommand(() => HeavyOperation(arg));
-                processingUnit.Info = $"Unit {i}";
-                processor2.AddCommand(processingUnit);
-            }
-            processor2.EnqueueCommands();
-            
-            var processor3 = new CommandQueue();
-            processor3.Title = "processor3";
-            for (int i = 0; i < 8; i++)
-            {
-                var arg = i;
-                var processingUnit = new ActionCommand(() => HeavyOperation(arg));
-                processingUnit.Info = $"Unit {i}";
-                processor3.AddCommand(processingUnit);
-            }
-            processor3.EnqueueCommands();
-            
-            
             var loadSettingsQueue = new CommandQueue();
             var loadSettingsCommand = new ActionCommand(LoadSettingsFile, nameof(LoadSettingsFile));
             loadSettingsQueue.AddCommand(loadSettingsCommand);
             loadSettingsQueue.EnqueueCommands();
 
-            return new[] 
+            var commandQueues =  new List<CommandQueue>  
             { 
-                processor1, processor2, processor3,
-                new SettingsFilesCommandProcessor(m_DataContainer).GetCommands(),
-                loadSettingsQueue
+                processor1,
+                new SettingsFilesCommandQueue(m_DataContainer),
+                loadSettingsQueue,
             };
+
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
+                commandQueues.Add(new DependencyGraphCommandQueue(m_DataContainer));
+            
+            return commandQueues;
         }
         
         IEnumerator RunAsyncLoop()
@@ -211,12 +148,13 @@ namespace AAGen
             InitializeDataContainer();
             var commandQueues = InitializeCommands();
 
-            for (int i = 0; i < commandQueues.Length; i++)
+            for (int i = 0; i < commandQueues.Count; i++)
             {
                 var currentProcessor = commandQueues[i];
+                currentProcessor.PreExecute();
 
-                float progressStart = (float)i / commandQueues.Length;
-                float progressEnd = (float)(i + 1) / commandQueues.Length;
+                float progressStart = (float)i / commandQueues.Count;
+                float progressEnd = (float)(i + 1) / commandQueues.Count;
 
                 int progress = 0;
                 int totalCount = currentProcessor.RemainingCommandCount;
@@ -246,6 +184,7 @@ namespace AAGen
                     {
                         Debug.LogError(exception.Message);
                         Progress.Remove(progressId);
+                        m_IsProcessing = false;
                         yield break;
                     }
                     
@@ -272,12 +211,13 @@ namespace AAGen
             
             try
             {
-                for (int i = 0; i < commandQueues.Length; i++)
+                for (int i = 0; i < commandQueues.Count; i++)
                 {
                     var currentProcessor = commandQueues[i];
+                    currentProcessor.PreExecute();
 
-                    float progressStart = (float)i / commandQueues.Length;
-                    float progressEnd = (float)(i + 1) / commandQueues.Length; 
+                    float progressStart = (float)i / commandQueues.Count;
+                    float progressEnd = (float)(i + 1) / commandQueues.Count; 
 
                     int progress = 0;
                     int totalCount = currentProcessor.RemainingCommandCount;
@@ -305,95 +245,7 @@ namespace AAGen
             finally
             {
                 EditorUtility.ClearProgressBar();
-            }
-            
-            m_IsProcessing = false;
-        }
-        
-        void ExecuteBlocking()
-        {
-            m_DataContainer = new DataContainer();
-            
-            var dependencyGraphProcessor = new CommandQueue();
-            
-            dependencyGraphProcessor.AddCommand(new DefaultSystemSetupCreatorQueue(m_DataContainer).Root); 
-            dependencyGraphProcessor.AddCommand(new ActionCommand(LoadSettingsFile));
-            dependencyGraphProcessor.AddCommand(new DependencyGraphGeneratorQueue(m_DataContainer).Root);
-            // dependencyGraphProcessor.AddCommand(new SampleNode("LoadDependencyGraph"));
-            // dependencyGraphProcessor.AddCommand(new SampleNode("RemoveScenesFromBuildProfile"));
-            
-            dependencyGraphProcessor.EnqueueCommands();
-
-            var progressBarTitle = "Dependency Graph 1/2";
-            var progressBarInfo = "Processing Assets...";
-            
-            int progress = 0;
-            int count = dependencyGraphProcessor.RemainingCommandCount;
-
-            try
-            {
-                while (dependencyGraphProcessor.RemainingCommandCount > 0)
-                {
-                    if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo,
-                            (float)progress / count))
-                        break;
-
-                    dependencyGraphProcessor.ExecuteNextCommand();
-                    progress++;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-                throw;
-            }
-            finally
-            {
-                EditorUtility.ClearProgressBar();
-            }
-            
-            //Do the same for all of them. All need their own progress
-            
-            //----------------------------------------------( Phase 2 )-------------------------------------------------
-            // Even for creating the processing jobs and before doing any actual processing, we need the dependency graph.
-            // So we have to do things in two phases. First preparations and generation of the dependency graph and then processing.
-            
-            var groupingGraphProcessor = new CommandQueue();
-            
-            groupingGraphProcessor.AddCommand(new IntakeFilterQueue(m_DataContainer).Root);
-            groupingGraphProcessor.AddCommand(new SubgraphCommandQueue(m_DataContainer).Root);
-            groupingGraphProcessor.AddCommand(new GroupLayoutCommandQueue(m_DataContainer).Root); //<-- No refinement for group layouts
-            // groupingGraphProcessor.AddCommand(new SampleNode("GenerateAddressableGroup"));
-            // groupingGraphProcessor.AddCommand(new SampleNode("AddAndSetupBootScene"));
-            // groupingGraphProcessor.AddCommand(new SampleNode("Cleanup"));
-            
-            groupingGraphProcessor.EnqueueCommands();
-
-            progressBarTitle = "Grouping 2/2";
-            progressBarInfo = "Processing Assets...";
-            
-            progress = 0;
-            count = groupingGraphProcessor.RemainingCommandCount;
-            
-            try
-            {
-                while (groupingGraphProcessor.RemainingCommandCount > 0)
-                {
-                    if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo, (float)progress / count))
-                        break;
-                
-                    groupingGraphProcessor.ExecuteNextCommand();
-                    progress++;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-                throw;
-            }
-            finally
-            {
-                EditorUtility.ClearProgressBar();
+                m_IsProcessing = false;
             }
         }
         

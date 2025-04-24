@@ -8,32 +8,26 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SettingsFilesCommandProcessor 
+    internal class SettingsFilesCommandQueue : CommandQueue
     {
-        
-        DataContainer m_DataContainer;
+        readonly DataContainer m_DataContainer;
             
         const string DefaultSettingsPath = "Assets/AddressableAssetsData";
         const string DefaultSettingsName = "AddressableAssetSettings";
         
         const string DefaultAagenSettingsFolder = "Assets/AddressableAssetsData/AAGen/";
 
-
-        public SettingsFilesCommandProcessor(DataContainer dataContainer)
+        public SettingsFilesCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
+            Title = nameof(SettingsFilesCommandQueue);
         }
 
-        public CommandQueue GetCommands()
+        public override void PreExecute()
         {
-            var commandQueue = new CommandQueue("Addressable Settings");
-            
-            commandQueue.AddCommand(new ActionCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings)));
-            commandQueue.AddCommand(new ActionCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings)));
-            
-            commandQueue.EnqueueCommands();
-
-            return commandQueue;
+            AddCommand(new ActionCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings)));
+            AddCommand(new ActionCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings)));
+            EnqueueCommands();
         }
 
         void FindOrCreateDefaultAddressableSettings()

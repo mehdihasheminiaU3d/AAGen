@@ -31,9 +31,19 @@ namespace AAGen
             Title = title;
         }
         
+        public CommandQueue(Command command)
+        {
+            Title = command.Info;
+            AddCommand(command);
+            EnqueueCommands();
+        }
+        
         public string Title { get; set; }
         readonly Queue<Command> m_ProcessingQueue = new Queue<Command>();
         readonly Command m_Root = new ActionCommand();
+        
+        public int RemainingCommandCount => m_ProcessingQueue.Count;
+        public Command Root => m_Root;
 
         public void EnqueueCommands()
         {
@@ -49,10 +59,10 @@ namespace AAGen
             foreach (var child in node.Children)
                 EnqueueRecursive(child);
         }
-        
-        public int RemainingCommandCount => m_ProcessingQueue.Count;
 
-        public Command Root => m_Root;
+        public virtual void PreExecute()
+        {
+        }
 
         public string ExecuteNextCommand()
         {

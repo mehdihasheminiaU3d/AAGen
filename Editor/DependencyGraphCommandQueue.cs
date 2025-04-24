@@ -1,23 +1,24 @@
-using System;
 using AAGen.AssetDependencies;
 using UnityEditor;
 
 namespace AAGen
 {
-    internal class DependencyGraphGeneratorQueue : CommandQueue
+    internal class DependencyGraphCommandQueue : CommandQueue
     {
-        DataContainer m_DataContainer;
+        readonly DataContainer m_DataContainer;
         
-        public DependencyGraphGeneratorQueue(DataContainer dataContainer)
+        public DependencyGraphCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             m_DataContainer.m_DependencyGraph = new DependencyGraph();
-            
-            
+        }
+        
+        public override void PreExecute()
+        {
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
             {
-                AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath)));
+                AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath), assetPath));
             }
             AddCommand(new ActionCommand(CalculateTransposedGraph));
             
