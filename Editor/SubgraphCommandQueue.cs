@@ -7,32 +7,26 @@ namespace AAGen
 {
     internal class SubgraphCommandQueue : CommandQueue
     {
+        readonly DataContainer m_DataContainer;
+        
         public SubgraphCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
-            
-            AddCommand(CreateSubgraphs());
-            
-            EnqueueCommands();
+            Title = nameof(SubgraphCommandQueue);
         }
-        
-        DataContainer m_DataContainer;
-        
-        ActionCommand CreateSubgraphs()
+
+        public override void PreExecute()
         {
-            var root = new ActionCommand(null) { Info = "SubgraphNodeProcessor" };
-            
             m_DataContainer._allSubgraphs = new Category();
             m_DataContainer._subgraphSources = new Dictionary<int, HashSet<AssetNode>>();
             
             var nodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
-            
             foreach (var node in nodes)
             {
-                root.AddChild(new ActionCommand(() => TryAddNodeToSubgraph(node)));
+                AddCommand(new ActionCommand(() => TryAddNodeToSubgraph(node), node.AssetPath));
             }
             
-            return root;
+            EnqueueCommands();
         }
 
         void TryAddNodeToSubgraph(AssetNode node)
@@ -58,6 +52,7 @@ namespace AAGen
             //Sources cannot be saved in subgraph. Because sources can be redundant for each record leading to a very large file
             m_DataContainer._allSubgraphs.TryAdd(hash, subgraph);
             var nodeAdditionSuccess = m_DataContainer._allSubgraphs[hash].Nodes.Add(node);
+            
             if (!nodeAdditionSuccess)
                 Debug.LogError($"Unknown Error = node = {node} had added to subgraph ={hash} before");
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using AAGen.AssetDependencies;
 using AAGen.Shared;
 using Unity.EditorCoroutines.Editor;
@@ -63,13 +62,6 @@ namespace AAGen
             m_Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(m_DataContainer.SettingsFilePath);
         }
         
-        void HeavyOperation(int arg)
-        {
-            Thread.Sleep(200);
-            if (arg % 10 == 0)
-                Debug.Log($"heavy operation {arg} completed");
-        }
-
         void OnGUI()
         {
             GUILayout.BeginVertical(k_BoxStyleName);
@@ -112,17 +104,6 @@ namespace AAGen
         
         List<CommandQueue> InitializeCommands()
         {
-            var processor1 = new CommandQueue();
-            processor1.Title = "processor1";
-            for (int i = 0; i < 10; i++)
-            {
-                var arg = i;
-                var processingUnit = new ActionCommand(() => HeavyOperation(arg));
-                processingUnit.Info = $"Unit {i}";
-                processor1.AddCommand(processingUnit);
-            }
-            processor1.EnqueueCommands();
-            
             var loadSettingsQueue = new CommandQueue();
             var loadSettingsCommand = new ActionCommand(LoadSettingsFile, nameof(LoadSettingsFile));
             loadSettingsQueue.AddCommand(loadSettingsCommand);
@@ -130,7 +111,6 @@ namespace AAGen
 
             var commandQueues =  new List<CommandQueue>  
             { 
-                processor1,
                 new SettingsFilesCommandQueue(m_DataContainer),
                 loadSettingsQueue,
             };
@@ -141,7 +121,15 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetIntakeFilter))
                 commandQueues.Add(new IntakeFilterCommandQueue(m_DataContainer));
             
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateSubGraphs))
+                commandQueues.Add(new SubgraphCommandQueue(m_DataContainer));
+            
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateGroupLayout))
+                commandQueues.Add(new GroupLayoutCommandQueue(m_DataContainer));
+            
             return commandQueues;
+            
+            //     Log(LogLevelID.Info, $"{nameof(AddDefaultSettingsSequence)} Completed");
         }
         
         IEnumerator RunAsyncLoop()
@@ -251,90 +239,6 @@ namespace AAGen
                 m_IsProcessing = false;
             }
         }
-        
-        // <--- Log flags
-        //
-        // void AddDefaultSettingsSequence()
-        // {
-        //     m_DefaultSystemSetupCreator = new DefaultSystemSetupCreator(m_DependencyGraph, null, this);
-        //     m_DefaultSystemSetupCreator.CreateDefaultSettingsFiles();
-        //     Log(LogLevelID.Info, $"{nameof(AddDefaultSettingsSequence)} Completed");
-        // }
-        //
-        // IEnumerator GenerateDependencyGraph()
-        // {
-        //     var dependencyGraphGenerator = new DependencyGraphGenerator();
-        //     dependencyGraphGenerator.Start();
-        //     yield return new WaitUntil(() => !dependencyGraphGenerator.InProgress);
-        //     Log(LogLevelID.Info, $"{nameof(GenerateDependencyGraph)} Completed");
-        // }
-        //
-        // IEnumerator LoadDependencyGraph()
-        // {
-        //     if (m_LoadingInProgress)
-        //         yield break;
-        //
-        //     string filePath = Constants.DependencyGraphFilePath;
-        //     m_LoadingInProgress = true;
-        //
-        //     EditorCoroutineUtility.StartCoroutineOwnerless(FileUtils.LoadFromFileAsync<DependencyGraph>(
-        //         filePath,
-        //         (dependencyGraph) =>
-        //         {
-        //             m_DependencyGraph = dependencyGraph;
-        //             m_LoadingInProgress = false;
-        //             Log(LogLevelID.Info, $"{nameof(LoadDependencyGraph)} Completed");
-        //         }));
-        // }
-        //
-        // IEnumerator RemoveScenesFromBuildProfile()
-        // {
-        //     var preProcessing = new PreProcessingScenes(m_DependencyGraph, null);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessing.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(RemoveScenesFromBuildProfile)} Completed");
-        // }
-        //
-        // IEnumerator GenerateIntakeFilter()
-        // {
-        //     var preProcessingFilter = new PreProcessingFilter(m_DependencyGraph, null, this);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(preProcessingFilter.SaveIgnoredAssetsToFile());
-        //     Log(LogLevelID.Info, $"{nameof(GenerateIntakeFilter)} Completed");
-        // }
-        //
-        // IEnumerator GenerateSubgraphs()
-        // {
-        //     var subgraphProcessor = new SubgraphProcessor(m_DependencyGraph, null);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(subgraphProcessor.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(GenerateSubgraphs)} Completed");
-        // }
-        //
-        // IEnumerator GenerateGroupLayout()
-        // {
-        //     var groupLayoutProcessor = new GroupLayoutProcessor(m_DependencyGraph, null, this);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(groupLayoutProcessor.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(GenerateGroupLayout)} Completed");
-        // }
-        //
-        // IEnumerator GenerateAddressableGroup()
-        // {
-        //     var processor = new AddressableGroupCreator(m_DependencyGraph, null);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(GenerateAddressableGroup)} Completed");
-        // }
-        //
-        // IEnumerator AddAndSetupBootScene()
-        // {
-        //     var processor = new PostProcessScenes(m_DependencyGraph, null);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(AddAndSetupBootScene)} Completed");
-        // }
-        //
-        // IEnumerator Cleanup()
-        // {
-        //     var processor = new PostProcessor(m_DependencyGraph, null);
-        //     yield return EditorCoroutineUtility.StartCoroutineOwnerless(processor.Execute());
-        //     Log(LogLevelID.Info, $"{nameof(Cleanup)} Completed");
-        // }
         
         /// <summary>
         /// Draws GUI elements centered horizontally within the available width.

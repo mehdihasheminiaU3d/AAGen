@@ -10,12 +10,13 @@ namespace AAGen
         public DependencyGraphCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
-            m_DataContainer.m_DependencyGraph = new DependencyGraph();
             Title = nameof(DependencyGraphCommandQueue);
         }
         
         public override void PreExecute()
         {
+            m_DataContainer.m_DependencyGraph = new DependencyGraph();
+            
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
             {

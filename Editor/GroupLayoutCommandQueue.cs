@@ -8,26 +8,29 @@ namespace AAGen
 {
     internal class GroupLayoutCommandQueue : CommandQueue
     {
+        readonly DataContainer m_DataContainer;
+        
         public GroupLayoutCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
-            
+            Title = nameof(GroupLayoutCommandQueue);
+        }
+
+        public override void PreExecute()
+        {
             m_DataContainer._groupLayout = new Dictionary<string, GroupLayoutInfo>();
-            
             
             //one subgraph maps to one group
             foreach (var pair in m_DataContainer._allSubgraphs)
             {
                 var hash = pair.Key;
                 var subgraph = pair.Value;
-                var templateName = m_DataContainer.Settings._GroupLayoutRules[0].TemplateName; //<--------only one for now
-                AddCommand(new ActionCommand(() => CreateGroupLayout(hash, subgraph, templateName)));
+                var templateName = m_DataContainer.Settings._GroupLayoutRules[0].TemplateName; //<-------- ToDo: Default template
+                AddCommand(new ActionCommand(() => CreateGroupLayout(hash, subgraph, templateName), hash.ToString()));
             }
             
             EnqueueCommands();
         }
-        
-        DataContainer m_DataContainer;
 
         void CreateGroupLayout(int hash, SubgraphInfo subgraph, string templateName)
         {

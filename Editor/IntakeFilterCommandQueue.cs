@@ -12,12 +12,12 @@ namespace AAGen
         public IntakeFilterCommandQueue(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
-            m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             Title = nameof(IntakeFilterCommandQueue);
         }
 
         public override void PreExecute()
         {
+            m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             AddCommandsToIgnoreByInputRules();
             AddCommandsToIgnoreUnsupportedAssets();
             AddCommand(new ActionCommand(AddBuiltinScenesToIgnoredList));
