@@ -138,6 +138,9 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
                 commandQueues.Add(new DependencyGraphCommandQueue(m_DataContainer));
             
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetIntakeFilter))
+                commandQueues.Add(new IntakeFilterCommandQueue(m_DataContainer));
+            
             return commandQueues;
         }
         

@@ -5,42 +5,38 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class IntakeFilterQueue : CommandQueue //<--- inheritance needed?
+    internal class IntakeFilterCommandQueue : CommandQueue 
     {
-        public IntakeFilterQueue(DataContainer dataContainer) 
+        readonly DataContainer m_DataContainer;
+        
+        public IntakeFilterCommandQueue(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
-            
-            AddCommand(IgnoreByInputRules());
-            AddCommand(IgnoreUnsupportedAssets());
+            Title = nameof(IntakeFilterCommandQueue);
+        }
+
+        public override void PreExecute()
+        {
+            AddCommandsToIgnoreByInputRules();
+            AddCommandsToIgnoreUnsupportedAssets();
             AddCommand(new ActionCommand(AddBuiltinScenesToIgnoredList));
             EnqueueCommands();
         }
         
-        
-        DataContainer m_DataContainer;
-        
-        //---------------------------------------------------------------------------------------------------------------
-        
-        ActionCommand IgnoreByInputRules()
+        void AddCommandsToIgnoreByInputRules()
         {
-            var root = new ActionCommand(null) { Info = "IgnoreByInputRules" };
-            
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                root.AddChild(new ActionCommand(() => AddRuledFileToIgnoredList(node)));
+                AddCommand(new ActionCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath));
             }
-
-            return root;
         }
 
         void AddRuledFileToIgnoredList(AssetNode node)
         {
             foreach (var inputFilterRule in m_DataContainer.Settings._InputFilterRules)
             {
-
                 if (inputFilterRule.IgnoreOnlySourceNodes)
                 {
                     if (inputFilterRule.ShouldIgnoreNode(node) && IsSource(node))
@@ -58,20 +54,14 @@ namespace AAGen
         {
             return m_DataContainer.m_TransposedGraph.GetNeighbors(node).Count == 0;
         }
-        
-        //----------------------------------------------------------------------------------------------------------------
 
-        ActionCommand IgnoreUnsupportedAssets()
+        void AddCommandsToIgnoreUnsupportedAssets()
         {
-            var root = new ActionCommand(null) { Info = "IgnoreUnsupportedAssets" };
-            
             var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                root.AddChild(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
+                AddCommand(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
             }
-
-            return root;
         }
 
         void AddUnsupportedFileToIgnoreAssets(AssetNode node)
@@ -82,8 +72,6 @@ namespace AAGen
                 m_DataContainer.IgnoredAssets.Add(node);
             }
         }
-        
-        //----------------------------------------------------------------------------------------------------------------
         
         void AddBuiltinScenesToIgnoredList()
         {

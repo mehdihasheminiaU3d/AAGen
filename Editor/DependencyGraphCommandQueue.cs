@@ -11,6 +11,7 @@ namespace AAGen
         {
             m_DataContainer = dataContainer;
             m_DataContainer.m_DependencyGraph = new DependencyGraph();
+            Title = nameof(DependencyGraphCommandQueue);
         }
         
         public override void PreExecute()
