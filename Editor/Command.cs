@@ -9,7 +9,7 @@ namespace AAGen
         public string Info { get; set; }
         public List<Command> Children { get; } = new List<Command>();
 
-        public void AddChild(Command child)
+        public void AddChild(Command child) //<------------------- ToDo: probably we don't need this anymore!
         {
             if (child != null && !Children.Contains(child))
                 Children.Add(child);
@@ -105,17 +105,19 @@ namespace AAGen
 
     public class DataContainer
     {
-        public DependencyGraph m_DependencyGraph;
-        public DependencyGraph m_TransposedGraph;
+        public DependencyGraph DependencyGraph;
+        public DependencyGraph TransposedGraph;
 
         public string SettingsFilePath;
         public AagenSettings Settings;
 
         public HashSet<AssetNode> IgnoredAssets;
 
-        public Category _allSubgraphs;
-        public Dictionary<int, HashSet<AssetNode>> _subgraphSources;
+        public Category Subgraphs;
+        public Dictionary<int, HashSet<AssetNode>> SubgraphSources;
 
-        public Dictionary<string, GroupLayoutInfo> _groupLayout;
+        public Dictionary<string, GroupLayoutInfo> GroupLayout;
+
+        public bool AssetEditingInProgress;
     }
 }

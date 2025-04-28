@@ -15,7 +15,7 @@ namespace AAGen
         
         public override void PreExecute()
         {
-            m_DataContainer.m_DependencyGraph = new DependencyGraph();
+            m_DataContainer.DependencyGraph = new DependencyGraph();
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var assetPath in assetPaths)
@@ -29,12 +29,12 @@ namespace AAGen
 
         void AddAssetToDependencyGraph(string assetPath)
         {
-            DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.m_DependencyGraph, assetPath);
+            DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.DependencyGraph, assetPath);
         }
 
         void CalculateTransposedGraph()
         {
-            m_DataContainer.m_TransposedGraph = new DependencyGraph(m_DataContainer.m_DependencyGraph.GetTransposedGraph());
+            m_DataContainer.TransposedGraph = new DependencyGraph(m_DataContainer.DependencyGraph.GetTransposedGraph());
         }
     }
 }

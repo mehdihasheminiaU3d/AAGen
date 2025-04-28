@@ -61,10 +61,7 @@ namespace AAGen
         {
             //Settings is loaded
             if (m_DataContainer.Settings != null)
-            {
-                Debug.Log($"Settings is loaded");
                 return;
-            }
 
             //Settings exists but not loaded, ask the user to provide one
             if (ToolSettingsExists())

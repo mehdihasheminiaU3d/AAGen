@@ -26,7 +26,7 @@ namespace AAGen
         
         void AddCommandsToIgnoreByInputRules()
         {
-            var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
+            var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
                 AddCommand(new ActionCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath));
@@ -52,12 +52,12 @@ namespace AAGen
         
         bool IsSource(AssetNode node)
         {
-            return m_DataContainer.m_TransposedGraph.GetNeighbors(node).Count == 0;
+            return m_DataContainer.TransposedGraph.GetNeighbors(node).Count == 0;
         }
 
         void AddCommandsToIgnoreUnsupportedAssets()
         {
-            var allNodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
+            var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
                 AddCommand(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));

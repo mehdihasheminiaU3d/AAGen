@@ -17,10 +17,10 @@ namespace AAGen
 
         public override void PreExecute()
         {
-            m_DataContainer._allSubgraphs = new Category();
-            m_DataContainer._subgraphSources = new Dictionary<int, HashSet<AssetNode>>();
+            m_DataContainer.Subgraphs = new Category();
+            m_DataContainer.SubgraphSources = new Dictionary<int, HashSet<AssetNode>>();
             
-            var nodes = m_DataContainer.m_DependencyGraph.GetAllNodes();
+            var nodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in nodes)
             {
                 AddCommand(new ActionCommand(() => TryAddNodeToSubgraph(node), node.AssetPath));
@@ -31,7 +31,7 @@ namespace AAGen
 
         void TryAddNodeToSubgraph(AssetNode node)
         {
-            var sources = FindSourcesForNode(node, m_DataContainer.m_TransposedGraph, m_DataContainer.IgnoredAssets);
+            var sources = FindSourcesForNode(node, m_DataContainer.TransposedGraph, m_DataContainer.IgnoredAssets);
             if (sources == null)
                 return;
 
@@ -42,16 +42,16 @@ namespace AAGen
                 
             int hash = CalculateHashForSources(sources);
 
-            if (!m_DataContainer._subgraphSources.TryAdd(hash, sources))
+            if (!m_DataContainer.SubgraphSources.TryAdd(hash, sources))
             {
-                if (!m_DataContainer._subgraphSources[hash].SetEquals(sources))
+                if (!m_DataContainer.SubgraphSources[hash].SetEquals(sources))
                     Debug.LogError($"Hash collision = inconsistent sources for subgraph {hash}");
             }
                 
             //uniqueness of Hash is key! if we want to validate uniqueness of sources, then we need to save them
             //Sources cannot be saved in subgraph. Because sources can be redundant for each record leading to a very large file
-            m_DataContainer._allSubgraphs.TryAdd(hash, subgraph);
-            var nodeAdditionSuccess = m_DataContainer._allSubgraphs[hash].Nodes.Add(node);
+            m_DataContainer.Subgraphs.TryAdd(hash, subgraph);
+            var nodeAdditionSuccess = m_DataContainer.Subgraphs[hash].Nodes.Add(node);
             
             if (!nodeAdditionSuccess)
                 Debug.LogError($"Unknown Error = node = {node} had added to subgraph ={hash} before");

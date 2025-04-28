@@ -18,10 +18,10 @@ namespace AAGen
 
         public override void PreExecute()
         {
-            m_DataContainer._groupLayout = new Dictionary<string, GroupLayoutInfo>();
+            m_DataContainer.GroupLayout = new Dictionary<string, GroupLayoutInfo>();
             
             //one subgraph maps to one group
-            foreach (var pair in m_DataContainer._allSubgraphs)
+            foreach (var pair in m_DataContainer.Subgraphs)
             {
                 var hash = pair.Key;
                 var subgraph = pair.Value;
@@ -34,10 +34,10 @@ namespace AAGen
 
         void CreateGroupLayout(int hash, SubgraphInfo subgraph, string templateName)
         {
-            var sources = m_DataContainer._subgraphSources[hash];
+            var sources = m_DataContainer.SubgraphSources[hash];
 
             var groupName = GetSubgraphName(subgraph, sources); //ToDo: Add a naming settings to customize names
-            if (m_DataContainer._groupLayout.ContainsKey(groupName))
+            if (m_DataContainer.GroupLayout.ContainsKey(groupName))
             {
                 //If name already registered, switch to fallback name
                 groupName += $"_{hash}";
@@ -50,7 +50,7 @@ namespace AAGen
             };
                     
             if (groupLayoutInfo.Nodes.Count > 0)
-                m_DataContainer._groupLayout.Add(groupName, groupLayoutInfo);
+                m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
         }
         
         static string GetSubgraphName(SubgraphInfo subgraph, HashSet<AssetNode> sources)

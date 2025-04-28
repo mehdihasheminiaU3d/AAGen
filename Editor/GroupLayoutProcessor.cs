@@ -12,7 +12,7 @@ using AAGen.Shared;
 
 namespace AAGen
 {
-    public class Category : Dictionary<int, SubgraphInfo>
+    public class Category : Dictionary<int, SubgraphInfo> //<------ToDo: Do we need this wrapper class in v2.0 ?
     {
         public bool CanMoveFrom;
         public bool CanMoveTo;

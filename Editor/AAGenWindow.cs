@@ -127,6 +127,12 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateGroupLayout))
                 commandQueues.Add(new GroupLayoutCommandQueue(m_DataContainer));
             
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateAddressableGroups))
+                commandQueues.Add(new AddressableGroupCommandQueue(m_DataContainer));
+            
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
+                commandQueues.Add(new AddressableCleanupCommandQueue(m_DataContainer));
+            
             return commandQueues;
             
             //     Log(LogLevelID.Info, $"{nameof(AddDefaultSettingsSequence)} Completed");
@@ -174,8 +180,9 @@ namespace AAGen
                     if (error)
                     {
                         Debug.LogError(exception.Message);
-                        Progress.Remove(progressId);
                         m_IsProcessing = false;
+                        StopAssetEditingIfNeeded();
+                        Progress.Remove(progressId);
                         yield break;
                     }
                     
@@ -237,6 +244,7 @@ namespace AAGen
             {
                 EditorUtility.ClearProgressBar();
                 m_IsProcessing = false;
+                StopAssetEditingIfNeeded();
             }
         }
         
@@ -269,6 +277,15 @@ namespace AAGen
             if (logLevel <= m_Settings.LogLevel)
             {
                 Debug.Log($"{GetType().Name}: {message}");
+            }
+        }
+
+        void StopAssetEditingIfNeeded()
+        {
+            if(m_DataContainer.AssetEditingInProgress)
+            {
+                AssetDatabase.StopAssetEditing();
+                m_DataContainer.AssetEditingInProgress = false;
             }
         }
     }
