@@ -57,7 +57,7 @@ namespace AAGen
             }
         }
 
-        void LoadSettingsFile()
+        void LoadSettingsFileInEditor()
         {
             m_Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(m_DataContainer.SettingsFilePath);
         }
@@ -105,7 +105,7 @@ namespace AAGen
         List<CommandQueue> InitializeCommands()
         {
             var loadSettingsQueue = new CommandQueue();
-            var loadSettingsCommand = new ActionCommand(LoadSettingsFile, nameof(LoadSettingsFile));
+            var loadSettingsCommand = new ActionCommand(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor));
             loadSettingsQueue.AddCommand(loadSettingsCommand);
             loadSettingsQueue.EnqueueCommands();
 

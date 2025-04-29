@@ -36,6 +36,12 @@ namespace AAGen
                 return; //the default addressable asset settings already created
 
             CreateDefaultAddressableSettings();
+            
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            if (settings == null)
+                throw new Exception($"Addressable Asset Settings not found!");
+
+            m_DataContainer.AddressableSettings = settings;
         }
 
         bool AddressableSettingsExists()
@@ -122,6 +128,10 @@ namespace AAGen
                 };
 
                 var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
+                if (defaultGroupTemplate == null)
+                    throw new Exception($"cannot find default addressable group template");
+                settings.m_DefaultGroupTemplate = defaultGroupTemplate;
+                
                 settings._GroupLayoutRules = new List<GroupLayoutRule>
                 {
                     CreateGroupLayoutRule(CategoryId.ExclusiveToSingleSource, defaultGroupTemplate),

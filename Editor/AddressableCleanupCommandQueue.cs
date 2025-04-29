@@ -15,14 +15,9 @@ namespace AAGen
         }
         
         readonly DataContainer m_DataContainer;
-        AddressableAssetSettings m_AddressableSettings; 
         
         public override void PreExecute()
         {
-            m_AddressableSettings = AddressableAssetSettingsDefaultObject.Settings;
-            if (m_AddressableSettings == null)
-                throw new Exception($"Addressable Asset Settings not found!");
-            
             AddCommand(new ActionCommand(StartAssetEditing));
             AddCommand(new ActionCommand(RemoveEmptyAddressableGroups));
             AddCommand(new ActionCommand(StopAssetEditing));
@@ -31,11 +26,11 @@ namespace AAGen
 
         void RemoveEmptyAddressableGroups()
         {
-            var groups = m_AddressableSettings.groups.Where(CanRemoveGroup).ToList();
+            var groups = m_DataContainer.AddressableSettings.groups.Where(CanRemoveGroup).ToList();
 
             foreach (var group in groups)
             {
-                m_AddressableSettings.RemoveGroup(group);
+                m_DataContainer.AddressableSettings.RemoveGroup(group);
             }
         }
 
@@ -43,7 +38,7 @@ namespace AAGen
         {
             return group.entries.Count == 0 && 
                    !group.ReadOnly && 
-                   group != m_AddressableSettings.DefaultGroup;
+                   group != m_DataContainer.AddressableSettings.DefaultGroup;
         }
         
         void StartAssetEditing()

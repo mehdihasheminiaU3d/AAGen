@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AAGen.AssetDependencies;
+using UnityEditor.AddressableAssets.Settings;
 
 namespace AAGen
 {
@@ -110,6 +111,7 @@ namespace AAGen
 
         public string SettingsFilePath;
         public AagenSettings Settings;
+        public AddressableAssetSettings AddressableSettings;
 
         public HashSet<AssetNode> IgnoredAssets;
 

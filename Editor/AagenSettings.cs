@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AAGen.Shared;
+using UnityEditor.AddressableAssets.Settings;
+using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -32,6 +34,7 @@ namespace AAGen
         ProcessingStepID m_ProcessingSteps = (ProcessingStepID)~0;
         [SerializeField]
         bool m_RunInBackground;
+        public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [Header("Rules")]
         public List<InputFilterRule> _InputFilterRules;
         public List<MergeRule> _MergeRules;

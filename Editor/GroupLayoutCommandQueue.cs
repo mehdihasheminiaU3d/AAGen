@@ -25,7 +25,7 @@ namespace AAGen
             {
                 var hash = pair.Key;
                 var subgraph = pair.Value;
-                var templateName = m_DataContainer.Settings._GroupLayoutRules[0].TemplateName; //<-------- ToDo: Default template
+                var templateName = m_DataContainer.Settings.m_DefaultGroupTemplate.Name;
                 AddCommand(new ActionCommand(() => CreateGroupLayout(hash, subgraph, templateName), hash.ToString()));
             }
             
