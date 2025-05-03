@@ -70,19 +70,10 @@ namespace AAGen
             {
                 var node = allNodes[i];
                 
-                foreach (var inputFilterRule in _parentUi.Settings._InputFilterRules)
+                foreach (var inputFilterRule in _parentUi.Settings.InputFilterRules)
                 {
-
-                    if (inputFilterRule.IgnoreOnlySourceNodes)
-                    {
-                        if (inputFilterRule.ShouldIgnoreNode(node) && IsSource(node))
-                            ignoredNodes.Add(node);
-                    }
-                    else
-                    {
-                        if (inputFilterRule.ShouldIgnoreNode(node))
-                            ignoredNodes.Add(node);
-                    }
+                    if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
+                        ignoredNodes.Add(node);
                 }
 
                 if (ShouldUpdateUi)

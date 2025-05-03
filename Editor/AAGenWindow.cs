@@ -118,8 +118,8 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
                 commandQueues.Add(new DependencyGraphCommandQueue(m_DataContainer));
             
-            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetIntakeFilter))
-                commandQueues.Add(new IntakeFilterCommandQueue(m_DataContainer));
+            if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetInputFilter))
+                commandQueues.Add(new InputFilterCommandQueue(m_DataContainer));
             
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateSubGraphs))
                 commandQueues.Add(new SubgraphCommandQueue(m_DataContainer));

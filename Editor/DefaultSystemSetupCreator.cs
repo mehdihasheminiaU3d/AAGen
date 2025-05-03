@@ -70,10 +70,9 @@ namespace AAGen
                 
                 var settings = ScriptableObject.CreateInstance<AagenSettings>();
                 
-                settings._InputFilterRules = new List<InputFilterRule>
+                settings.InputFilterRules = new List<InputFilterRule>
                 {
-                    CreateDefaultInputRule(),
-                    CreateHardIgnoreInputRule()
+                    CreateDefaultInputRule()
                 };
 
                 settings._MergeRules = new List<MergeRule>
@@ -123,10 +122,9 @@ namespace AAGen
                 var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagenSettings)}.asset");
                 var settings = ScriptableObject.CreateInstance<AagenSettings>();
                 
-                settings._InputFilterRules = new List<InputFilterRule>
+                settings.InputFilterRules = new List<InputFilterRule>
                 {
-                    CreateDefaultInputRule(),
-                    CreateHardIgnoreInputRule()
+                    CreateDefaultInputRule()
                 };
 
                 settings._MergeRules = new List<MergeRule>
@@ -167,34 +165,53 @@ namespace AAGen
         InputFilterRule CreateDefaultInputRule()
         {
             var inputFilterRulePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(InputFilterRule)}.asset");
-            var inputFilterRule = ScriptableObject.CreateInstance<IgnoreAssetByPathRule>();
-            inputFilterRule._IgnoreOnlySourceNodes = true;
-            inputFilterRule._IgnorePathsExcept = new List<string> { "Assets/" };
-            inputFilterRule._IgnorePaths = new List<string>
+            var inputFilterRule = ScriptableObject.CreateInstance<PathFilterRule>();
+            inputFilterRule.m_Criteria = new List<PathFilterCriterion>
             {
-                "/Editor/",
-                "Assets/Plugins",
+                new PathFilterCriterion()
+                {
+                    m_Description = "Ignore all except files in Assets folder",
+                    m_PathMatchCondition = PathMatchCondition.DoesNotContain,
+                    m_PathKeyword = "Assets/",
+                    m_InclusionAction = InclusionAction.IgnoreIfSourceOnly,
+                },
+                new PathFilterCriterion()
+                {
+                    m_Description = "Ignore assets in Editor folders",
+                    m_PathMatchCondition = PathMatchCondition.Contains,
+                    m_PathKeyword = "/Editor/",
+                    m_InclusionAction = InclusionAction.IgnoreIfSourceOnly,
+                },
+                new PathFilterCriterion()
+                {
+                    m_Description = "Ignore Plugins",
+                    m_PathMatchCondition = PathMatchCondition.Contains,
+                    m_PathKeyword = "Assets/Plugins",
+                    m_InclusionAction = InclusionAction.IgnoreIfSourceOnly,
+                },
+                new PathFilterCriterion() 
+                {
+                    m_Description = "Ignore Addressable data files",
+                    m_PathMatchCondition = PathMatchCondition.Contains,
+                    m_PathKeyword = "Assets/AddressableAssetsData",
+                    m_InclusionAction = InclusionAction.AlwaysIgnore,
+                },
+                new PathFilterCriterion()
+                {
+                    m_Description = "Ignore assets in StreamingAssets folder",
+                    m_PathMatchCondition = PathMatchCondition.Contains,
+                    m_PathKeyword = "Assets/StreamingAssets",
+                    m_InclusionAction = InclusionAction.AlwaysIgnore,
+                },
+                new PathFilterCriterion()
+                {
+                    m_Description = "Ignore Resources",
+                    m_PathMatchCondition = PathMatchCondition.Contains,
+                    m_PathKeyword = "/Resources/",
+                    m_InclusionAction = InclusionAction.AlwaysIgnore,
+                }
             };
-            inputFilterRule._DontIgnorePaths = new List<string>();
-            AssetDatabase.CreateAsset(inputFilterRule, inputFilterRulePath);
-            AssetDatabase.SaveAssets();
-            return inputFilterRule;
-        }
-        
-        InputFilterRule CreateHardIgnoreInputRule()
-        {
-            var inputFilterRulePath = Path.Combine(DefaultAagenSettingsFolder, $"HardIgnore {nameof(InputFilterRule)}.asset");
-            var inputFilterRule = ScriptableObject.CreateInstance<IgnoreAssetByPathRule>();
-            inputFilterRule._IgnoreOnlySourceNodes = false;
-            inputFilterRule._IgnorePathsExcept = new List<string>();
-            inputFilterRule._IgnorePaths = new List<string>
-            {
-                "Assets/AddressableAssetsData",
-                "Assets/StreamingAssets",
-                "/Resources/",
-                "Assets/Gizmos"
-            };
-            inputFilterRule._DontIgnorePaths = new List<string>();
+            
             AssetDatabase.CreateAsset(inputFilterRule, inputFilterRulePath);
             AssetDatabase.SaveAssets();
             return inputFilterRule;

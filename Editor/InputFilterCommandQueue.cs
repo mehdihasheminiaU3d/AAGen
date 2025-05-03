@@ -5,14 +5,14 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class IntakeFilterCommandQueue : CommandQueue 
+    internal class InputFilterCommandQueue : CommandQueue 
     {
         readonly DataContainer m_DataContainer;
         
-        public IntakeFilterCommandQueue(DataContainer dataContainer) 
+        public InputFilterCommandQueue(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
-            Title = nameof(IntakeFilterCommandQueue);
+            Title = nameof(InputFilterCommandQueue);
         }
 
         public override void PreExecute()
@@ -35,18 +35,10 @@ namespace AAGen
 
         void AddRuledFileToIgnoredList(AssetNode node)
         {
-            foreach (var inputFilterRule in m_DataContainer.Settings._InputFilterRules)
+            foreach (var inputFilterRule in m_DataContainer.Settings.InputFilterRules)
             {
-                if (inputFilterRule.IgnoreOnlySourceNodes)
-                {
-                    if (inputFilterRule.ShouldIgnoreNode(node) && IsSource(node))
-                        m_DataContainer.IgnoredAssets.Add(node);
-                }
-                else
-                {
-                    if (inputFilterRule.ShouldIgnoreNode(node))
-                        m_DataContainer.IgnoredAssets.Add(node);
-                }
+                if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
+                    m_DataContainer.IgnoredAssets.Add(node);
             }
         }
         

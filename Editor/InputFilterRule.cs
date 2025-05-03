@@ -9,12 +9,6 @@ namespace AAGen
     /// </summary>
     public abstract class InputFilterRule : ScriptableObject
     {
-        [SerializeField,
-         Tooltip("Ignores the specified nodes in the rule only if they're source nodes")]
-        public bool _IgnoreOnlySourceNodes = true;
-
-        public bool IgnoreOnlySourceNodes => _IgnoreOnlySourceNodes;
-
-        public abstract bool ShouldIgnoreNode(AssetNode node);
+        public abstract bool ShouldIgnoreNode(AssetNode node, bool isSourceNode);
     }
 }

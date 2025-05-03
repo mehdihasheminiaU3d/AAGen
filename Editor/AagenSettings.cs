@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using AAGen.Shared;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -12,7 +11,7 @@ namespace AAGen
     {
         GenerateDependencyGraph = 1 << 0,
         RemoveScenesFromBuildProfile = 1 << 1,
-        AssetIntakeFilter = 1 << 2,
+        AssetInputFilter = 1 << 2,
         GenerateSubGraphs = 1 << 3,
         GenerateGroupLayout = 1 << 4,
         GenerateAddressableGroups = 1 << 5,
@@ -36,7 +35,7 @@ namespace AAGen
         bool m_RunInBackground;
         public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [Header("Rules")]
-        public List<InputFilterRule> _InputFilterRules;
+        public List<InputFilterRule> InputFilterRules;
         public List<MergeRule> _MergeRules;
         public List<GroupLayoutRule> _GroupLayoutRules;
         [Space]
