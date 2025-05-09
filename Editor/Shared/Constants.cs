@@ -36,5 +36,6 @@ namespace AAGen.Shared
         
         public static string FolderPath => Path.Combine(Application.persistentDataPath, "DependencyGraph");
         public static string DependencyGraphFilePath => Path.Combine(FolderPath, "DependencyGraph.txt");
+        public static string SummaryReportPath => Path.Combine(Application.persistentDataPath, "SummaryReport.txt");
     }
 }

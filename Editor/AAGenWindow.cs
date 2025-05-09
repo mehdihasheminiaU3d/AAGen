@@ -98,21 +98,17 @@ namespace AAGen
             m_DataContainer = new DataContainer
             {
                 Settings = m_Settings,
-                SettingsFilePath = AssetDatabase.GetAssetPath(m_Settings)
+                SettingsFilePath = AssetDatabase.GetAssetPath(m_Settings),
+                SummaryReport = new SummaryReport(m_Settings)
             };
         }
         
         List<CommandQueue> InitializeCommands()
         {
-            var loadSettingsQueue = new CommandQueue();
-            var loadSettingsCommand = new ActionCommand(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor));
-            loadSettingsQueue.AddCommand(loadSettingsCommand);
-            loadSettingsQueue.EnqueueCommands();
-
-            var commandQueues =  new List<CommandQueue>  
-            { 
+            var commandQueues = new List<CommandQueue>
+            {
                 new SettingsFilesCommandQueue(m_DataContainer),
-                loadSettingsQueue,
+                new CommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor))
             };
 
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
@@ -132,6 +128,8 @@ namespace AAGen
             
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
                 commandQueues.Add(new AddressableCleanupCommandQueue(m_DataContainer));
+
+            commandQueues.Add(new CommandQueue(m_DataContainer.SummaryReport.WriteReportToDisk, nameof(SummaryReport.WriteReportToDisk)));
             
             return commandQueues;
             

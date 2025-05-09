@@ -32,8 +32,11 @@ namespace AAGen
 
         void FindOrCreateDefaultAddressableSettings()
         {
-            if (AddressableSettingsExists()) 
+            if (AddressableSettingsExists())
+            {
+                m_DataContainer.AddressableSettings = AddressableAssetSettingsDefaultObject.Settings;
                 return; //the default addressable asset settings already created
+            }
 
             CreateDefaultAddressableSettings();
             

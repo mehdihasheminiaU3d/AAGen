@@ -18,11 +18,15 @@ namespace AAGen
             m_DataContainer.DependencyGraph = new DependencyGraph();
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
+            
             foreach (var assetPath in assetPaths)
             {
                 AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath), assetPath));
             }
             AddCommand(new ActionCommand(CalculateTransposedGraph));
+            
+            //report
+            AddCommand(new ActionCommand(() => AddToReport($"Total Asset Count = {assetPaths.Length}")));
             
             EnqueueCommands(); 
         }
@@ -35,6 +39,11 @@ namespace AAGen
         void CalculateTransposedGraph()
         {
             m_DataContainer.TransposedGraph = new DependencyGraph(m_DataContainer.DependencyGraph.GetTransposedGraph());
+        }
+
+        void AddToReport(string value)
+        {
+            m_DataContainer.SummaryReport.TryAdd(value);
         }
     }
 }

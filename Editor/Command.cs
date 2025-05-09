@@ -39,6 +39,13 @@ namespace AAGen
             EnqueueCommands();
         }
         
+        public CommandQueue(Action action, string info)
+        {
+            var loadSettingsCommand = new ActionCommand(action, info);
+            AddCommand(loadSettingsCommand);
+            EnqueueCommands();
+        }
+        
         public string Title { get; set; }
         readonly Queue<Command> m_ProcessingQueue = new Queue<Command>();
         readonly Command m_Root = new ActionCommand();
@@ -121,5 +128,7 @@ namespace AAGen
         public Dictionary<string, GroupLayoutInfo> GroupLayout;
 
         public bool AssetEditingInProgress;
+
+        public SummaryReport SummaryReport;
     }
 }

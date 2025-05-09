@@ -38,12 +38,17 @@ namespace AAGen
         public List<InputFilterRule> InputFilterRules;
         public List<MergeRule> _MergeRules;
         public List<GroupLayoutRule> _GroupLayoutRules;
-        [Space]
+
+        [Header("Reports")]
+        [SerializeField]
+        bool m_GenerateSummaryReport;
         [SerializeField]
         LogLevelID m_LogLevel = LogLevelID.OnlyErrors;
 
         public ProcessingStepID ProcessingSteps => m_ProcessingSteps;
         public LogLevelID LogLevel => m_LogLevel;
         public bool RunInBackground => m_RunInBackground;
+
+        public bool GenerateSummaryReport => m_GenerateSummaryReport;
     }
 }
