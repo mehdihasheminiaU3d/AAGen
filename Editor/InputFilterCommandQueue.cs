@@ -9,6 +9,9 @@ namespace AAGen
     {
         readonly DataContainer m_DataContainer;
         
+        int m_NumUnsupportedFiles = 0;
+        int m_NumIgnoredbyRule = 0;
+        
         public InputFilterCommandQueue(DataContainer dataContainer) 
         {
             m_DataContainer = dataContainer;
@@ -31,6 +34,8 @@ namespace AAGen
             {
                 AddCommand(new ActionCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath));
             }
+            
+            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Number of ignored files by rules = {m_NumIgnoredbyRule}")));
         }
 
         void AddRuledFileToIgnoredList(AssetNode node)
@@ -38,7 +43,10 @@ namespace AAGen
             foreach (var inputFilterRule in m_DataContainer.Settings.InputFilterRules)
             {
                 if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
+                {
                     m_DataContainer.IgnoredAssets.Add(node);
+                    m_NumIgnoredbyRule++;
+                }
             }
         }
         
@@ -54,14 +62,17 @@ namespace AAGen
             {
                 AddCommand(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
             }
+            
+            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Number of unsupported files ignored = {m_NumUnsupportedFiles}")));
         }
-
+        
         void AddUnsupportedFileToIgnoreAssets(AssetNode node)
         {
             var mainAssetType = AssetDatabase.GetMainAssetTypeAtPath(node.AssetPath);
             if (mainAssetType == null || mainAssetType == typeof(DefaultAsset))
             {
                 m_DataContainer.IgnoredAssets.Add(node);
+                m_NumUnsupportedFiles++;
             }
         }
         
@@ -73,6 +84,9 @@ namespace AAGen
             
             var sceneNodes = scenes.Select(scene => AssetNode.FromAssetPath(scene.path)).ToHashSet();
             m_DataContainer.IgnoredAssets.UnionWith(sceneNodes);
+            
+            //We can use it here because it's a command
+            m_DataContainer.SummaryReport.TryAdd($"Number of built-in scenes ignored = {scenes.Length}");
         }
     }
 }

@@ -25,8 +25,8 @@ namespace AAGen
             }
             AddCommand(new ActionCommand(CalculateTransposedGraph));
             
-            //report
-            AddCommand(new ActionCommand(() => AddToReport($"Total Asset Count = {assetPaths.Length}")));
+            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Total Asset Count = {assetPaths.Length}")));
+            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Total Node Count = {m_DataContainer.DependencyGraph.NodeCount}")));
             
             EnqueueCommands(); 
         }
@@ -39,11 +39,6 @@ namespace AAGen
         void CalculateTransposedGraph()
         {
             m_DataContainer.TransposedGraph = new DependencyGraph(m_DataContainer.DependencyGraph.GetTransposedGraph());
-        }
-
-        void AddToReport(string value)
-        {
-            m_DataContainer.SummaryReport.TryAdd(value);
         }
     }
 }

@@ -83,6 +83,11 @@ namespace AAGen
         {
             Root.AddChild(node);
         }
+        
+        public void AddCommand(Action action, string info=null)
+        {
+            Root.AddChild(new ActionCommand(action, info));
+        }
     }
     
     public class ActionCommand : Command
@@ -94,12 +99,7 @@ namespace AAGen
             m_Action = null;
         }
         
-        public ActionCommand(Action action)
-        {
-            m_Action = action;
-        }
-        
-        public ActionCommand(Action action, string info)
+        public ActionCommand(Action action, string info = null)
         {
             m_Action = action;
             Info = info;

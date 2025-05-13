@@ -209,21 +209,21 @@ namespace AAGen
             {
                 for (int i = 0; i < commandQueues.Count; i++)
                 {
-                    var currentProcessor = commandQueues[i];
-                    currentProcessor.PreExecute();
+                    var currentQueue = commandQueues[i];
+                    currentQueue.PreExecute();
 
                     float progressStart = (float)i / commandQueues.Count;
                     float progressEnd = (float)(i + 1) / commandQueues.Count; 
 
                     int progress = 0;
-                    int totalCount = currentProcessor.RemainingCommandCount;
+                    int totalCount = currentQueue.RemainingCommandCount;
                     
-                    var progressBarTitle = currentProcessor.Title;
+                    var progressBarTitle = currentQueue.Title;
                     var progressBarInfo = "Processing ...";
                     
-                    while (currentProcessor.RemainingCommandCount > 0)
+                    while (currentQueue.RemainingCommandCount > 0)
                     {
-                        var info = currentProcessor.ExecuteNextCommand();
+                        var info = currentQueue.ExecuteNextCommand();
                         progress++;
                         
                         progressBarInfo = string.IsNullOrEmpty(info) ? progressBarInfo : info;
