@@ -19,11 +19,12 @@ When the AAGen window opens (Tools > Automated Addressable Grouping Tool), it de
 ## Documentation
 - Introductory Guide : [Link](https://docs.google.com/document/d/1EWuvrttQIKcIeIJvLuVkujtJQVETHVSZBYUjIjknP0k/edit?usp=sharing)
 - Comprehensive Guide : [Link](https://docs.google.com/document/d/1zlxPaWpsz85uIXgAWt22gKm0-s3JAUpuQPgtKvNgW7I/edit?usp=sharing)
-- Slides : [Link](https://docs.google.com/presentation/d/1JahSS4w8OH3YEE9U0892XtTAs01BTSP74OpIbsy1lKQ/edit?usp=sharing)
+- Slides : [Link](https://docs.google.com/presentation/d/1WGxOmsQTfDDkL84O4ky5MFJ4OGtginClFkuI1-2iio8/edit?usp=sharing)
 
 ## Tested Unity Versions
 - Unity 6 (6000.0)
-- Unity 2022.3  
+- Unity 2022.3
+- Unity 2021.3  
 
 ## License
 **All Rights Reserved**  
