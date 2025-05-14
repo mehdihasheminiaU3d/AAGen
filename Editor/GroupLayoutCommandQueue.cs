@@ -87,5 +87,21 @@ namespace AAGen
                 
             return name;
         }
+        
+        public override void PostExecute()
+        {
+            AppendToSummaryReport();
+        }
+
+        void AppendToSummaryReport()
+        {
+            if (!m_DataContainer.Settings.GenerateSummaryReport)
+                return;
+
+            var summary =
+                $"";
+            
+            m_DataContainer.SummaryReport.AppendLine(summary);
+        }
     }
 }

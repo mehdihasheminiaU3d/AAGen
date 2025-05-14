@@ -52,9 +52,9 @@ namespace AAGen
             if (!m_DataContainer.Settings.GenerateSummaryReport)
                 return;
 
-            var summary =
-                $"Total Asset Count = {m_TotalAssetCount} \n" +
-                $"Total Node Count = {m_DataContainer.DependencyGraph.NodeCount}";
+            var summary = $"\n=== Dependency Graph ===\n";
+            summary += $"{nameof(m_TotalAssetCount).ToReadableFormat()} = {m_TotalAssetCount}\n";
+            summary += $"Total Node Count = {m_DataContainer.DependencyGraph.NodeCount}";
             
             m_DataContainer.SummaryReport.AppendLine(summary); 
         }

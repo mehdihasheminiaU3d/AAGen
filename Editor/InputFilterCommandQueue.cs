@@ -10,9 +10,9 @@ namespace AAGen
         readonly DataContainer m_DataContainer;
         
         //Summary report values
-        int m_NumUnsupportedFiles = 0;
-        int m_NumIgnoredByRule = 0;
-        int m_NumBuiltinScenes = 0;
+        int m_IgnoredUnsupportedFiles = 0;
+        int m_NodesIgnoredByRules = 0;
+        int m_IgnoredScenesInBuildProfile = 0;
         
         public InputFilterCommandQueue(DataContainer dataContainer) 
         {
@@ -45,7 +45,7 @@ namespace AAGen
                 if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
                 {
                     m_DataContainer.IgnoredAssets.Add(node);
-                    m_NumIgnoredByRule++;
+                    m_NodesIgnoredByRules++;
                 }
             }
         }
@@ -70,14 +70,14 @@ namespace AAGen
             if (mainAssetType == null || mainAssetType == typeof(DefaultAsset))
             {
                 m_DataContainer.IgnoredAssets.Add(node);
-                m_NumUnsupportedFiles++;
+                m_IgnoredUnsupportedFiles++;
             }
         }
         
         void AddBuiltinScenesToIgnoredList()
         {
             var scenes = EditorBuildSettings.scenes; //scenes in build profile
-            m_NumBuiltinScenes = scenes.Length;
+            m_IgnoredScenesInBuildProfile = scenes.Length;
             if (scenes.Length == 0)
                 return;
             
@@ -95,10 +95,14 @@ namespace AAGen
             if (!m_DataContainer.Settings.GenerateSummaryReport)
                 return;
 
-            var summary =
-                $"Number of ignored files by rules = {m_NumIgnoredByRule} \n" +
-                $"Number of unsupported files ignored = {m_NumUnsupportedFiles} \n" +
-                $"Number of built-in scenes ignored = {m_NumBuiltinScenes}";
+            var summary = $"\n=== Input Filter ===\n";
+            summary += $"{nameof(m_NodesIgnoredByRules).ToReadableFormat()} = {m_NodesIgnoredByRules} \n";
+            summary += $"{nameof(m_IgnoredUnsupportedFiles).ToReadableFormat()} = {m_IgnoredUnsupportedFiles} \n";
+            summary += $"{nameof(m_IgnoredScenesInBuildProfile).ToReadableFormat()} = {m_IgnoredScenesInBuildProfile}\n";
+            summary += $"----------\n";
+            var nodesPassed = m_DataContainer.DependencyGraph.NodeCount -
+                              (m_NodesIgnoredByRules + m_IgnoredUnsupportedFiles + m_IgnoredScenesInBuildProfile);
+            summary += $"{nameof(nodesPassed).ToReadableFormat()} = {nodesPassed}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }

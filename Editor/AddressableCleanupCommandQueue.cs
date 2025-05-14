@@ -53,5 +53,21 @@ namespace AAGen
             m_DataContainer.AssetEditingInProgress = false;
             AssetDatabase.Refresh();
         }
+        
+        public override void PostExecute()
+        {
+            AppendToSummaryReport();
+        }
+
+        void AppendToSummaryReport()
+        {
+            if (!m_DataContainer.Settings.GenerateSummaryReport)
+                return;
+
+            var summary =
+                $"";
+            
+            m_DataContainer.SummaryReport.AppendLine(summary);
+        }
     }
 }
