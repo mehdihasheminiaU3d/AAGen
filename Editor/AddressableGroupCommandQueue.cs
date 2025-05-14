@@ -15,6 +15,8 @@ namespace AAGen
         
         readonly DataContainer m_DataContainer;
         
+        int m_AddressableGroupCreated;
+        
         public override void PreExecute()
         {
             AddCommand(new ActionCommand(StartAssetEditing));
@@ -34,6 +36,7 @@ namespace AAGen
         void CreateGroupAndMoveAssets(string groupName, GroupLayoutInfo groupLayoutInfo)
         {
             var addressableGroup = CreateGroupFromTemplate(groupName, groupLayoutInfo.TemplateName);
+            m_AddressableGroupCreated++;
 
             foreach (var node in groupLayoutInfo.Nodes)
             {
@@ -100,8 +103,8 @@ namespace AAGen
             if (!m_DataContainer.Settings.GenerateSummaryReport)
                 return;
 
-            var summary =
-                $"";
+            var summary = $"\n=== Addressable Groups ===\n";
+            summary += $"{nameof(m_AddressableGroupCreated).ToReadableFormat()} = {m_AddressableGroupCreated}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }

@@ -9,6 +9,9 @@ namespace AAGen
     internal class GroupLayoutCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
+
+        int m_SubgraphsProcessed;
+        int m_GroupLayoutCreated;
         
         public GroupLayoutCommandQueue(DataContainer dataContainer)
         {
@@ -34,6 +37,8 @@ namespace AAGen
 
         void CreateGroupLayout(int hash, SubgraphInfo subgraph, string templateName)
         {
+            m_SubgraphsProcessed++;
+            
             var sources = m_DataContainer.SubgraphSources[hash];
 
             var groupName = GetSubgraphName(subgraph, sources); //ToDo: Add a naming settings to customize names
@@ -50,7 +55,10 @@ namespace AAGen
             };
                     
             if (groupLayoutInfo.Nodes.Count > 0)
+            {
                 m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
+                m_GroupLayoutCreated++;
+            }
         }
         
         static string GetSubgraphName(SubgraphInfo subgraph, HashSet<AssetNode> sources)
@@ -98,8 +106,9 @@ namespace AAGen
             if (!m_DataContainer.Settings.GenerateSummaryReport)
                 return;
 
-            var summary =
-                $"";
+            var summary = $"\n=== Group Layout ===\n";
+            summary += $"{nameof(m_SubgraphsProcessed).ToReadableFormat()} = {m_SubgraphsProcessed}\n";
+            summary += $"{nameof(m_GroupLayoutCreated).ToReadableFormat()} = {m_GroupLayoutCreated}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }
