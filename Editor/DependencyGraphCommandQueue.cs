@@ -7,6 +7,9 @@ namespace AAGen
     {
         readonly DataContainer m_DataContainer;
         
+        //Summary report values
+        int m_TotalAssetCount = 0;
+        
         public DependencyGraphCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
@@ -18,15 +21,13 @@ namespace AAGen
             m_DataContainer.DependencyGraph = new DependencyGraph();
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
+            m_TotalAssetCount = assetPaths.Length;
             
             foreach (var assetPath in assetPaths)
             {
                 AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath), assetPath));
             }
             AddCommand(new ActionCommand(CalculateTransposedGraph));
-            
-            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Total Asset Count = {assetPaths.Length}")));
-            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Total Node Count = {m_DataContainer.DependencyGraph.NodeCount}")));
             
             EnqueueCommands(); 
         }
@@ -39,6 +40,23 @@ namespace AAGen
         void CalculateTransposedGraph()
         {
             m_DataContainer.TransposedGraph = new DependencyGraph(m_DataContainer.DependencyGraph.GetTransposedGraph());
+        }
+
+        public override void PostExecute()
+        {
+            AppendToSummaryReport();
+        }
+
+        void AppendToSummaryReport()
+        {
+            if (!m_DataContainer.Settings.GenerateSummaryReport)
+                return;
+
+            var summary =
+                $"Total Asset Count = {m_TotalAssetCount} \n" +
+                $"Total Node Count = {m_DataContainer.DependencyGraph.NodeCount}";
+            
+            m_DataContainer.SummaryReport.AppendLine(summary); 
         }
     }
 }

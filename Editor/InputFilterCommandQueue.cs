@@ -9,8 +9,10 @@ namespace AAGen
     {
         readonly DataContainer m_DataContainer;
         
+        //Summary report values
         int m_NumUnsupportedFiles = 0;
-        int m_NumIgnoredbyRule = 0;
+        int m_NumIgnoredByRule = 0;
+        int m_NumBuiltinScenes = 0;
         
         public InputFilterCommandQueue(DataContainer dataContainer) 
         {
@@ -34,8 +36,6 @@ namespace AAGen
             {
                 AddCommand(new ActionCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath));
             }
-            
-            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Number of ignored files by rules = {m_NumIgnoredbyRule}")));
         }
 
         void AddRuledFileToIgnoredList(AssetNode node)
@@ -45,7 +45,7 @@ namespace AAGen
                 if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
                 {
                     m_DataContainer.IgnoredAssets.Add(node);
-                    m_NumIgnoredbyRule++;
+                    m_NumIgnoredByRule++;
                 }
             }
         }
@@ -62,8 +62,6 @@ namespace AAGen
             {
                 AddCommand(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
             }
-            
-            AddCommand(new ActionCommand(() => m_DataContainer.SummaryReport.TryAdd($"Number of unsupported files ignored = {m_NumUnsupportedFiles}")));
         }
         
         void AddUnsupportedFileToIgnoreAssets(AssetNode node)
@@ -79,14 +77,30 @@ namespace AAGen
         void AddBuiltinScenesToIgnoredList()
         {
             var scenes = EditorBuildSettings.scenes; //scenes in build profile
+            m_NumBuiltinScenes = scenes.Length;
             if (scenes.Length == 0)
                 return;
             
             var sceneNodes = scenes.Select(scene => AssetNode.FromAssetPath(scene.path)).ToHashSet();
             m_DataContainer.IgnoredAssets.UnionWith(sceneNodes);
+        }
+        
+        public override void PostExecute()
+        {
+            AppendToSummaryReport();
+        }
+
+        void AppendToSummaryReport()
+        {
+            if (!m_DataContainer.Settings.GenerateSummaryReport)
+                return;
+
+            var summary =
+                $"Number of ignored files by rules = {m_NumIgnoredByRule} \n" +
+                $"Number of unsupported files ignored = {m_NumUnsupportedFiles} \n" +
+                $"Number of built-in scenes ignored = {m_NumBuiltinScenes}";
             
-            //We can use it here because it's a command
-            m_DataContainer.SummaryReport.TryAdd($"Number of built-in scenes ignored = {scenes.Length}");
+            m_DataContainer.SummaryReport.AppendLine(summary);
         }
     }
 }

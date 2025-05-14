@@ -71,6 +71,10 @@ namespace AAGen
         public virtual void PreExecute()
         {
         }
+        
+        public virtual void PostExecute()
+        {
+        }
 
         public string ExecuteNextCommand()
         {
@@ -129,6 +133,6 @@ namespace AAGen
 
         public bool AssetEditingInProgress;
 
-        public SummaryReport SummaryReport;
+        public SummaryReport SummaryReport = new SummaryReport();
     }
 }

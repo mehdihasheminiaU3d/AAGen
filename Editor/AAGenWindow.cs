@@ -99,7 +99,6 @@ namespace AAGen
             {
                 Settings = m_Settings,
                 SettingsFilePath = AssetDatabase.GetAssetPath(m_Settings),
-                SummaryReport = new SummaryReport(m_Settings)
             };
         }
         
@@ -129,7 +128,7 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
                 commandQueues.Add(new AddressableCleanupCommandQueue(m_DataContainer));
 
-            commandQueues.Add(new CommandQueue(m_DataContainer.SummaryReport.WriteReportToDisk, nameof(SummaryReport.WriteReportToDisk)));
+            commandQueues.Add(new CommandQueue(WriteReportToDisk, nameof(WriteReportToDisk)));
             
             return commandQueues;
             
@@ -145,21 +144,21 @@ namespace AAGen
 
             for (int i = 0; i < commandQueues.Count; i++)
             {
-                var currentProcessor = commandQueues[i];
-                currentProcessor.PreExecute();
+                var currentQueue = commandQueues[i];
+                currentQueue.PreExecute();
 
                 float progressStart = (float)i / commandQueues.Count;
                 float progressEnd = (float)(i + 1) / commandQueues.Count;
 
                 int progress = 0;
-                int totalCount = currentProcessor.RemainingCommandCount;
+                int totalCount = currentQueue.RemainingCommandCount;
 
-                var progressBarTitle = currentProcessor.Title;
+                var progressBarTitle = currentQueue.Title;
                 var progressBarInfo = "Processing ...";
                 
                 var progressId = Progress.Start(progressBarTitle);
 
-                while (currentProcessor.RemainingCommandCount > 0)
+                while (currentQueue.RemainingCommandCount > 0)
                 {
                     var info = string.Empty;
                     bool error = false;
@@ -167,7 +166,7 @@ namespace AAGen
                     
                     try
                     {
-                        info = currentProcessor.ExecuteNextCommand();
+                        info = currentQueue.ExecuteNextCommand();
                     }
                     catch (Exception e)
                     {
@@ -191,6 +190,8 @@ namespace AAGen
                     Progress.Report(progressId, percentage, progressBarInfo);
                     yield return null;
                 }
+                
+                currentQueue.PostExecute();
                 
                 Progress.Remove(progressId);
             }
@@ -232,6 +233,7 @@ namespace AAGen
                                 progressStart + ((float)progress / totalCount) * (progressEnd - progressStart))) 
                             break;
                     }
+                    currentQueue.PostExecute();
                 }
             }
             catch (Exception e)
@@ -285,6 +287,12 @@ namespace AAGen
                 AssetDatabase.StopAssetEditing();
                 m_DataContainer.AssetEditingInProgress = false;
             }
+        }
+
+        void WriteReportToDisk()
+        {
+            if (m_Settings.GenerateSummaryReport)
+                m_DataContainer.SummaryReport.WriteReportToDisk();
         }
     }
 }
