@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AAGen.Shared;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -36,7 +37,14 @@ namespace AAGen
         public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [Header("Rules")]
         public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
-        public List<SubgraphCategoryID> SubgraphCategoryIds = new List<SubgraphCategoryID>();
+        
+        SubgraphCategoryID m_DefaultCategoryID;
+        [SerializeField]
+        List<SubgraphCategoryID> m_SubgraphCategoryIds = new List<SubgraphCategoryID>();
+        
+        AddressableGroupNamingRule m_DefaultNamingRule;
+        [SerializeField]
+        List<AddressableGroupNamingRule> m_NamingRules = new List<AddressableGroupNamingRule>();
         [Header("Reports")]
         [SerializeField]
         bool m_GenerateSummaryReport;
@@ -52,5 +60,39 @@ namespace AAGen
         public bool RunInBackground => m_RunInBackground;
 
         public bool GenerateSummaryReport => m_GenerateSummaryReport;
+
+        public List<SubgraphCategoryID> SubgraphCategoryIds
+        {
+            get
+            {
+                return new List<SubgraphCategoryID>(m_SubgraphCategoryIds) //ToDo: Inefficient
+                {
+                    DefaultCategoryID
+                };
+            }
+        }
+
+        public List<AddressableGroupNamingRule> NamingRules
+        {
+            get
+            {
+                return new List<AddressableGroupNamingRule>(m_NamingRules) //ToDo: Inefficient
+                {
+                    DefaultNamingRule
+                };
+            }
+        }
+
+        public SubgraphCategoryID DefaultCategoryID
+        {
+            get => m_DefaultCategoryID;
+            set => m_DefaultCategoryID = value;
+        }
+
+        public AddressableGroupNamingRule DefaultNamingRule
+        {
+            get => m_DefaultNamingRule;
+            set => m_DefaultNamingRule = value;
+        }
     }
 }

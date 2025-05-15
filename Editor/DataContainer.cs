@@ -16,7 +16,6 @@ namespace AAGen
         public HashSet<AssetNode> IgnoredAssets;
 
         public Category Subgraphs;
-        public Dictionary<SubgraphCategoryID, List<SubgraphInfo>> SubgraphCategories;
         public Dictionary<int, HashSet<AssetNode>> SubgraphSources;
 
         public Dictionary<string, GroupLayoutInfo> GroupLayout;

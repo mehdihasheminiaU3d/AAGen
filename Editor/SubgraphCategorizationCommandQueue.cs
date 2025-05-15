@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AAGen
@@ -7,20 +6,20 @@ namespace AAGen
     internal class SubgraphCategorizationCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
-        readonly SubgraphCategoryID m_DefaultSubgraphID;
+        SubgraphCategoryID m_DefaultSubgraphCategoryID;
         
         public SubgraphCategorizationCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
             Title = nameof(SubgraphCommandQueue);
-            m_DefaultSubgraphID = ScriptableObject.CreateInstance<UncategorizedSubgraphID>();
-            m_DefaultSubgraphID.name = $"Uncategorized";
         }
 
         public override void PreExecute()
         {
-            m_DataContainer.SubgraphCategories = new Dictionary<SubgraphCategoryID, List<SubgraphInfo>>();
-
+            m_DefaultSubgraphCategoryID = ScriptableObject.CreateInstance<UncategorizedSubgraphID>();
+            m_DefaultSubgraphCategoryID.name = $"Uncategorized";
+            m_DataContainer.Settings.DefaultCategoryID = m_DefaultSubgraphCategoryID; //ToDo: Could be done before
+            
             foreach (var pair in m_DataContainer.Subgraphs)
             {
                 var subgraph = pair.Value;
@@ -33,7 +32,7 @@ namespace AAGen
         void CategorizeSubgraph(SubgraphInfo subgraph)
         {
             var subgraphCategoryIDs = m_DataContainer.Settings.SubgraphCategoryIds;
-            var matchingCategoryID = m_DefaultSubgraphID;
+            var matchingCategoryID = m_DefaultSubgraphCategoryID;
             
             //Finds first matching category (prioritizes smaller indices)
             foreach (var categoryID in subgraphCategoryIDs)
@@ -45,12 +44,7 @@ namespace AAGen
                 }
             }
 
-            var subgraphCategories = m_DataContainer.SubgraphCategories;
-            if (!subgraphCategories.ContainsKey(matchingCategoryID))
-            {
-                subgraphCategories[matchingCategoryID] = new List<SubgraphInfo>();
-            }
-            subgraphCategories[matchingCategoryID].Add(subgraph);
+            subgraph.CategoryID = matchingCategoryID;
         }
         
         public override void PostExecute()
@@ -62,13 +56,15 @@ namespace AAGen
         {
             if (!m_DataContainer.Settings.GenerateSummaryReport)
                 return;
-
+            
             var summary = $"\n=== Subgraph Categories ===\n";
-            foreach (var category in m_DataContainer.SubgraphCategories)
+            
+            var allSubgraphs = m_DataContainer.Subgraphs.Values.ToList();
+            
+            foreach (var categoryId in m_DataContainer.Settings.SubgraphCategoryIds)
             {
-                var categoryID = category.Key;
-                var subgraphsInCategory = category.Value;
-                summary += $"{categoryID.name} = {subgraphsInCategory.Count} \n";
+                var subgraphsInCategory = SubgraphInfo.SelectSubgraphsByCategory(allSubgraphs, categoryId);
+                summary += $"{categoryId.name} = {subgraphsInCategory.Count} \n";
             }
             
             m_DataContainer.SummaryReport.AppendLine(summary);

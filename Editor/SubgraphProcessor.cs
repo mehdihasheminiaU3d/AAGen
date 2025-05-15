@@ -10,12 +10,7 @@ using AAGen.Shared;
 namespace AAGen
 {
     //Nodes of a graph with identical set of sources
-    public class SubgraphInfo
-    {
-        public bool IsShared; 
-        public HashSet<AssetNode> Nodes = new HashSet<AssetNode>();
-    }
-    
+
     internal class SubgraphProcessor : DependencyGraphProcessor
     {
         public SubgraphProcessor(DependencyGraph dependencyGraph, EditorUiGroup uiGroup) 

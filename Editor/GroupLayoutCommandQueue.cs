@@ -23,6 +23,11 @@ namespace AAGen
         {
             m_DataContainer.GroupLayout = new Dictionary<string, GroupLayoutInfo>();
             
+            var defaultNamingRule = ScriptableObject.CreateInstance<DefaultNamingRule>();  //ToDo: Could be done before
+            defaultNamingRule.name = $"DefaultNamingRule";
+            defaultNamingRule.m_CategoryID = m_DataContainer.Settings.DefaultCategoryID;
+            m_DataContainer.Settings.DefaultNamingRule = defaultNamingRule;
+            
             //one subgraph maps to one group
             foreach (var pair in m_DataContainer.Subgraphs)
             {
@@ -41,13 +46,15 @@ namespace AAGen
             
             var sources = m_DataContainer.SubgraphSources[hash];
 
-            var groupName = GetSubgraphName(subgraph, sources); //ToDo: Add a naming settings to customize names
-            if (m_DataContainer.GroupLayout.ContainsKey(groupName))
-            {
-                //If name already registered, switch to fallback name
-                groupName += $"_{hash}";
-            }
+            // var groupName = GetSubgraphName(subgraph, sources);
+            // if (m_DataContainer.GroupLayout.ContainsKey(groupName))
+            // {
+            //     //If name already registered, switch to fallback name
+            //     groupName += $"_{hash}";
+            // }
 
+            var groupName = GetSubgraphName2(hash, subgraph, sources);
+            
             var groupLayoutInfo = new GroupLayoutInfo()
             {
                 TemplateName = templateName,
@@ -59,6 +66,25 @@ namespace AAGen
                 m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
                 m_GroupLayoutCreated++;
             }
+        }
+
+        string GetSubgraphName2(int hash, SubgraphInfo subgraph, HashSet<AssetNode> sources)
+        {
+            //find naming rule
+            AddressableGroupNamingRule matchingNamingRule = null;
+            foreach (var namingRule in m_DataContainer.Settings.NamingRules)
+            {
+                if (namingRule.m_CategoryID == subgraph.CategoryID)
+                {
+                    matchingNamingRule = namingRule;
+                    break;
+                }
+            }
+
+            if (matchingNamingRule == null)
+                throw new Exception($"Cannot find a naming rule for subgraph {hash}");
+
+            return matchingNamingRule.GetGroupName(hash, subgraph, m_DataContainer);
         }
         
         static string GetSubgraphName(SubgraphInfo subgraph, HashSet<AssetNode> sources)
