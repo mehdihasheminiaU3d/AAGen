@@ -35,16 +35,18 @@ namespace AAGen
         bool m_RunInBackground;
         public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [Header("Rules")]
-        public List<InputFilterRule> InputFilterRules;
-        public List<MergeRule> _MergeRules;
-        public List<GroupLayoutRule> _GroupLayoutRules;
-
+        public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
+        public List<SubgraphCategoryID> SubgraphCategoryIds = new List<SubgraphCategoryID>();
         [Header("Reports")]
         [SerializeField]
         bool m_GenerateSummaryReport;
         [SerializeField]
         LogLevelID m_LogLevel = LogLevelID.OnlyErrors;
-
+        
+        [Header("Obsolete")]
+        public List<MergeRule> _MergeRules;
+        public List<GroupLayoutRule> _GroupLayoutRules;
+        
         public ProcessingStepID ProcessingSteps => m_ProcessingSteps;
         public LogLevelID LogLevel => m_LogLevel;
         public bool RunInBackground => m_RunInBackground;
