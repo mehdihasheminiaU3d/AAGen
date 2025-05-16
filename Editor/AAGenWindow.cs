@@ -107,7 +107,8 @@ namespace AAGen
             var commandQueues = new List<CommandQueue>
             {
                 new SettingsFilesCommandQueue(m_DataContainer),
-                new CommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor))
+                new CommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor)),
+                new CommandQueue(ValidateSettings, nameof(ValidateSettings)),
             };
 
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
@@ -296,6 +297,11 @@ namespace AAGen
         {
             if (m_Settings.GenerateSummaryReport)
                 m_DataContainer.SummaryReport.WriteReportToDisk();
+        }
+        
+        void ValidateSettings()
+        {
+            m_Settings.Validate();
         }
     }
 }

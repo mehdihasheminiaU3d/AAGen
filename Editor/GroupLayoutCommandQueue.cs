@@ -23,11 +23,6 @@ namespace AAGen
         {
             m_DataContainer.GroupLayout = new Dictionary<string, GroupLayoutInfo>();
             
-            var defaultNamingRule = ScriptableObject.CreateInstance<DefaultNamingRule>();  //ToDo: Could be done before
-            defaultNamingRule.name = $"DefaultNamingRule";
-            defaultNamingRule.m_CategoryID = m_DataContainer.Settings.DefaultCategoryID;
-            m_DataContainer.Settings.DefaultNamingRule = defaultNamingRule;
-            
             //one subgraph maps to one group
             foreach (var pair in m_DataContainer.Subgraphs)
             {
@@ -44,50 +39,26 @@ namespace AAGen
         {
             m_SubgraphsProcessed++;
             
-            var sources = subgraph.Sources;
-
-            // var groupName = GetSubgraphName(subgraph, sources);
-            // if (m_DataContainer.GroupLayout.ContainsKey(groupName))
-            // {
-            //     //If name already registered, switch to fallback name
-            //     groupName += $"_{hash}";
-            // }
-
-            var groupName = GetSubgraphName2(hash, subgraph, sources);
-            
             var groupLayoutInfo = new GroupLayoutInfo()
             {
                 TemplateName = templateName,
                 Nodes = subgraph.Nodes.ToList()
             };
-                    
+            
             if (groupLayoutInfo.Nodes.Count > 0)
             {
+                var groupName = CalculateGroupName(hash, subgraph);
                 m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
                 m_GroupLayoutCreated++;
             }
         }
 
-        string GetSubgraphName2(int hash, SubgraphInfo subgraph, HashSet<AssetNode> sources)
+        string CalculateGroupName(int hash, SubgraphInfo subgraph)
         {
-            //find naming rule
-            AddressableGroupNamingRule matchingNamingRule = null;
-            foreach (var namingRule in m_DataContainer.Settings.NamingRules)
-            {
-                if (namingRule.m_CategoryID == subgraph.CategoryID)
-                {
-                    matchingNamingRule = namingRule;
-                    break;
-                }
-            }
-
-            if (matchingNamingRule == null)
-                throw new Exception($"Cannot find a naming rule for subgraph {hash}");
-
-            return matchingNamingRule.GetGroupName(hash, subgraph, m_DataContainer);
+            return FindNamingRuleForSubgraph(subgraph).CalculateGroupName(hash, subgraph);
         }
         
-        static string GetSubgraphName(SubgraphInfo subgraph, HashSet<AssetNode> sources)
+        static string GetSubgraphName_Old(SubgraphInfo subgraph, HashSet<AssetNode> sources)
         {
             string name = null;
             if (subgraph.IsShared) 
@@ -137,6 +108,27 @@ namespace AAGen
             summary += $"{nameof(m_GroupLayoutCreated).ToReadableFormat()} = {m_GroupLayoutCreated}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
+        }
+        
+        /// <summary>
+        /// Returns the first naming rule found for that matches the subgraph category
+        /// If nothing is found, it returns the default naming rule
+        /// </summary>
+        /// <param name="subgraph"></param>
+        /// <returns></returns>
+        public AddressableGroupNamingRule FindNamingRuleForSubgraph(SubgraphInfo subgraph)
+        {
+            var settings = m_DataContainer.Settings;
+            var matchingNamingRule = settings.DefaultNamingRule;
+            foreach (var namingRule in settings.NamingRules)
+            {
+                if (namingRule.m_CategoryID == subgraph.CategoryID)
+                {
+                    matchingNamingRule = namingRule;
+                    break;
+                }
+            }
+            return matchingNamingRule;
         }
     }
 }

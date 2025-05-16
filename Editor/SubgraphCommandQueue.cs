@@ -51,9 +51,9 @@ namespace AAGen
             {
                 var newSubgraph = new SubgraphInfo
                 {
-                    Hash = hash,
                     Sources = sources,
-                    IsShared = sources.Count > 1 //ToDo: Can be a property
+                    IsShared = sources.Count > 1, //ToDo: Can be a property
+                    CategoryID = m_DataContainer.Settings.DefaultCategoryID
                 };
                 
                 m_DataContainer.Subgraphs.Add(hash, newSubgraph);

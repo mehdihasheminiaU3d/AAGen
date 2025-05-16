@@ -6,7 +6,6 @@ namespace AAGen
     internal class SubgraphCategorizationCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
-        SubgraphCategoryID m_DefaultSubgraphCategoryID;
         
         public SubgraphCategorizationCommandQueue(DataContainer dataContainer)
         {
@@ -16,10 +15,6 @@ namespace AAGen
 
         public override void PreExecute()
         {
-            m_DefaultSubgraphCategoryID = ScriptableObject.CreateInstance<UncategorizedSubgraphID>();
-            m_DefaultSubgraphCategoryID.name = $"Uncategorized";
-            m_DataContainer.Settings.DefaultCategoryID = m_DefaultSubgraphCategoryID; //ToDo: Could be done before
-            
             foreach (var pair in m_DataContainer.Subgraphs)
             {
                 var subgraph = pair.Value;
@@ -31,20 +26,15 @@ namespace AAGen
 
         void CategorizeSubgraph(SubgraphInfo subgraph)
         {
-            var subgraphCategoryIDs = m_DataContainer.Settings.SubgraphCategoryIds;
-            var matchingCategoryID = m_DefaultSubgraphCategoryID;
-            
-            //Finds first matching category (prioritizes smaller indices)
-            foreach (var categoryID in subgraphCategoryIDs)
+            //Finds first matching category 
+            foreach (var categoryID in m_DataContainer.Settings.SubgraphCategoryIds)
             {
-                if (categoryID.MatchesCategoryRule(subgraph))
+                if (categoryID.DoesSubgraphMatchCategory(subgraph))
                 {
-                    matchingCategoryID = categoryID;
+                    subgraph.CategoryID = categoryID;
                     break;
                 }
             }
-
-            subgraph.CategoryID = matchingCategoryID;
         }
         
         public override void PostExecute()
@@ -59,12 +49,11 @@ namespace AAGen
             
             var summary = $"\n=== Subgraph Categories ===\n";
             
-            var allSubgraphs = m_DataContainer.Subgraphs.Values.ToList();
-            
-            foreach (var categoryId in m_DataContainer.Settings.SubgraphCategoryIds)
+            foreach (var kvp in m_DataContainer.GetSubgraphsGroupedByCategory())
             {
-                var subgraphsInCategory = SubgraphInfo.SelectSubgraphsByCategory(allSubgraphs, categoryId);
-                summary += $"{categoryId.name} = {subgraphsInCategory.Count} \n";
+                var category = kvp.Key;
+                var subgraphsInCategory = kvp.Value;
+                summary += $"{category.name} = {subgraphsInCategory.Count} \n";
             }
             
             m_DataContainer.SummaryReport.AppendLine(summary);

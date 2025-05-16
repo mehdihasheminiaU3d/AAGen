@@ -38,11 +38,9 @@ namespace AAGen
         [Header("Rules")]
         public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
         
-        SubgraphCategoryID m_DefaultCategoryID;
         [SerializeField]
         List<SubgraphCategoryID> m_SubgraphCategoryIds = new List<SubgraphCategoryID>();
         
-        AddressableGroupNamingRule m_DefaultNamingRule;
         [SerializeField]
         List<AddressableGroupNamingRule> m_NamingRules = new List<AddressableGroupNamingRule>();
         [Header("Reports")]
@@ -61,38 +59,41 @@ namespace AAGen
 
         public bool GenerateSummaryReport => m_GenerateSummaryReport;
 
-        public List<SubgraphCategoryID> SubgraphCategoryIds
-        {
-            get
-            {
-                return new List<SubgraphCategoryID>(m_SubgraphCategoryIds) //ToDo: Inefficient
-                {
-                    DefaultCategoryID
-                };
-            }
-        }
+        public List<SubgraphCategoryID> SubgraphCategoryIds => m_SubgraphCategoryIds;
+        public List<AddressableGroupNamingRule> NamingRules => m_NamingRules;
 
-        public List<AddressableGroupNamingRule> NamingRules
+        public void Validate()
         {
-            get
-            {
-                return new List<AddressableGroupNamingRule>(m_NamingRules) //ToDo: Inefficient
-                {
-                    DefaultNamingRule
-                };
-            }
         }
-
+        
+        SubgraphCategoryID m_DefaultCategoryID;
         public SubgraphCategoryID DefaultCategoryID
         {
-            get => m_DefaultCategoryID;
-            set => m_DefaultCategoryID = value;
+            get
+            {
+                if (m_DefaultCategoryID == null)
+                {
+                    m_DefaultCategoryID = CreateInstance<UncategorizedSubgraphID>();
+                    m_DefaultCategoryID.name = $"Uncategorized";
+                }
+                return m_DefaultCategoryID;
+            }
         }
 
+        AddressableGroupNamingRule m_DefaultNamingRule;
         public AddressableGroupNamingRule DefaultNamingRule
         {
-            get => m_DefaultNamingRule;
-            set => m_DefaultNamingRule = value;
+            get
+            {
+                if (m_DefaultNamingRule == null)
+                {
+                    m_DefaultNamingRule = CreateInstance<DefaultNamingRule>();  
+                    m_DefaultNamingRule.name = $"DefaultNamingRule";
+                    m_DefaultNamingRule.m_CategoryID = DefaultCategoryID;
+                }
+                
+                return m_DefaultNamingRule;
+            }
         }
     }
 }
