@@ -85,7 +85,7 @@ namespace AAGen
         {
             sources = null;
             
-            var transposedGraph = m_DataContainer.TransposedGraph;
+            var transposedGraph = m_DataContainer.DependencyGraph.Transposed;
             var ignoredAssets = m_DataContainer.IgnoredAssets;
                 
             if (ignoredAssets.Contains(node)) //Ignore sources in specified folders
@@ -154,8 +154,8 @@ namespace AAGen
                 if (nodes.Count == 1)
                 {
                     var singleNode = nodes.ToList()[0];
-                    var outgoingEdges = CountOutgoingEdges(singleNode);
-                    var incomingEdges = CountIncomingEdges(singleNode);
+                    var outgoingEdges = m_DataContainer.DependencyGraph.CountOutgoingEdges(singleNode);
+                    var incomingEdges = m_DataContainer.DependencyGraph.CountIncomingEdges(singleNode);
                     if (incomingEdges == 0 && outgoingEdges == 0)
                     {
                         singleAssets.Add(hash, subgraph);
@@ -217,16 +217,6 @@ namespace AAGen
             summary+=  $"{indent}{nameof(total).ToReadableFormat()} : {total}\n";
             
             return summary;
-            
-            int CountOutgoingEdges(AssetNode node)
-            {
-                return m_DataContainer.DependencyGraph.GetNeighbors(node).Count;
-            }
-            
-            int CountIncomingEdges(AssetNode node)
-            {
-                return m_DataContainer.TransposedGraph.GetNeighbors(node).Count;
-            }
         }
     }
 }

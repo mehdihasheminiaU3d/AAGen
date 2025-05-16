@@ -27,7 +27,6 @@ namespace AAGen
             {
                 AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath), assetPath));
             }
-            AddCommand(new ActionCommand(CalculateTransposedGraph));
             
             EnqueueCommands(); 
         }
@@ -35,11 +34,6 @@ namespace AAGen
         void AddAssetToDependencyGraph(string assetPath)
         {
             DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.DependencyGraph, assetPath);
-        }
-
-        void CalculateTransposedGraph()
-        {
-            m_DataContainer.TransposedGraph = new DependencyGraph(m_DataContainer.DependencyGraph.GetTransposedGraph());
         }
 
         public override void PostExecute()

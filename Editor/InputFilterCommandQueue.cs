@@ -42,17 +42,13 @@ namespace AAGen
         {
             foreach (var inputFilterRule in m_DataContainer.Settings.InputFilterRules)
             {
-                if (inputFilterRule.ShouldIgnoreNode(node, IsSource(node)))
+                var isSource = m_DataContainer.DependencyGraph.IsSourceNode(node);
+                if (inputFilterRule.ShouldIgnoreNode(node, isSource))
                 {
                     m_DataContainer.IgnoredAssets.Add(node);
                     m_NodesIgnoredByRules++;
                 }
             }
-        }
-        
-        bool IsSource(AssetNode node)
-        {
-            return m_DataContainer.TransposedGraph.GetNeighbors(node).Count == 0;
         }
 
         void AddCommandsToIgnoreUnsupportedAssets()

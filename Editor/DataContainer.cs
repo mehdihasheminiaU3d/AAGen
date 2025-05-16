@@ -8,7 +8,6 @@ namespace AAGen
     public class DataContainer
     {
         public DependencyGraph DependencyGraph;
-        public DependencyGraph TransposedGraph;
 
         public string SettingsFilePath;
         public AagenSettings Settings;
