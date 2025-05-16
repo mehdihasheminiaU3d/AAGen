@@ -25,17 +25,20 @@ namespace AAGen
             var nodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in nodes)
             {
-                AddCommand(new ActionCommand(() => TryAddNodeToSubgraph(node), node.AssetPath));
+                AddCommand(new ActionCommand(() => AddNodeToSubgraph(node), node.AssetPath));
             }
             
             EnqueueCommands();
         }
 
-        void TryAddNodeToSubgraph(AssetNode node)
+        void AddNodeToSubgraph(AssetNode node)
         {
-            var sources = FindSourcesForNode(node, m_DataContainer.TransposedGraph, m_DataContainer.IgnoredAssets);
-            if (sources == null)
+            var sourceFound = TryFindSourcesForNode(node, out var sources);
+            if (!sourceFound)
                 return;
+
+            if (sources == null || sources.Count == 0)
+                throw new Exception($"Cannot find source nodes for node = {node.FileName}");
             
             m_NodesProcessed++;
             
@@ -78,19 +81,26 @@ namespace AAGen
             return hash;
         }
 
-        static HashSet<AssetNode> FindSourcesForNode(AssetNode node, DependencyGraph transposedGraph, HashSet<AssetNode> ignoredAssets)
+        bool TryFindSourcesForNode(AssetNode node, out HashSet<AssetNode> sources)
         {
-            if (ignoredAssets.Contains(node)) //ignore sources in specified folders
-                return null;
+            sources = null;
+            
+            var transposedGraph = m_DataContainer.TransposedGraph;
+            var ignoredAssets = m_DataContainer.IgnoredAssets;
+                
+            if (ignoredAssets.Contains(node)) //Ignore sources in specified folders
+                return false;
 
             var allPaths = transposedGraph.DepthFirstSearchForAllPaths(node, IsSource);
-            var sources = allPaths.Select(path => path[^1]).ToHashSet();
+            var allSources = allPaths.Select(path => path[^1]).ToHashSet();
                 
-            if(sources.IsSubsetOf(ignoredAssets)) //ignore assets exclusive to ignored sources 
-                return null;
+            if(allSources.IsSubsetOf(ignoredAssets)) //Ignore assets exclusive to ignored sources 
+                return false;
                 
-            sources.ExceptWith(ignoredAssets);
-            return sources;
+            allSources.ExceptWith(ignoredAssets);
+            
+            sources = allSources;
+            return true;
             
             bool IsSource(AssetNode endNode)
             {
@@ -207,15 +217,15 @@ namespace AAGen
             summary+=  $"{indent}{nameof(total).ToReadableFormat()} : {total}\n";
             
             return summary;
-
+            
             int CountOutgoingEdges(AssetNode node)
             {
                 return m_DataContainer.DependencyGraph.GetNeighbors(node).Count;
             }
-
+            
             int CountIncomingEdges(AssetNode node)
             {
-                return m_DataContainer.DependencyGraph.GetNeighbors(node).Count;
+                return m_DataContainer.TransposedGraph.GetNeighbors(node).Count;
             }
         }
     }

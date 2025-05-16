@@ -48,6 +48,7 @@ namespace AAGen
             if (groupLayoutInfo.Nodes.Count > 0)
             {
                 var groupName = CalculateGroupName(hash, subgraph);
+                //What if the name is redundant?
                 m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
                 m_GroupLayoutCreated++;
             }

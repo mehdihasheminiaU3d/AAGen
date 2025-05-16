@@ -29,7 +29,7 @@ namespace AAGen
             //Finds first matching category 
             foreach (var categoryID in m_DataContainer.Settings.SubgraphCategoryIds)
             {
-                if (categoryID.DoesSubgraphMatchCategory(subgraph))
+                if (categoryID.DoesSubgraphMatchCategory(subgraph, m_DataContainer))
                 {
                     subgraph.CategoryID = categoryID;
                     break;
