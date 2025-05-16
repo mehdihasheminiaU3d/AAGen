@@ -15,9 +15,7 @@ namespace AAGen
 
         public HashSet<AssetNode> IgnoredAssets;
 
-        public Category Subgraphs;
-        public Dictionary<int, HashSet<AssetNode>> SubgraphSources;
-
+        public Dictionary<int, SubgraphInfo> Subgraphs;
         public Dictionary<string, GroupLayoutInfo> GroupLayout;
 
         public bool AssetEditingInProgress;

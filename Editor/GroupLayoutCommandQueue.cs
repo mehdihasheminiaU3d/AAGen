@@ -44,7 +44,7 @@ namespace AAGen
         {
             m_SubgraphsProcessed++;
             
-            var sources = m_DataContainer.SubgraphSources[hash];
+            var sources = subgraph.Sources;
 
             // var groupName = GetSubgraphName(subgraph, sources);
             // if (m_DataContainer.GroupLayout.ContainsKey(groupName))

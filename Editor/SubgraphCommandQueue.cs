@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AAGen.AssetDependencies;
@@ -19,8 +20,7 @@ namespace AAGen
 
         public override void PreExecute()
         {
-            m_DataContainer.Subgraphs = new Category();
-            m_DataContainer.SubgraphSources = new Dictionary<int, HashSet<AssetNode>>();
+            m_DataContainer.Subgraphs = new Dictionary<int, SubgraphInfo>();
             
             var nodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in nodes)
@@ -38,27 +38,32 @@ namespace AAGen
                 return;
             
             m_NodesProcessed++;
-
-            var subgraph = new SubgraphInfo
-            {
-                IsShared = sources.Count > 1
-            };
-                
+            
             int hash = CalculateHashForSources(sources);
 
-            if (!m_DataContainer.SubgraphSources.TryAdd(hash, sources))
+            if (m_DataContainer.Subgraphs.TryGetValue(hash, out var existingSubgraph))
             {
-                if (!m_DataContainer.SubgraphSources[hash].SetEquals(sources))
-                    Debug.LogError($"Hash collision = inconsistent sources for subgraph {hash}");
+                //Double check the uniqueness of hash for the set of sources
+                if (!existingSubgraph.Sources.SetEquals(sources))
+                    throw new Exception($"Hash collision = inconsistent sources for subgraph {hash}");
             }
+            else
+            {
+                var newSubgraph = new SubgraphInfo
+                {
+                    Hash = hash,
+                    Sources = sources,
+                    IsShared = sources.Count > 1 //ToDo: Can be a property
+                };
                 
-            //uniqueness of Hash is key! if we want to validate uniqueness of sources, then we need to save them
-            //Sources cannot be saved in subgraph. Because sources can be redundant for each record leading to a very large file
-            m_DataContainer.Subgraphs.TryAdd(hash, subgraph);
-            var nodeAdditionSuccess = m_DataContainer.Subgraphs[hash].Nodes.Add(node);
+                m_DataContainer.Subgraphs.Add(hash, newSubgraph);
+            }
             
-            if (!nodeAdditionSuccess)
-                Debug.LogError($"Unknown Error = node = {node} had added to subgraph ={hash} before");
+            var result = m_DataContainer.Subgraphs[hash].Nodes.Add(node);
+                
+            //Make sure the node isn't added before. If so, it can indicate a problem in our logic.
+            if (!result)
+                throw new Exception($"Unknown Error = node = {node} had added to subgraph ={hash} before");
         }
         
         static int CalculateHashForSources(HashSet<AssetNode> sources)
@@ -127,7 +132,7 @@ namespace AAGen
                 var hash = pair.Key;
                 var subgraph = pair.Value;
                 var nodes = subgraph.Nodes;
-                var sources = m_DataContainer.SubgraphSources[hash];
+                var sources = subgraph.Sources;
                 bool isShared = sources.Count > 1;
 
                 if (nodes.Count == 0)
