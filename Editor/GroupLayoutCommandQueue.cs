@@ -117,7 +117,7 @@ namespace AAGen
         /// </summary>
         /// <param name="subgraph"></param>
         /// <returns></returns>
-        public AddressableGroupNamingRule FindNamingRuleForSubgraph(SubgraphInfo subgraph)
+        AddressableGroupNamingRule FindNamingRuleForSubgraph(SubgraphInfo subgraph)
         {
             var settings = m_DataContainer.Settings;
             var matchingNamingRule = settings.DefaultNamingRule;

@@ -37,12 +37,12 @@ namespace AAGen
         public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [Header("Rules")]
         public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
-        
         [SerializeField]
         List<SubgraphCategoryID> m_SubgraphCategoryIds = new List<SubgraphCategoryID>();
-        
         [SerializeField]
         List<AddressableGroupNamingRule> m_NamingRules = new List<AddressableGroupNamingRule>();
+        [SerializeField]
+        List<RefinementRule> m_RefinementRules = new List<RefinementRule>();
         [Header("Reports")]
         [SerializeField]
         bool m_GenerateSummaryReport;
@@ -95,5 +95,7 @@ namespace AAGen
                 return m_DefaultNamingRule;
             }
         }
+
+        public List<RefinementRule> RefinementRules => m_RefinementRules;
     }
 }

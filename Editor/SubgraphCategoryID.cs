@@ -4,6 +4,8 @@ namespace AAGen
 {
     public abstract class SubgraphCategoryID : ScriptableObject
     {
+        //ToDo: Should ID and Selection criteria be separate classes?
+        
         public abstract bool DoesSubgraphMatchCategory(SubgraphInfo subgraph, DataContainer dataContainer);
     }
     

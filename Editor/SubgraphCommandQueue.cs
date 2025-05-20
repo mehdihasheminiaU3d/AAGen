@@ -69,7 +69,7 @@ namespace AAGen
                 throw new Exception($"Unknown Error = node = {node} had added to subgraph ={hash} before");
         }
         
-        static int CalculateHashForSources(HashSet<AssetNode> sources)
+        public static int CalculateHashForSources(HashSet<AssetNode> sources)
         {
             int hash = 17; 
 
