@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AAGen.AssetDependencies;
 using AAGen.Shared;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
@@ -11,33 +10,30 @@ namespace AAGen
 {
     internal class AAGenWindow : EditorWindow 
     {
-        [MenuItem("Tools/AAGen", priority = 100)] //<-- ToDo: Add constants here 
+        [MenuItem(Constants.Menus.Root+"AAGen", priority = Constants.Menus.AAGenMenuPriority)] 
         public static void ShowWindow()
         {
             var window = GetWindow<AAGenWindow>("AAGen");
             window.minSize = new Vector2(400, 200); 
         }
-
+       
+        EditorPersistentValue<string> m_SettingsAssetPath = new (null, "EPK_AAG_SettingsPath");
         AagenSettings m_Settings;
-        EditorPersistentValue<string> _settingsAssetPath = new (null, "EPK_AAG_SettingsPath");
-        
+        DataContainer m_DataContainer;
+         
         const string k_BoxStyleName = "Box";
         const float k_Space = 5f;
         const string k_QuickButtonLabel = "Generate Addressable Groups Automatically";
         const int k_QuickButtonWidth = 300;
         const int k_QuickButtonHeight = 30;
         
-        DependencyGraph m_DependencyGraph;
-        DefaultSystemSetupCreator m_DefaultSystemSetupCreator;
-
-        bool m_LoadingInProgress = false;
-
         bool m_IsProcessing = false;
-        DataContainer m_DataContainer;
+        bool m_IsCancelled = false;
+        double m_LastTime;
         
         void OnEnable()
         {
-            var assetPath = _settingsAssetPath.Value;
+            var assetPath = m_SettingsAssetPath.Value;
             if (!string.IsNullOrEmpty(assetPath))
             {
                 m_Settings = AssetDatabase.LoadAssetAtPath<AagenSettings>(assetPath);
@@ -49,11 +45,11 @@ namespace AAGen
             if (m_Settings != null)
             {
                 string assetPath = AssetDatabase.GetAssetPath(m_Settings);
-                _settingsAssetPath.Value = assetPath;
+                m_SettingsAssetPath.Value = assetPath;
             }
             else
             {
-                _settingsAssetPath.ClearPersistentData();
+                m_SettingsAssetPath.ClearPersistentData();
             }
         }
 
@@ -143,12 +139,17 @@ namespace AAGen
         IEnumerator RunAsyncLoop()
         {
             m_IsProcessing = true;
+            m_IsCancelled = false;
+            
+            double lastUpdateTime = 0;
+            const double editorUpdateInterval = 0.25;
             
             InitializeDataContainer();
             var commandQueues = InitializeCommands();
 
             for (int i = 0; i < commandQueues.Count; i++)
             {
+                m_LastTime = EditorApplication.timeSinceStartup;
                 var currentQueue = commandQueues[i];
                 currentQueue.PreExecute();
 
@@ -162,7 +163,8 @@ namespace AAGen
                 var progressBarInfo = "Processing ...";
                 
                 var progressId = Progress.Start(progressBarTitle);
-
+                Progress.RegisterCancelCallback(progressId, CancelCallback);
+                
                 while (currentQueue.RemainingCommandCount > 0)
                 {
                     var info = string.Empty;
@@ -179,6 +181,16 @@ namespace AAGen
                         exception = e;
                     }
 
+                    if (m_IsCancelled)
+                    {
+                        LogUtil.Log(this, m_Settings, LogLevelID.Info, $"Cancelled!");
+                        Progress.UnregisterCancelCallback(progressId);
+                        m_IsProcessing = false;
+                        StopAssetEditingIfNeeded();
+                        Progress.Remove(progressId);
+                        yield break;
+                    }
+
                     if (error)
                     {
                         Debug.LogError(exception.Message);
@@ -191,22 +203,37 @@ namespace AAGen
                     progress++;
                     progressBarInfo = string.IsNullOrEmpty(info) ? progressBarInfo : info;
 
-                    var percentage = progressStart + ((float)progress / totalCount) * (progressEnd - progressStart);
-                    Progress.Report(progressId, percentage, progressBarInfo);
-                    yield return null;
+                    var currentTime = EditorApplication.timeSinceStartup;
+                    if (currentTime - lastUpdateTime > editorUpdateInterval)
+                    {
+                        lastUpdateTime = currentTime;
+                        var percentage = progressStart + ((float)progress / totalCount) * (progressEnd - progressStart);
+                        Progress.Report(progressId, percentage, progressBarInfo);
+                        yield return null;
+                    }
                 }
                 
                 currentQueue.PostExecute();
+                LogUtil.Log(this, m_Settings, LogLevelID.Developer,
+                    $"Time Taken for {currentQueue.Title} = {Math.Round(EditorApplication.timeSinceStartup - m_LastTime)}s");
                 
+                Progress.UnregisterCancelCallback(progressId);
                 Progress.Remove(progressId);
             }
             
             m_IsProcessing = false;
+
+            bool CancelCallback()
+            {
+                m_IsCancelled = true;
+                return true;
+            }
         }
         
         void RunBlockingLoop()
         {
             m_IsProcessing = true;
+            m_IsCancelled = false;
             
             InitializeDataContainer();
             var commandQueues = InitializeCommands();
@@ -215,30 +242,44 @@ namespace AAGen
             {
                 for (int i = 0; i < commandQueues.Count; i++)
                 {
+                    m_LastTime = EditorApplication.timeSinceStartup;
                     var currentQueue = commandQueues[i];
                     currentQueue.PreExecute();
 
                     float progressStart = (float)i / commandQueues.Count;
-                    float progressEnd = (float)(i + 1) / commandQueues.Count; 
+                    float progressEnd = (float)(i + 1) / commandQueues.Count;
 
                     int progress = 0;
                     int totalCount = currentQueue.RemainingCommandCount;
-                    
+
                     var progressBarTitle = currentQueue.Title;
                     var progressBarInfo = "Processing ...";
-                    
+
                     while (currentQueue.RemainingCommandCount > 0)
                     {
                         var info = currentQueue.ExecuteNextCommand();
                         progress++;
-                        
+
                         progressBarInfo = string.IsNullOrEmpty(info) ? progressBarInfo : info;
-                        
+
                         if (EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarInfo,
-                                progressStart + ((float)progress / totalCount) * (progressEnd - progressStart))) 
+                                progressStart + ((float)progress / totalCount) * (progressEnd - progressStart)))
+                        {
+                            m_IsCancelled = true;
                             break;
+                        }
                     }
+
+                    if (m_IsCancelled)
+                    {
+                        LogUtil.Log(this, m_Settings, LogLevelID.Info, $"Cancelled!");
+                        break;
+                    }
+
                     currentQueue.PostExecute();
+                    LogUtil.Log(this, m_Settings, LogLevelID.Developer,
+                        $"Time Taken for {currentQueue.Title} = {Math.Round(EditorApplication.timeSinceStartup - m_LastTime)}s");
+
                 }
             }
             catch (Exception e)
@@ -269,20 +310,6 @@ namespace AAGen
     
             GUILayout.Space(padding);
             GUILayout.EndHorizontal();
-        }
-
-        void Log(LogLevelID logLevel, string message)
-        {
-            if (logLevel == LogLevelID.OnlyErrors)
-            {
-                Debug.LogError($"{GetType().Name}: {message}");
-                return;
-            }
-
-            if (logLevel <= m_Settings.LogLevel)
-            {
-                Debug.Log($"{GetType().Name}: {message}");
-            }
         }
 
         void StopAssetEditingIfNeeded()

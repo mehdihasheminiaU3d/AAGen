@@ -48,10 +48,10 @@ namespace AAGen
         readonly Queue<Command> m_ProcessingQueue = new Queue<Command>();
         readonly Command m_Root = new ActionCommand();
         
-        public int RemainingCommandCount => m_ProcessingQueue.Count;
-        public Command Root => m_Root;
+        public virtual int RemainingCommandCount => m_ProcessingQueue.Count;
+        Command Root => m_Root;
 
-        public void EnqueueCommands()
+        public virtual void EnqueueCommands()
         {
             m_ProcessingQueue.Clear();
             EnqueueRecursive(m_Root);
@@ -74,27 +74,65 @@ namespace AAGen
         {
         }
 
-        public string ExecuteNextCommand()
+        public virtual string ExecuteNextCommand()
         {
             var currentUnit = m_ProcessingQueue.Dequeue();
             currentUnit.Execute();
             return currentUnit.Info;
         }
 
-        public void AddCommand(Command node)
+        public virtual void AddCommand(Command node)
         {
             Root.AddChild(node);
         }
         
-        public void AddCommand(Action action, string info=null)
+        public virtual void AddCommand(Action action, string info=null)
         {
             Root.AddChild(new ActionCommand(action, info));
+        }
+    }
+
+    public class NewCommandQueue : CommandQueue
+    {
+        readonly Queue<NewActionCommand> m_ProcessingQueue = new Queue<NewActionCommand>();
+        public override int RemainingCommandCount => m_ProcessingQueue.Count;
+        
+        public override void EnqueueCommands()
+        {
+            throw new Exception($"{nameof(EnqueueCommands)} is deprecated");
+        }
+
+        protected void ClearQueue()
+        {
+            m_ProcessingQueue.Clear();
+        }
+        
+        public override string ExecuteNextCommand()
+        {
+            var currentUnit = m_ProcessingQueue.Dequeue();
+            currentUnit.Action.Invoke();
+            return currentUnit.Info;
+        }
+        
+        public override void AddCommand(Command node)
+        {
+            throw new Exception($"{nameof(AddCommand)} is deprecated");
+        }
+        
+        public override void AddCommand(Action action, string info=null)
+        {
+            throw new Exception($"{nameof(AddCommand)} is deprecated");
+        }
+        
+        public void AddCommand(NewActionCommand command)
+        {
+            m_ProcessingQueue.Enqueue(command);
         }
     }
     
     public class ActionCommand : Command
     {
-        readonly Action m_Action;
+        Action m_Action;
         
         public ActionCommand()
         {
@@ -102,6 +140,11 @@ namespace AAGen
         }
         
         public ActionCommand(Action action, string info = null)
+        {
+            Initialize(action, info);
+        }
+
+        public void Initialize(Action action, string info = null)
         {
             m_Action = action;
             Info = info;
@@ -111,5 +154,11 @@ namespace AAGen
         {
             m_Action?.Invoke();
         }
+    }
+    
+    public struct NewActionCommand
+    {
+        public Action Action;
+        public string Info;
     }
 }

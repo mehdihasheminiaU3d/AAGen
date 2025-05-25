@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class DependencyGraphCommandQueue : CommandQueue
+    internal class DependencyGraphCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
         
@@ -18,6 +18,8 @@ namespace AAGen
         
         public override void PreExecute()
         {
+            ClearQueue();
+            
             m_DataContainer.DependencyGraph = new DependencyGraph();
             
             var assetPaths = AssetDatabase.GetAllAssetPaths();
@@ -25,10 +27,13 @@ namespace AAGen
             
             foreach (var assetPath in assetPaths)
             {
-                AddCommand(new ActionCommand(() => AddAssetToDependencyGraph(assetPath), assetPath));
+                var path = assetPath; // avoid closure capturing loop variable
+                AddCommand(new NewActionCommand()
+                {
+                    Action = () => AddAssetToDependencyGraph(path),
+                    Info = path,
+                });
             }
-            
-            EnqueueCommands(); 
         }
 
         void AddAssetToDependencyGraph(string assetPath)
