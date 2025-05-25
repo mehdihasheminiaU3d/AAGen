@@ -118,12 +118,16 @@ namespace AAGen
         {
             throw new Exception($"{nameof(AddCommand)} is deprecated");
         }
-        
-        public override void AddCommand(Action action, string info=null)
+
+        public override void AddCommand(Action action, string info = null)
         {
-            throw new Exception($"{nameof(AddCommand)} is deprecated");
+            m_ProcessingQueue.Enqueue(new NewActionCommand
+            {
+                Action = action,
+                Info = info,
+            });
         }
-        
+
         public void AddCommand(NewActionCommand command)
         {
             m_ProcessingQueue.Enqueue(command);

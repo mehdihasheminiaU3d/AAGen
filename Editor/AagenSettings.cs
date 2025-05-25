@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using AAGen.Shared;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -11,7 +10,6 @@ namespace AAGen
     public enum ProcessingStepID
     {
         GenerateDependencyGraph = 1 << 0,
-        RemoveScenesFromBuildProfile = 1 << 1,
         AssetInputFilter = 1 << 2,
         GenerateSubGraphs = 1 << 3,
         GenerateGroupLayout = 1 << 4,
@@ -35,6 +33,10 @@ namespace AAGen
         [SerializeField]
         bool m_RunInBackground;
         public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
+        [SerializeField]
+        bool m_CheckBuiltinSceneDuplicates = true;
+        [SerializeField]
+        bool m_SaveGraphOnDisk = false;
         [Header("Rules")]
         public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
         [SerializeField]
@@ -97,5 +99,7 @@ namespace AAGen
         }
 
         public List<RefinementRule> RefinementRules => m_RefinementRules;
+
+        public bool SaveGraphOnDisk => m_SaveGraphOnDisk;
     }
 }

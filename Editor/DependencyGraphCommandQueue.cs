@@ -1,4 +1,7 @@
 using AAGen.AssetDependencies;
+using AAGen.Shared;
+using Newtonsoft.Json;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 
 namespace AAGen
@@ -28,17 +31,24 @@ namespace AAGen
             foreach (var assetPath in assetPaths)
             {
                 var path = assetPath; // avoid closure capturing loop variable
-                AddCommand(new NewActionCommand()
-                {
-                    Action = () => AddAssetToDependencyGraph(path),
-                    Info = path,
-                });
+                AddCommand(() => AddAssetToDependencyGraph(path), path);
+            }
+
+            if (m_DataContainer.Settings.SaveGraphOnDisk)
+            {
+                AddCommand(SaveGraphOnDisk, "Saving DependencyGraph");
             }
         }
 
         void AddAssetToDependencyGraph(string assetPath)
         {
             DependencyGraphGeneratorCore.AddAssetToGraph(m_DataContainer.DependencyGraph, assetPath);
+        }
+
+        void SaveGraphOnDisk()
+        {
+            var data = JsonConvert.SerializeObject(m_DataContainer.DependencyGraph, Formatting.Indented);
+            FileUtils.SaveToFile(Constants.DependencyGraphFilePath,data);
         }
 
         public override void PostExecute()

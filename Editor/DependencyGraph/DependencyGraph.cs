@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AAGen.Shared;
+using Newtonsoft.Json;
 using UnityEditor;
 
 namespace AAGen.AssetDependencies
@@ -22,6 +23,8 @@ namespace AAGen.AssetDependencies
         }
         
         readonly Lazy<DependencyGraph> m_LazyTransposedGraph;
+        
+        [JsonIgnore]
         public DependencyGraph Transposed => m_LazyTransposedGraph.Value;
 
         public void AddEdge(string pathA, string pathB)

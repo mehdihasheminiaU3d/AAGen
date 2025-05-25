@@ -1,7 +1,9 @@
+using AAGen.AssetDependencies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using AAGen.Shared;
+using Newtonsoft.Json;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -96,6 +98,8 @@ namespace AAGen
                 Settings = m_Settings,
                 SettingsFilePath = AssetDatabase.GetAssetPath(m_Settings),
             };
+
+            m_DataContainer.Logger = new Logger(m_DataContainer);
         }
         
         List<CommandQueue> InitializeCommands()
@@ -109,6 +113,10 @@ namespace AAGen
 
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
                 commandQueues.Add(new DependencyGraphCommandQueue(m_DataContainer));
+            else
+            {
+                commandQueues.Add(new CommandQueue(LoadDependencyGraph, nameof(LoadDependencyGraph)));
+            }
             
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetInputFilter))
                 commandQueues.Add(new InputFilterCommandQueue(m_DataContainer));
@@ -183,7 +191,7 @@ namespace AAGen
 
                     if (m_IsCancelled)
                     {
-                        LogUtil.Log(this, m_Settings, LogLevelID.Info, $"Cancelled!");
+                        m_DataContainer.Logger.LogInfo(this, $"Cancelled!");
                         Progress.UnregisterCancelCallback(progressId);
                         m_IsProcessing = false;
                         StopAssetEditingIfNeeded();
@@ -214,7 +222,7 @@ namespace AAGen
                 }
                 
                 currentQueue.PostExecute();
-                LogUtil.Log(this, m_Settings, LogLevelID.Developer,
+                m_DataContainer.Logger.LogDev(this,
                     $"Time Taken for {currentQueue.Title} = {Math.Round(EditorApplication.timeSinceStartup - m_LastTime)}s");
                 
                 Progress.UnregisterCancelCallback(progressId);
@@ -272,12 +280,12 @@ namespace AAGen
 
                     if (m_IsCancelled)
                     {
-                        LogUtil.Log(this, m_Settings, LogLevelID.Info, $"Cancelled!");
+                        m_DataContainer.Logger.LogInfo(this, $"Cancelled!");
                         break;
                     }
 
                     currentQueue.PostExecute();
-                    LogUtil.Log(this, m_Settings, LogLevelID.Developer,
+                    m_DataContainer.Logger.LogDev(this,
                         $"Time Taken for {currentQueue.Title} = {Math.Round(EditorApplication.timeSinceStartup - m_LastTime)}s");
 
                 }
@@ -330,6 +338,12 @@ namespace AAGen
         void ValidateSettings()
         {
             m_Settings.Validate();
+        }
+
+        void LoadDependencyGraph()
+        {
+            var serializedData = FileUtils.LoadFromFile(Constants.DependencyGraphFilePath);
+            m_DataContainer.DependencyGraph = JsonConvert.DeserializeObject<DependencyGraph>(serializedData);
         }
     }
 }

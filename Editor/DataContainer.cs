@@ -21,6 +21,7 @@ namespace AAGen
         public bool AssetEditingInProgress;
 
         public SummaryReport SummaryReport = new SummaryReport();
+        public Logger Logger;
         
         public Dictionary<SubgraphCategoryID, List<SubgraphInfo>> GetSubgraphsGroupedByCategory()
         {
