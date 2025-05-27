@@ -47,7 +47,7 @@ namespace AAGen
 
         void SaveGraphOnDisk()
         {
-            var data = JsonConvert.SerializeObject(m_DataContainer.DependencyGraph, Formatting.Indented);
+            var data = JsonConvert.SerializeObject(m_DataContainer.DependencyGraph.Serialize(), Formatting.None);
             FileUtils.SaveToFile(Constants.DependencyGraphFilePath,data);
         }
 

@@ -114,9 +114,7 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
                 commandQueues.Add(new DependencyGraphCommandQueue(m_DataContainer));
             else
-            {
-                commandQueues.Add(new CommandQueue(LoadDependencyGraph, nameof(LoadDependencyGraph)));
-            }
+                commandQueues.Add(new LoadDependencyGraphCommandQueue(m_DataContainer));
             
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.AssetInputFilter))
                 commandQueues.Add(new InputFilterCommandQueue(m_DataContainer));
@@ -340,10 +338,6 @@ namespace AAGen
             m_Settings.Validate();
         }
 
-        void LoadDependencyGraph()
-        {
-            var serializedData = FileUtils.LoadFromFile(Constants.DependencyGraphFilePath);
-            m_DataContainer.DependencyGraph = JsonConvert.DeserializeObject<DependencyGraph>(serializedData);
-        }
+        
     }
 }

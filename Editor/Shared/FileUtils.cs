@@ -13,26 +13,23 @@ namespace AAGen.Shared
         public static void SaveToFile(string filePath, string data)
         {
             EnsureDirectoryExist(filePath);
-            
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (BufferedStream bs = new BufferedStream(fs))
+            using (StreamWriter sw = new StreamWriter(bs, Encoding.UTF8))
             {
-                byte[] binaryData = Encoding.UTF8.GetBytes(data);
-                fileStream.Write(binaryData, 0, binaryData.Length);
+                sw.Write(data);
             }
         }
 
         public static string LoadFromFile(string path)
         {
-            string data = string.Empty;
-
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None))
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (BufferedStream bs = new BufferedStream(fs))
+            using (StreamReader sr = new StreamReader(bs, Encoding.UTF8))
             {
-                byte[] bytes = new byte[fileStream.Length];
-                fileStream.Read(bytes, 0, bytes.Length);
-                data = Encoding.UTF8.GetString(bytes);
+                return sr.ReadToEnd();
             }
-            
-            return data;
         }
         
         public static IEnumerator SaveToFileAsync<T>(T obj, string filePath, Action<bool> onComplete = null, int bytesPerStep = 1024 * 1024)
