@@ -14,7 +14,7 @@ namespace AAGen
     
     internal class AutomatedAssetGrouper : EditorWindow, ISettingsHolderWindow
     {
-        [MenuItem(Constants.Menus.AAGenMenuPath, priority = Constants.Menus.AAGenMenuPriority)]
+        // [MenuItem(Constants.Menus.AAGenMenuPath, priority = Constants.Menus.AAGenMenuPriority)]
         public static void ShowWindow()
         {
             var window = GetWindow<AutomatedAssetGrouper>("Automated Asset Grouper");

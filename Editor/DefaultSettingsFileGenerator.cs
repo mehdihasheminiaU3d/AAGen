@@ -1,3 +1,4 @@
+using AAGen.Shared;
 using UnityEditor;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ namespace AAGen
 {
     internal static class DefaultSettingsFileGenerator
     {
-        [MenuItem("Tools/Generate Default settings")]
+        [MenuItem(Constants.Menus.Root + "Generate Settings File", priority = Constants.Menus.AAGenMenuPriority)] 
         private static void SaveTextAsset()
         {
             var path = EditorUtility.SaveFilePanel("Save Text Asset", 

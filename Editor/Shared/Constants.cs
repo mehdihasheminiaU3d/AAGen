@@ -10,7 +10,7 @@ namespace AAGen.Shared
 
         public static class Menus
         {
-            public const string Root = "Tools/";
+            public const string Root = "Tools/AAGen/";
 
             public const int AAGenMenuPriority = 100;
             public const string AAGenRootMenuPath = Root;

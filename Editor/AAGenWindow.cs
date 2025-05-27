@@ -10,7 +10,7 @@ namespace AAGen
 {
     internal class AAGenWindow : EditorWindow 
     {
-        [MenuItem(Constants.Menus.Root+"AAGen", priority = Constants.Menus.AAGenMenuPriority)] 
+        [MenuItem(Constants.Menus.Root + "AAGen", priority = Constants.Menus.AAGenMenuPriority)] 
         public static void ShowWindow()
         {
             var window = GetWindow<AAGenWindow>("AAGen");
