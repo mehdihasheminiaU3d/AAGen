@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace AAGen
 {
-    internal class LoadDependencyGraphCommandQueue : NewCommandQueue
+    internal class LoadDependencyGraphCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
         

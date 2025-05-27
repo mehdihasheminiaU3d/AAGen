@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphCategorizationCommandQueue : NewCommandQueue
+    internal class SubgraphCategorizationCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
         

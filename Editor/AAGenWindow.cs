@@ -100,12 +100,12 @@ namespace AAGen
             m_DataContainer.Logger = new Logger(m_DataContainer);
         }
         
-        List<NewCommandQueue> InitializeCommands()
+        List<CommandQueue> InitializeCommands()
         {
-            var commandQueues = new List<NewCommandQueue>
+            var commandQueues = new List<CommandQueue>
             {
                 new SettingsFilesCommandQueue(m_DataContainer),
-                new NewCommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor))
+                new CommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor))
             };
 
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
@@ -132,7 +132,7 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.Cleanup))
                 commandQueues.Add(new AddressableCleanupCommandQueue(m_DataContainer));
 
-            commandQueues.Add(new NewCommandQueue(WriteReportToDisk, nameof(WriteReportToDisk)));
+            commandQueues.Add(new CommandQueue(WriteReportToDisk, nameof(WriteReportToDisk)));
             
             return commandQueues;
         }

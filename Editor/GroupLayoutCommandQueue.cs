@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class GroupLayoutCommandQueue : NewCommandQueue
+    internal class GroupLayoutCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
 

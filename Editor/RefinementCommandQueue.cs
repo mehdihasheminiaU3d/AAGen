@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class RefinementCommandQueue : NewCommandQueue
+    internal class RefinementCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
         

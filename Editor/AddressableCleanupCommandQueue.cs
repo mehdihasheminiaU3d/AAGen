@@ -4,7 +4,7 @@ using UnityEditor.AddressableAssets.Settings;
 
 namespace AAGen
 {
-    internal class AddressableCleanupCommandQueue : NewCommandQueue
+    internal class AddressableCleanupCommandQueue : CommandQueue
     {
         public AddressableCleanupCommandQueue(DataContainer dataContainer) 
         {

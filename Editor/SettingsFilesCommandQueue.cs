@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SettingsFilesCommandQueue : NewCommandQueue
+    internal class SettingsFilesCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
             

@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class InputFilterCommandQueue : NewCommandQueue 
+    internal class InputFilterCommandQueue : CommandQueue 
     {
         readonly DataContainer m_DataContainer;
         

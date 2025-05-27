@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class DependencyGraphCommandQueue : NewCommandQueue
+    internal class DependencyGraphCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
         

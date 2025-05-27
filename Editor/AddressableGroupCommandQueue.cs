@@ -5,7 +5,7 @@ using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 
 namespace AAGen
 {
-    internal class AddressableGroupCommandQueue : NewCommandQueue
+    internal class AddressableGroupCommandQueue : CommandQueue
     {
         public AddressableGroupCommandQueue(DataContainer dataContainer) 
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphCommandQueue : NewCommandQueue
+    internal class SubgraphCommandQueue : CommandQueue
     {
         readonly DataContainer m_DataContainer;
 
