@@ -327,12 +327,5 @@ namespace AAGen
             if (m_Settings.GenerateSummaryReport)
                 m_DataContainer.SummaryReport.WriteReportToDisk();
         }
-        
-        void ValidateSettings()
-        {
-            m_Settings.Validate();
-        }
-
-        
     }
 }
