@@ -19,9 +19,10 @@ namespace AAGen
         public override void PreExecute()
         {
             ClearQueue();
-            foreach (var refinementRule in m_DataContainer.Settings.RefinementRules) 
+            foreach (var refinementRule in m_DataContainer.Settings.RefinementRules)
             {
-                AddCommand(() => refinementRule.Execute(m_DataContainer), refinementRule.name);
+                var rule = refinementRule;
+                AddCommand(() => rule.Execute(m_DataContainer), rule.name);
             }
         }
         

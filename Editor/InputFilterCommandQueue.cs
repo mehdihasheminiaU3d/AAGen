@@ -24,18 +24,17 @@ namespace AAGen
         {
             ClearQueue();
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
-            AddCommandsToIgnoreByInputRules();
-            AddCommandsToIgnoreUnsupportedAssets();
-            AddCommand(AddBuiltinScenesToIgnoredList, nameof(AddBuiltinScenesToIgnoredList));
-        }
-        
-        void AddCommandsToIgnoreByInputRules()
-        {
-            var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
-            foreach (var node in allNodes)
+            
+            foreach (var node in m_DataContainer.DependencyGraph.GetAllNodes())
             {
-                AddCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath);
+                var localNode = node; // avoid closure capturing loop variable
+                var fileName = node.FileName; 
+                
+                AddCommand(() => AddRuledFileToIgnoredList(localNode), fileName);
+                AddCommand(() => AddUnsupportedFileToIgnoreAssets(localNode), fileName);
             }
+            
+            AddCommand(AddBuiltinScenesToIgnoredList, nameof(AddBuiltinScenesToIgnoredList));
         }
 
         void AddRuledFileToIgnoredList(AssetNode node)
@@ -48,15 +47,6 @@ namespace AAGen
                     m_DataContainer.IgnoredAssets.Add(node);
                     m_NodesIgnoredByRules++;
                 }
-            }
-        }
-
-        void AddCommandsToIgnoreUnsupportedAssets()
-        {
-            var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
-            foreach (var node in allNodes)
-            {
-                AddCommand(() => AddUnsupportedFileToIgnoreAssets(node), node.AssetPath);
             }
         }
         

@@ -26,7 +26,8 @@ namespace AAGen
             var nodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in nodes)
             {
-                AddCommand(() => AddNodeToSubgraph(node), node.AssetPath);
+                var localNode = node;
+                AddCommand(() => AddNodeToSubgraph(localNode), localNode.FileName);
             }
         }
 
