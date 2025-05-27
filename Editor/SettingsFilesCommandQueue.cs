@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SettingsFilesCommandQueue : CommandQueue
+    internal class SettingsFilesCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
             
@@ -25,9 +25,10 @@ namespace AAGen
 
         public override void PreExecute()
         {
-            AddCommand(new ActionCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings)));
-            AddCommand(new ActionCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings)));
-            EnqueueCommands();
+            ClearQueue();
+            AddCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings));
+            AddCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings));
+            AddCommand(() => m_DataContainer.Settings.Validate(), "Validate Settings");
         }
 
         void FindOrCreateDefaultAddressableSettings()
@@ -63,7 +64,7 @@ namespace AAGen
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             
-            Debug.Log("Default addressable assets settings created at: " + DefaultSettingsPath);
+            m_DataContainer.Logger.LogInfo(this, "Default addressable assets settings created at: " + DefaultSettingsPath);
         }
 
         void FindOrCreateDefaultToolSettings()
@@ -78,7 +79,7 @@ namespace AAGen
             
             //If a settings file doesn't exists in the project, create one with default settings
             CreateDefaultToolSettings();
-            Debug.Log($"CreateDefaultToolSettings");
+            m_DataContainer.Logger.LogInfo(this,$"CreateDefaultToolSettings");
         }
 
         bool ToolSettingsExists()

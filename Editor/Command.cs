@@ -94,6 +94,20 @@ namespace AAGen
 
     public class NewCommandQueue : CommandQueue
     {
+        public NewCommandQueue()
+        {
+        }
+
+        public NewCommandQueue(Action action, string info)
+        {
+            m_ProcessingQueue.Enqueue(new NewActionCommand //ToDo: redundant Code (AddCommand is virtual)
+            {
+                Action = action,
+                Info = info,
+            });
+            Title = info;
+        }
+        
         readonly Queue<NewActionCommand> m_ProcessingQueue = new Queue<NewActionCommand>();
         public override int RemainingCommandCount => m_ProcessingQueue.Count;
         
@@ -101,7 +115,7 @@ namespace AAGen
         {
             throw new Exception($"{nameof(EnqueueCommands)} is deprecated");
         }
-
+        
         protected void ClearQueue()
         {
             m_ProcessingQueue.Clear();

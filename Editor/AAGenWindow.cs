@@ -1,9 +1,7 @@
-using AAGen.AssetDependencies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using AAGen.Shared;
-using Newtonsoft.Json;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -107,8 +105,7 @@ namespace AAGen
             var commandQueues = new List<CommandQueue>
             {
                 new SettingsFilesCommandQueue(m_DataContainer),
-                new CommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor)),
-                new CommandQueue(ValidateSettings, nameof(ValidateSettings)),
+                new NewCommandQueue(LoadSettingsFileInEditor, nameof(LoadSettingsFileInEditor))
             };
 
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateDependencyGraph))
