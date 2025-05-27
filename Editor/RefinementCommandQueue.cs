@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class RefinementCommandQueue : CommandQueue
+    internal class RefinementCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
         
@@ -18,12 +18,11 @@ namespace AAGen
 
         public override void PreExecute()
         {
+            ClearQueue();
             foreach (var refinementRule in m_DataContainer.Settings.RefinementRules) 
             {
-                AddCommand(new ActionCommand(() => refinementRule.Execute(m_DataContainer), refinementRule.name));
+                AddCommand(() => refinementRule.Execute(m_DataContainer), refinementRule.name);
             }
-            
-            EnqueueCommands();
         }
         
         public override void PostExecute()

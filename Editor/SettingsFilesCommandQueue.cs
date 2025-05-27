@@ -64,7 +64,7 @@ namespace AAGen
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             
-            m_DataContainer.Logger.LogInfo(this, "Default addressable assets settings created at: " + DefaultSettingsPath);
+            // m_DataContainer.Logger.LogInfo(this, "Default addressable assets settings created at: " + DefaultSettingsPath); //ToDo: settings might not exists yet!
         }
 
         void FindOrCreateDefaultToolSettings()
@@ -79,7 +79,8 @@ namespace AAGen
             
             //If a settings file doesn't exists in the project, create one with default settings
             CreateDefaultToolSettings();
-            m_DataContainer.Logger.LogInfo(this,$"CreateDefaultToolSettings");
+            
+            // m_DataContainer.Logger.LogInfo(this,$"CreateDefaultToolSettings"); //ToDo: sometimes doesn't work immediately after creating the settings
         }
 
         bool ToolSettingsExists()

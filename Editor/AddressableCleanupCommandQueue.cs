@@ -4,7 +4,7 @@ using UnityEditor.AddressableAssets.Settings;
 
 namespace AAGen
 {
-    internal class AddressableCleanupCommandQueue : CommandQueue
+    internal class AddressableCleanupCommandQueue : NewCommandQueue
     {
         public AddressableCleanupCommandQueue(DataContainer dataContainer) 
         {
@@ -19,10 +19,10 @@ namespace AAGen
         
         public override void PreExecute()
         {
-            AddCommand(new ActionCommand(StartAssetEditing));
-            AddCommand(new ActionCommand(RemoveEmptyAddressableGroups));
-            AddCommand(new ActionCommand(StopAssetEditing));
-            EnqueueCommands();
+            ClearQueue();
+            AddCommand(StartAssetEditing);
+            AddCommand(RemoveEmptyAddressableGroups);
+            AddCommand(StopAssetEditing);
         }
 
         void RemoveEmptyAddressableGroups()

@@ -5,7 +5,7 @@ using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 
 namespace AAGen
 {
-    internal class AddressableGroupCommandQueue : CommandQueue
+    internal class AddressableGroupCommandQueue : NewCommandQueue
     {
         public AddressableGroupCommandQueue(DataContainer dataContainer) 
         {
@@ -19,18 +19,19 @@ namespace AAGen
         
         public override void PreExecute()
         {
-            AddCommand(new ActionCommand(StartAssetEditing));
+            ClearQueue();
+            
+            AddCommand(StartAssetEditing);
             
             foreach (var pair in m_DataContainer.GroupLayout)
             {
                 var groupName = pair.Key;
                 var groupLayoutInfo = pair.Value;
 
-                AddCommand(new ActionCommand(() => CreateGroupAndMoveAssets(groupName, groupLayoutInfo), groupName));
+                AddCommand(() => CreateGroupAndMoveAssets(groupName, groupLayoutInfo), groupName);
             }
             
-            AddCommand(new ActionCommand(StopAssetEditing));
-            EnqueueCommands();
+            AddCommand(StopAssetEditing);
         }
 
         void CreateGroupAndMoveAssets(string groupName, GroupLayoutInfo groupLayoutInfo)

@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace AAGen
 {
-    internal class InputFilterCommandQueue : CommandQueue 
+    internal class InputFilterCommandQueue : NewCommandQueue 
     {
         readonly DataContainer m_DataContainer;
         
@@ -22,11 +22,11 @@ namespace AAGen
 
         public override void PreExecute()
         {
+            ClearQueue();
             m_DataContainer.IgnoredAssets = new HashSet<AssetNode>();
             AddCommandsToIgnoreByInputRules();
             AddCommandsToIgnoreUnsupportedAssets();
-            AddCommand(new ActionCommand(AddBuiltinScenesToIgnoredList));
-            EnqueueCommands();
+            AddCommand(AddBuiltinScenesToIgnoredList, nameof(AddBuiltinScenesToIgnoredList));
         }
         
         void AddCommandsToIgnoreByInputRules()
@@ -34,7 +34,7 @@ namespace AAGen
             var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                AddCommand(new ActionCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath));
+                AddCommand(() => AddRuledFileToIgnoredList(node), node.AssetPath);
             }
         }
 
@@ -56,7 +56,7 @@ namespace AAGen
             var allNodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in allNodes)
             {
-                AddCommand(new ActionCommand(() => AddUnsupportedFileToIgnoreAssets(node)));
+                AddCommand(() => AddUnsupportedFileToIgnoreAssets(node), node.AssetPath);
             }
         }
         

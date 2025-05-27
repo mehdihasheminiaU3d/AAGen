@@ -161,13 +161,13 @@ namespace AAGen
         {
             Initialize(action, info);
         }
-
+    
         public void Initialize(Action action, string info = null)
         {
             m_Action = action;
             Info = info;
         }
-
+    
         protected override void OnExecute()
         {
             m_Action?.Invoke();

@@ -3,25 +3,24 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphCategorizationCommandQueue : CommandQueue
+    internal class SubgraphCategorizationCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
         
         public SubgraphCategorizationCommandQueue(DataContainer dataContainer)
         {
             m_DataContainer = dataContainer;
-            Title = nameof(SubgraphCommandQueue);
+            Title = nameof(SubgraphCategorizationCommandQueue);
         }
 
         public override void PreExecute()
         {
+            ClearQueue();
             foreach (var pair in m_DataContainer.Subgraphs)
             {
                 var subgraph = pair.Value;
-                AddCommand(new ActionCommand(() => CategorizeSubgraph(subgraph)));
+                AddCommand(() => CategorizeSubgraph(subgraph));
             }
-            
-            EnqueueCommands();
         }
 
         void CategorizeSubgraph(SubgraphInfo subgraph)

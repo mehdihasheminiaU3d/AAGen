@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class GroupLayoutCommandQueue : CommandQueue
+    internal class GroupLayoutCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
 
@@ -21,6 +21,7 @@ namespace AAGen
 
         public override void PreExecute()
         {
+            ClearQueue();
             m_DataContainer.GroupLayout = new Dictionary<string, GroupLayoutInfo>();
             
             //one subgraph maps to one group
@@ -29,10 +30,8 @@ namespace AAGen
                 var hash = pair.Key;
                 var subgraph = pair.Value;
                 var templateName = m_DataContainer.Settings.m_DefaultGroupTemplate.Name;
-                AddCommand(new ActionCommand(() => CreateGroupLayout(hash, subgraph, templateName), hash.ToString()));
+                AddCommand(() => CreateGroupLayout(hash, subgraph, templateName), hash.ToString());
             }
-            
-            EnqueueCommands();
         }
 
         void CreateGroupLayout(int hash, SubgraphInfo subgraph, string templateName)

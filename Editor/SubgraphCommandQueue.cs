@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    internal class SubgraphCommandQueue : CommandQueue
+    internal class SubgraphCommandQueue : NewCommandQueue
     {
         readonly DataContainer m_DataContainer;
 
@@ -20,15 +20,14 @@ namespace AAGen
 
         public override void PreExecute()
         {
+            ClearQueue();
             m_DataContainer.Subgraphs = new Dictionary<int, SubgraphInfo>();
             
             var nodes = m_DataContainer.DependencyGraph.GetAllNodes();
             foreach (var node in nodes)
             {
-                AddCommand(new ActionCommand(() => AddNodeToSubgraph(node), node.AssetPath));
+                AddCommand(() => AddNodeToSubgraph(node), node.AssetPath);
             }
-            
-            EnqueueCommands();
         }
 
         void AddNodeToSubgraph(AssetNode node)
