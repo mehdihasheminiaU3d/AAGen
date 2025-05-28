@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 
@@ -45,7 +46,7 @@ namespace AAGen
                 if (string.IsNullOrEmpty(assetGuid))
                     throw new Exception($"Asset with path '{node.AssetPath}' not found in project.");
 
-                var entry = m_DataContainer.AddressableSettings.CreateOrMoveEntry(assetGuid, addressableGroup, false, false);
+                var entry = AddressableSettings.CreateOrMoveEntry(assetGuid, addressableGroup, false, false);
                 if (entry == null)
                     throw new Exception($"Failed to add asset '{node.AssetPath}' to group '{addressableGroup.name}'.");
             }
@@ -57,7 +58,7 @@ namespace AAGen
             if (template == null)
                 throw new Exception($"Template with name '{templateName}' not found!");
 
-            AddressableAssetGroup newGroup = m_DataContainer.AddressableSettings.CreateGroup(name, false, false,
+            AddressableAssetGroup newGroup = AddressableSettings.CreateGroup(name, false, false,
                 false, null, typeof(BundledAssetGroupSchema));
             
             if (newGroup == null)
@@ -70,7 +71,7 @@ namespace AAGen
         
         AddressableAssetGroupTemplate FindTemplateByName(string templateName)
         {
-            foreach (var template in m_DataContainer.AddressableSettings.GroupTemplateObjects)
+            foreach (var template in AddressableSettings.GroupTemplateObjects)
             {
                 if (template.name.Equals(templateName))
                 {
@@ -109,5 +110,7 @@ namespace AAGen
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }
+        
+        AddressableAssetSettings AddressableSettings => AddressableAssetSettingsDefaultObject.Settings;
     }
 }

@@ -11,7 +11,6 @@ namespace AAGen
 
         public string SettingsFilePath;
         public AagenSettings Settings;
-        public AddressableAssetSettings AddressableSettings;
 
         public HashSet<AssetNode> IgnoredAssets;
 

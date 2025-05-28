@@ -7,9 +7,9 @@ namespace AAGen
     internal static class DefaultSettingsFileGenerator
     {
         [MenuItem(Constants.Menus.Root + "Generate Settings File", priority = Constants.Menus.AAGenMenuPriority)] 
-        private static void SaveTextAsset()
+        static void OpenSaveSettingsPanel()
         {
-            var path = EditorUtility.SaveFilePanel("Save Text Asset", 
+            var path = EditorUtility.SaveFilePanel("Generate Settings Asset at", 
                 "Assets", 
                 "NewAagenSettings", 
                 "asset");
@@ -24,9 +24,9 @@ namespace AAGen
             }
 
             string relativePath = "Assets" + path.Substring(Application.dataPath.Length);
-        
-            var defaultSystemSetupCreator = new DefaultSystemSetupCreator(null, null, null);
-            defaultSystemSetupCreator.CreateDefaultSettingsFileAtPath(relativePath);
+
+            SettingsFilesCommandQueue.CreateAddressableSettingsIfRequired();
+            SettingsFilesCommandQueue.CreateDefaultToolSettingsAtPath(relativePath);
 
             Debug.Log($"asset saved at: {relativePath}");
         }

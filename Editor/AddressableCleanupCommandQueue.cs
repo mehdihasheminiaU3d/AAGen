@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 
 namespace AAGen
@@ -27,12 +28,12 @@ namespace AAGen
 
         void RemoveEmptyAddressableGroups()
         {
-            var groups = m_DataContainer.AddressableSettings.groups.Where(CanRemoveGroup).ToList();
+            var groups = AddressableSettings.groups.Where(CanRemoveGroup).ToList();
             m_EmptyGroupCount = groups.Count;
             
             foreach (var group in groups)
             {
-                m_DataContainer.AddressableSettings.RemoveGroup(group);
+                AddressableSettings.RemoveGroup(group);
                 m_EmptyGroupRemoved++;
             }
         }
@@ -41,7 +42,7 @@ namespace AAGen
         {
             return group.entries.Count == 0 && 
                    !group.ReadOnly && 
-                   group != m_DataContainer.AddressableSettings.DefaultGroup;
+                   group != AddressableSettings.DefaultGroup;
         }
         
         void StartAssetEditing()
@@ -73,5 +74,7 @@ namespace AAGen
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }
+
+        AddressableAssetSettings AddressableSettings => AddressableAssetSettingsDefaultObject.Settings;
     }
 }

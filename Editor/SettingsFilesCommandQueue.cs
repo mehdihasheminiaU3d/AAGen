@@ -26,34 +26,18 @@ namespace AAGen
         public override void PreExecute()
         {
             ClearQueue();
-            AddCommand(FindOrCreateDefaultAddressableSettings, nameof(FindOrCreateDefaultAddressableSettings));
+            AddCommand(CreateAddressableSettingsIfRequired, nameof(CreateAddressableSettingsIfRequired));
             AddCommand(FindOrCreateDefaultToolSettings, nameof(FindOrCreateDefaultToolSettings));
             AddCommand(() => m_DataContainer.Settings.Validate(), "Validate Settings");
         }
 
-        void FindOrCreateDefaultAddressableSettings()
+       public static void CreateAddressableSettingsIfRequired()
         {
-            if (AddressableSettingsExists())
-            {
-                m_DataContainer.AddressableSettings = AddressableAssetSettingsDefaultObject.Settings;
-                return; //the default addressable asset settings already created
-            }
-
-            CreateDefaultAddressableSettings();
-            
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-            if (settings == null)
-                throw new Exception($"Addressable Asset Settings not found!");
-
-            m_DataContainer.AddressableSettings = settings;
+            if (AddressableAssetSettingsDefaultObject.Settings == null)
+                CreateDefaultAddressableSettings();
         }
 
-        bool AddressableSettingsExists()
-        {
-            return AddressableAssetSettingsDefaultObject.Settings != null;
-        }
-
-        void CreateDefaultAddressableSettings()
+        static void CreateDefaultAddressableSettings()
         {
             EnsureDirectoryExists(DefaultSettingsPath);
 
@@ -63,8 +47,6 @@ namespace AAGen
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            
-            // m_DataContainer.Logger.LogInfo(this, "Default addressable assets settings created at: " + DefaultSettingsPath); //ToDo: settings might not exists yet!
         }
 
         void FindOrCreateDefaultToolSettings()
@@ -73,60 +55,44 @@ namespace AAGen
             if (m_DataContainer.Settings != null)
                 return;
 
-            //Settings exists but not loaded, ask the user to provide one
+            //Settings exists but not loaded, ask the user nicely to provide one
             if (ToolSettingsExists())
                 throw new Exception($"Cannot find AAGen settings file");
             
             //If a settings file doesn't exists in the project, create one with default settings
             CreateDefaultToolSettings();
-            
-            // m_DataContainer.Logger.LogInfo(this,$"CreateDefaultToolSettings"); //ToDo: sometimes doesn't work immediately after creating the settings
-        }
-
-        bool ToolSettingsExists()
-        {
-            var allSettings = FindAllToolSettingsInstances();
-
-            return allSettings.Count > 0;
-        }
-        
-        static List<AagenSettings> FindAllToolSettingsInstances() 
-        {
-            List<AagenSettings> results = new List<AagenSettings>();
-            string[] guids = AssetDatabase.FindAssets($"t:{typeof(AagenSettings).Name}");
-
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                AagenSettings asset = AssetDatabase.LoadAssetAtPath<AagenSettings>(path);
-                if (asset != null)
-                {
-                    results.Add(asset);
-                }
-            }
-
-            return results;
         }
         
         void CreateDefaultToolSettings()
         {
             EnsureDirectoryExists(DefaultAagenSettingsFolder);
+            var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagenSettings)}.asset");
+            var settings = CreateDefaultToolSettingsAtPath(settingsFilePath);
+            
+            m_DataContainer.SettingsFilePath = settingsFilePath;
+            m_DataContainer.Settings = settings;
+        }
+        
+        public static AagenSettings CreateDefaultToolSettingsAtPath(string settingsFilePath)
+        {
+            var directory = Path.GetDirectoryName(settingsFilePath);
+            
+            AagenSettings settings = null;
             
             try
             {
                 AssetDatabase.StartAssetEditing();
                 
-                var settingsFilePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(AagenSettings)}.asset");
-                var settings = ScriptableObject.CreateInstance<AagenSettings>();
+                settings = ScriptableObject.CreateInstance<AagenSettings>();
                 
                 settings.InputFilterRules = new List<InputFilterRule>
                 {
-                    CreateDefaultInputRule()
+                    CreateDefaultInputRule(directory)
                 };
                 
                 settings.OutputRules = new List<OutputRule>
                 {
-                    CreateDefaultOutputRule()
+                    CreateDefaultOutputRule(directory)
                 };
                 
                 var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
@@ -134,11 +100,8 @@ namespace AAGen
                     throw new Exception($"cannot find default addressable group template");
                 settings.m_DefaultGroupTemplate = defaultGroupTemplate;
 
-                AssetDatabase.CreateAsset(settings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting?
+                AssetDatabase.CreateAsset(settings, settingsFilePath);
                 AssetDatabase.SaveAssets();
-
-                m_DataContainer.SettingsFilePath = settingsFilePath;
-                m_DataContainer.Settings = settings;
             }
             catch (Exception e)
             {
@@ -149,11 +112,13 @@ namespace AAGen
                 AssetDatabase.StopAssetEditing();
                 AssetDatabase.Refresh();
             }
+
+            return settings;
         }
 
-        static InputFilterRule CreateDefaultInputRule()
+        static InputFilterRule CreateDefaultInputRule(string directoryPath)
         {
-            var inputFilterRulePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(InputFilterRule)}.asset");
+            var inputFilterRulePath = Path.Combine(directoryPath, $"Default {nameof(InputFilterRule)}.asset");
             var inputFilterRule = ScriptableObject.CreateInstance<PathFilterRule>();
             inputFilterRule.m_Criteria = new List<PathFilterCriterion>
             {
@@ -206,25 +171,24 @@ namespace AAGen
             return inputFilterRule;
         }
         
-        static OutputRule CreateDefaultOutputRule()
+        static OutputRule CreateDefaultOutputRule(string directoryPath)
         {
             var outputRule = new OutputRule
             {
                 Name = "Default Output Rule"
             };
-
             
-            var subgraphSelectorPath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultSubgraphSelector)}.asset");
+            var subgraphSelectorPath = Path.Combine(directoryPath, $"{nameof(DefaultSubgraphSelector)}.asset");
             var subgraphSelectorRule = ScriptableObject.CreateInstance<DefaultSubgraphSelector>();
             AssetDatabase.CreateAsset(subgraphSelectorRule, subgraphSelectorPath);
             outputRule.SubgraphSelector = subgraphSelectorRule;
             
-            var refinementRulePath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultRefinementRule)}.asset");
+            var refinementRulePath = Path.Combine(directoryPath, $"{nameof(DefaultRefinementRule)}.asset");
             var refinementRule = ScriptableObject.CreateInstance<DefaultRefinementRule>();
             AssetDatabase.CreateAsset(refinementRule, refinementRulePath);
             outputRule.RefinementRule = refinementRule;
             
-            var namingRulePath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultNamingRule)}.asset");
+            var namingRulePath = Path.Combine(directoryPath, $"{nameof(DefaultNamingRule)}.asset");
             var namingRule = ScriptableObject.CreateInstance<DefaultNamingRule>();
             AssetDatabase.CreateAsset(namingRule, namingRulePath);
             outputRule.NamingRule = namingRule;
@@ -236,31 +200,54 @@ namespace AAGen
         
         static AddressableAssetGroupTemplate FindDefaultAddressableGroupTemplate()
         {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
 
             if (settings == null)
-            {
-                Debug.LogError("AddressableAssetSettings not found. Ensure Addressables are initialized.");
-                return null;
-            }
+                throw new ("AddressableAssetSettings not found. Ensure Addressables are initialized.");
             
             var templates = settings.GroupTemplateObjects;
 
             if (templates == null || templates.Count == 0)
-            {
-                Debug.LogWarning("No group templates found in Addressable Settings.");
-                return null;
-            }
-
+               throw new ("No group templates found in Addressable Settings.");
+            
             // Assuming the first template is the default one
             var defaultTemplate = templates[0];
             return defaultTemplate as AddressableAssetGroupTemplate;
         }
-        
+
+        #region Utils
+
         static void EnsureDirectoryExists(string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
+        
+        static bool ToolSettingsExists()
+        {
+            var allSettings = FindAllToolSettingsInstances();
+
+            return allSettings.Count > 0;
+        }
+        
+        static List<AagenSettings> FindAllToolSettingsInstances() 
+        {
+            List<AagenSettings> results = new List<AagenSettings>();
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(AagenSettings).Name}");
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                AagenSettings asset = AssetDatabase.LoadAssetAtPath<AagenSettings>(path);
+                if (asset != null)
+                {
+                    results.Add(asset);
+                }
+            }
+
+            return results;
+        }
+
+        #endregion
     }
 }
