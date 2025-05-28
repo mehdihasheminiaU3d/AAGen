@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    [CreateAssetMenu(menuName = Constants.ContextMenus.RefinementRulesMenu + nameof(SingleIsolatedNodeSelector))]
+    [CreateAssetMenu(menuName = Constants.ContextMenus.OutputRulesMenu + nameof(SingleIsolatedNodeSelector))]
     public class SingleIsolatedNodeSelector : SubgraphSelector
     {
         protected override bool IsMatch(SubgraphInfo subgraph)

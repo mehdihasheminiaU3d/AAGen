@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    [CreateAssetMenu(menuName = Constants.ContextMenus.RefinementRulesMenu + nameof(DefaultNamingRule))]
+    [CreateAssetMenu(menuName = Constants.ContextMenus.OutputRulesMenu + nameof(DefaultNamingRule))]
     public class DefaultNamingRule : NamingRule
     {
         protected override string CalculateName(SubgraphInfo subgraph)

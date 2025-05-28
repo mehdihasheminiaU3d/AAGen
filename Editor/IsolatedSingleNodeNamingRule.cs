@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AAGen
 {
-    [CreateAssetMenu(menuName = Constants.ContextMenus.RefinementRulesMenu + nameof(IsolatedSingleNodeNamingRule))]
+    [CreateAssetMenu(menuName = Constants.ContextMenus.OutputRulesMenu + nameof(IsolatedSingleNodeNamingRule))]
     public class IsolatedSingleNodeNamingRule : NamingRule
     {
         protected override string CalculateName(SubgraphInfo subgraph)

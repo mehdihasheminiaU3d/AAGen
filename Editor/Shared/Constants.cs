@@ -27,7 +27,8 @@ namespace AAGen.Shared
         {
             public const string Root = "AAGen/";
             public const string SettingsMenu = Root + "Settings files/";
-            public const string RefinementRulesMenu = SettingsMenu + "RefinementRules/";
+            public const string InputRulesMenu = SettingsMenu + "Input Rules/";
+            public const string OutputRulesMenu = SettingsMenu + "Output Rules/";
         }
 
         public static class FilePaths

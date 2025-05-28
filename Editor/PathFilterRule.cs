@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using AAGen.AssetDependencies;
+using AAGen.Shared;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -28,7 +28,7 @@ namespace AAGen
         public InclusionAction m_InclusionAction;
     }
     
-    [CreateAssetMenu(menuName = "AAGen/Settings/" + nameof(PathFilterRule))]
+    [CreateAssetMenu(menuName = Constants.ContextMenus.InputRulesMenu + nameof(PathFilterRule))]
     internal class PathFilterRule : InputFilterRule
     {
         [SerializeField, Tooltip("Conditions for including or ignoring assets based on their file paths.")]
