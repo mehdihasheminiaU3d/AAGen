@@ -9,8 +9,8 @@ namespace AAGen
         
         public bool IsShared; 
         public HashSet<AssetNode> Nodes = new HashSet<AssetNode>(); 
-        
-        public SubgraphCategoryID CategoryID;
         public HashSet<AssetNode> Sources = new HashSet<AssetNode>();
+        public string Name;
+        public int HashOfSources;
     }
 }

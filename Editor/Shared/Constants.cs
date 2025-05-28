@@ -26,6 +26,8 @@ namespace AAGen.Shared
         public static class ContextMenus
         {
             public const string Root = "AAGen/";
+            public const string SettingsMenu = Root + "Settings files/";
+            public const string RefinementRulesMenu = SettingsMenu + "RefinementRules/";
         }
 
         public static class FilePaths

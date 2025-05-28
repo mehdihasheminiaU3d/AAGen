@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AAGen.AssetDependencies;
-using UnityEngine;
 
 namespace AAGen
 {
@@ -46,51 +44,11 @@ namespace AAGen
             
             if (groupLayoutInfo.Nodes.Count > 0)
             {
-                var groupName = CalculateGroupName(hash, subgraph);
+                var groupName = subgraph.Name;
                 //What if the name is redundant?
                 m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
                 m_GroupLayoutCreated++;
             }
-        }
-
-        string CalculateGroupName(int hash, SubgraphInfo subgraph)
-        {
-            return FindNamingRuleForSubgraph(subgraph).CalculateGroupName(hash, subgraph);
-        }
-        
-        static string GetSubgraphName_Old(SubgraphInfo subgraph, HashSet<AssetNode> sources)
-        {
-            string name = null;
-            if (subgraph.IsShared) 
-            {
-                name = $"Shared_";
-                if (subgraph.Nodes.Count == 1)
-                {
-                    var node = subgraph.Nodes.ToList()[0];
-                    name += node.FileName;
-                }
-                else
-                {
-                    name += SubgraphProcessor.CalculateHashForSources(sources).ToString();
-                }
-            }
-            else
-            {
-                if(sources is { Count: > 0 })
-                {
-                    var sourceNode = sources.ToList()[0];
-                    var n = sourceNode.FileName;
-                    name = $"{n}_Assets";
-                }
-            }
-            
-            if (string.IsNullOrEmpty(name)) // ToDo: Is this condition ever met?
-            {
-                name = $"NullName_{Guid.NewGuid().ToString()}"; 
-                Debug.LogError($"empty subgraph name");
-            }
-                
-            return name;
         }
         
         public override void PostExecute()
@@ -108,27 +66,6 @@ namespace AAGen
             summary += $"{nameof(m_GroupLayoutCreated).ToReadableFormat()} = {m_GroupLayoutCreated}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
-        }
-        
-        /// <summary>
-        /// Returns the first naming rule found for that matches the subgraph category
-        /// If nothing is found, it returns the default naming rule
-        /// </summary>
-        /// <param name="subgraph"></param>
-        /// <returns></returns>
-        AddressableGroupNamingRule FindNamingRuleForSubgraph(SubgraphInfo subgraph)
-        {
-            var settings = m_DataContainer.Settings;
-            var matchingNamingRule = settings.DefaultNamingRule;
-            foreach (var namingRule in settings.NamingRules)
-            {
-                if (namingRule.m_CategoryID == subgraph.CategoryID)
-                {
-                    matchingNamingRule = namingRule;
-                    break;
-                }
-            }
-            return matchingNamingRule;
         }
     }
 }

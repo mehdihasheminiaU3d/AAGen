@@ -1,12 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using AAGen.Shared;
 using UnityEngine;
 
 namespace AAGen
 {
-    [CreateAssetMenu(menuName = "AAGen/Settings/Subgraph Categories/" + nameof(IsolatedSingleNodeNamingRule))]
-    public class IsolatedSingleNodeNamingRule : AddressableGroupNamingRule
+    [CreateAssetMenu(menuName = Constants.ContextMenus.RefinementRulesMenu + nameof(IsolatedSingleNodeNamingRule))]
+    public class IsolatedSingleNodeNamingRule : NamingRule
     {
-        public override string CalculateGroupName(int hash, SubgraphInfo subgraph)
+        protected override string CalculateName(SubgraphInfo subgraph)
         {
             var node = subgraph.Nodes.ToList()[0];
             return $"Isolated Node {node.FileName}";

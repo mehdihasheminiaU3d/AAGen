@@ -5,6 +5,6 @@ namespace AAGen
 {
     public abstract class RefinementRule : ScriptableObject
     {
-        public abstract void Execute(DataContainer dataContainer);
+        public abstract void Execute(List<SubgraphInfo> subgraphs);
     }
 }

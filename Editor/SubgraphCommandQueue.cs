@@ -56,7 +56,7 @@ namespace AAGen
                 {
                     Sources = sources,
                     IsShared = sources.Count > 1, //ToDo: Can be a property
-                    CategoryID = m_DataContainer.Settings.DefaultCategoryID
+                    HashOfSources = hash
                 };
                 
                 m_DataContainer.Subgraphs.Add(hash, newSubgraph);

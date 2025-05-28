@@ -119,8 +119,7 @@ namespace AAGen
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateSubGraphs))
             {
                 commandQueues.Add(new SubgraphCommandQueue(m_DataContainer));
-                commandQueues.Add(new SubgraphCategorizationCommandQueue(m_DataContainer));
-                commandQueues.Add(new RefinementCommandQueue(m_DataContainer));
+                commandQueues.Add(new OutputRuleCommandQueue(m_DataContainer));
             }
             
             if (m_Settings == null || m_Settings.ProcessingSteps.HasFlag(ProcessingStepID.GenerateGroupLayout))
