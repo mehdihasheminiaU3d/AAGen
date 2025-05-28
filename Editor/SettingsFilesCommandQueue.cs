@@ -123,31 +123,18 @@ namespace AAGen
                 {
                     CreateDefaultInputRule()
                 };
-
-                settings._MergeRules = new List<MergeRule>
+                
+                settings.OutputRules = new List<OutputRule>
                 {
-                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedAssets),
-                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedSingles),
-                    CreateMergeRule(CategoryId.SingleSources, CategoryId.SharedSingleSinks)
+                    CreateDefaultOutputRule()
                 };
-
+                
                 var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
                 if (defaultGroupTemplate == null)
                     throw new Exception($"cannot find default addressable group template");
                 settings.m_DefaultGroupTemplate = defaultGroupTemplate;
-                
-                settings._GroupLayoutRules = new List<GroupLayoutRule>
-                {
-                    CreateGroupLayoutRule(CategoryId.ExclusiveToSingleSource, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.Hierarchies, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.SharedAssets, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.SharedSingles, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.SharedSingleSinks, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.SingleAssets, defaultGroupTemplate),
-                    CreateGroupLayoutRule(CategoryId.SingleSources, defaultGroupTemplate)
-                };
 
-                AssetDatabase.CreateAsset(settings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting!
+                AssetDatabase.CreateAsset(settings, settingsFilePath); //<--- ToDo: should we notify users about the file overwriting?
                 AssetDatabase.SaveAssets();
 
                 m_DataContainer.SettingsFilePath = settingsFilePath;
@@ -164,7 +151,7 @@ namespace AAGen
             }
         }
 
-        InputFilterRule CreateDefaultInputRule()
+        static InputFilterRule CreateDefaultInputRule()
         {
             var inputFilterRulePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(InputFilterRule)}.asset");
             var inputFilterRule = ScriptableObject.CreateInstance<PathFilterRule>();
@@ -219,26 +206,32 @@ namespace AAGen
             return inputFilterRule;
         }
         
-        MergeRule CreateMergeRule(CategoryId from, CategoryId to)
+        static OutputRule CreateDefaultOutputRule()
         {
-            var mergeRulePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(MergeRule)} {from} To {to}.asset");
-            var mergeRule = ScriptableObject.CreateInstance<AssetNameMergeRule>();
-            mergeRule._OriginCategory = from;
-            mergeRule._DestinationCategory = to;
-            AssetDatabase.CreateAsset(mergeRule, mergeRulePath);
+            var outputRule = new OutputRule
+            {
+                Name = "Default Output Rule"
+            };
+
+            
+            var subgraphSelectorPath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultSubgraphSelector)}.asset");
+            var subgraphSelectorRule = ScriptableObject.CreateInstance<DefaultSubgraphSelector>();
+            AssetDatabase.CreateAsset(subgraphSelectorRule, subgraphSelectorPath);
+            outputRule.SubgraphSelector = subgraphSelectorRule;
+            
+            var refinementRulePath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultRefinementRule)}.asset");
+            var refinementRule = ScriptableObject.CreateInstance<DefaultRefinementRule>();
+            AssetDatabase.CreateAsset(refinementRule, refinementRulePath);
+            outputRule.RefinementRule = refinementRule;
+            
+            var namingRulePath = Path.Combine(DefaultAagenSettingsFolder, $"{nameof(DefaultNamingRule)}.asset");
+            var namingRule = ScriptableObject.CreateInstance<DefaultNamingRule>();
+            AssetDatabase.CreateAsset(namingRule, namingRulePath);
+            outputRule.NamingRule = namingRule;
+            
             AssetDatabase.SaveAssets();
-            return mergeRule;
-        }
-        
-        GroupLayoutRule CreateGroupLayoutRule(CategoryId categoryId, AddressableAssetGroupTemplate template)
-        {
-            var groupLayoutRulePath = Path.Combine(DefaultAagenSettingsFolder, $"Default {nameof(GroupLayoutRule)} for {categoryId}.asset");
-            var groupLayoutRule = ScriptableObject.CreateInstance<GenericGroupLayoutRule>();
-            groupLayoutRule._CategoryId = categoryId;
-            groupLayoutRule._AddressableAssetGroupTemplate = template;
-            AssetDatabase.CreateAsset(groupLayoutRule, groupLayoutRulePath);
-            AssetDatabase.SaveAssets();
-            return groupLayoutRule;
+     
+            return outputRule;
         }
         
         static AddressableAssetGroupTemplate FindDefaultAddressableGroupTemplate()
