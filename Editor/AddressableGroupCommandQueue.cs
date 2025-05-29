@@ -17,6 +17,7 @@ namespace AAGen
         readonly DataContainer m_DataContainer;
         
         int m_AddressableGroupCreated;
+        int m_AddressableGroupReused;
         
         public override void PreExecute()
         {
@@ -37,36 +38,43 @@ namespace AAGen
 
         void CreateGroupAndMoveAssets(string groupName, GroupLayoutInfo groupLayoutInfo)
         {
-            var addressableGroup = CreateGroupFromTemplate(groupName, groupLayoutInfo.TemplateName);
-            m_AddressableGroupCreated++;
-
+            AddressableAssetGroup group = null;
+            if (TryGetAddressableGroup(groupName, out var existingGroup))
+            {
+                group = existingGroup;
+                m_AddressableGroupReused++;
+            }
+            else
+            {
+                group = CreateNewGroup(groupName);
+                m_AddressableGroupCreated++;
+            }
+            ApplyTemplateToGroup(group, groupLayoutInfo.TemplateName);
+            
+            
+            
             foreach (var node in groupLayoutInfo.Nodes)
             {
                 string assetGuid = node.Guid.ToString();
                 if (string.IsNullOrEmpty(assetGuid))
                     throw new Exception($"Asset with path '{node.AssetPath}' not found in project.");
 
-                var entry = AddressableSettings.CreateOrMoveEntry(assetGuid, addressableGroup, false, false);
+                var entry = AddressableSettings.CreateOrMoveEntry(assetGuid, group, false, false);
                 if (entry == null)
-                    throw new Exception($"Failed to add asset '{node.AssetPath}' to group '{addressableGroup.name}'.");
+                    throw new Exception($"Failed to add asset '{node.AssetPath}' to group '{group.name}'.");
             }
         }
 
-        AddressableAssetGroup CreateGroupFromTemplate(string name, string templateName)
+        AddressableAssetGroup CreateNewGroup(string name)
+        {
+            return AddressableSettings.CreateGroup(name, false, false,
+                false, null, typeof(BundledAssetGroupSchema));
+        }
+
+        void ApplyTemplateToGroup(AddressableAssetGroup group, string templateName)
         {
             var template = FindTemplateByName(templateName);
-            if (template == null)
-                throw new Exception($"Template with name '{templateName}' not found!");
-
-            AddressableAssetGroup newGroup = AddressableSettings.CreateGroup(name, false, false,
-                false, null, typeof(BundledAssetGroupSchema));
-            
-            if (newGroup == null)
-                throw new Exception($"Failed to create addressable group : {name}");
-            
-            template.ApplyToAddressableAssetGroup(newGroup);
-            
-            return newGroup;
+            template.ApplyToAddressableAssetGroup(group);
         }
         
         AddressableAssetGroupTemplate FindTemplateByName(string templateName)
@@ -106,11 +114,27 @@ namespace AAGen
                 return;
 
             var summary = $"\n=== Addressable Groups ===\n";
-            summary += $"{nameof(m_AddressableGroupCreated).ToReadableFormat()} = {m_AddressableGroupCreated}";
+            summary += $"{nameof(m_AddressableGroupCreated).ToReadableFormat()} = {m_AddressableGroupCreated} \n";
+            summary += $"{nameof(m_AddressableGroupReused).ToReadableFormat()} = {m_AddressableGroupReused}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }
         
         AddressableAssetSettings AddressableSettings => AddressableAssetSettingsDefaultObject.Settings;
+        
+        public bool TryGetAddressableGroup(string groupName, out AddressableAssetGroup existingGroup)
+        {
+            foreach (var group in AddressableSettings.groups)
+            {
+                if (group != null && group.Name == groupName)
+                {
+                    existingGroup = group;
+                    return true;
+                }
+            }
+
+            existingGroup = null;
+            return false;
+        }
     }
 }
