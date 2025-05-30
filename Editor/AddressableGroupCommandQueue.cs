@@ -22,7 +22,6 @@ namespace AAGen
         public override void PreExecute()
         {
             ClearQueue();
-            
             AddCommand(StartAssetEditing);
             
             foreach (var pair in m_DataContainer.GroupLayout)
@@ -50,8 +49,6 @@ namespace AAGen
                 m_AddressableGroupCreated++;
             }
             ApplyTemplateToGroup(group, groupLayoutInfo.TemplateName);
-            
-            
             
             foreach (var node in groupLayoutInfo.Nodes)
             {
@@ -92,6 +89,7 @@ namespace AAGen
         
         void StartAssetEditing()
         {
+            AssetDatabase.Refresh();
             AssetDatabase.StartAssetEditing();
             m_DataContainer.AssetEditingInProgress = true;
         }

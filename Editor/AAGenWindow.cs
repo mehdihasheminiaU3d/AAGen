@@ -279,12 +279,11 @@ namespace AAGen
                     currentQueue.PostExecute();
                     m_DataContainer.Logger.LogDev(this,
                         $"Time Taken for {currentQueue.Title} = {Math.Round(EditorApplication.timeSinceStartup - m_LastTime)}s");
-
                 }
             }
             catch (Exception e)
             {
-                throw;
+                m_DataContainer.Logger.LogError(this, $"Error: {e.Message}");
             }
             finally
             {
