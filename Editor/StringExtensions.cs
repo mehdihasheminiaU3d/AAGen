@@ -18,5 +18,14 @@ namespace AAGen
             // Capitalize the first letter
             return char.ToUpper(input[0]) + input.Substring(1);
         }
+        
+        public static string RemoveExtension(this string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return fileName;
+
+            int index = fileName.LastIndexOf('.');
+            return index > 0 ? fileName.Substring(0, index) : fileName;
+        }
     }
 }

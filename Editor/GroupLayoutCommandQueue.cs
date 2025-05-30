@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.AddressableAssets.Settings;
 
 namespace AAGen
 {
@@ -10,6 +11,8 @@ namespace AAGen
 
         int m_SubgraphsProcessed;
         int m_GroupLayoutCreated;
+
+        AddressableAssetGroupTemplate m_FallbackTemplate;
         
         public GroupLayoutCommandQueue(DataContainer dataContainer)
         {
@@ -27,30 +30,35 @@ namespace AAGen
             {
                 var hash = pair.Key;
                 var subgraph = pair.Value;
-                var templateName = m_DataContainer.Settings.m_DefaultGroupTemplate.Name;
-                AddCommand(() => CreateGroupLayout(hash, subgraph, templateName), hash.ToString());
+                AddCommand(() => CreateGroupLayout(subgraph), hash.ToString());
             }
         }
 
-        void CreateGroupLayout(int hash, SubgraphInfo subgraph, string templateName)
+        void CreateGroupLayout(SubgraphInfo subgraph)
         {
             m_SubgraphsProcessed++;
-            
-            var groupLayoutInfo = new GroupLayoutInfo()
+
+            var groupName = string.IsNullOrEmpty(subgraph.Name)
+                ? OutputRule.GetFallbackName(subgraph) 
+                : subgraph.Name;
+
+            var templateName = string.IsNullOrEmpty(subgraph.AddressableTemplateName)
+                ? OutputRule.GetFallbackTemplate().Name
+                : subgraph.AddressableTemplateName;
+
+            var groupLayoutInfo = new GroupLayoutInfo
             {
                 TemplateName = templateName,
                 Nodes = subgraph.Nodes.ToList()
             };
-            
-            if (groupLayoutInfo.Nodes.Count > 0)
-            {
-                var groupName = subgraph.Name;
-                //What if the name is redundant?
-                m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
-                m_GroupLayoutCreated++;
-            }
+
+            if (groupLayoutInfo.Nodes.Count == 0)
+                throw new Exception($"group node count == 0!"); //ToDo: Can this happen? we checked this in previous steps!
+
+            m_DataContainer.GroupLayout.Add(groupName, groupLayoutInfo);
+            m_GroupLayoutCreated++;
         }
-        
+
         public override void PostExecute()
         {
             AppendToSummaryReport();

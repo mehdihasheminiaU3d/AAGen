@@ -33,7 +33,6 @@ namespace AAGen
         ProcessingStepID m_ProcessingSteps = (ProcessingStepID)~0;
         [SerializeField]
         bool m_RunInBackground;
-        public AddressableAssetGroupTemplate m_DefaultGroupTemplate;
         [SerializeField]
         bool m_CheckBuiltinSceneDuplicates = true;
         [SerializeField]
@@ -62,14 +61,5 @@ namespace AAGen
         public void Validate()
         {
         }
-    }
-
-    [Serializable]
-    public class OutputRule
-    {
-        public string Name;
-        public SubgraphSelector SubgraphSelector;
-        public RefinementRule RefinementRule;
-        public NamingRule NamingRule;
     }
 }

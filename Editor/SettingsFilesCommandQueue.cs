@@ -94,11 +94,6 @@ namespace AAGen
                 {
                     CreateDefaultOutputRule(directory)
                 };
-                
-                var defaultGroupTemplate = FindDefaultAddressableGroupTemplate();
-                if (defaultGroupTemplate == null)
-                    throw new Exception($"cannot find default addressable group template");
-                settings.m_DefaultGroupTemplate = defaultGroupTemplate;
 
                 AssetDatabase.CreateAsset(settings, settingsFilePath);
                 AssetDatabase.SaveAssets();
@@ -173,46 +168,12 @@ namespace AAGen
         
         static OutputRule CreateDefaultOutputRule(string directoryPath)
         {
-            var outputRule = new OutputRule
-            {
-                Name = "Default Output Rule"
-            };
-            
-            var subgraphSelectorPath = Path.Combine(directoryPath, $"{nameof(DefaultSubgraphSelector)}.asset");
-            var subgraphSelectorRule = ScriptableObject.CreateInstance<DefaultSubgraphSelector>();
-            AssetDatabase.CreateAsset(subgraphSelectorRule, subgraphSelectorPath);
-            outputRule.SubgraphSelector = subgraphSelectorRule;
-            
-            var refinementRulePath = Path.Combine(directoryPath, $"{nameof(DefaultRefinementRule)}.asset");
-            var refinementRule = ScriptableObject.CreateInstance<DefaultRefinementRule>();
-            AssetDatabase.CreateAsset(refinementRule, refinementRulePath);
-            outputRule.RefinementRule = refinementRule;
-            
-            var namingRulePath = Path.Combine(directoryPath, $"{nameof(DefaultNamingRule)}.asset");
-            var namingRule = ScriptableObject.CreateInstance<DefaultNamingRule>();
-            AssetDatabase.CreateAsset(namingRule, namingRulePath);
-            outputRule.NamingRule = namingRule;
-            
+            var outputRulePath = Path.Combine(directoryPath, $"{nameof(DefaultOutputRule)}.asset");
+            var outputRule = ScriptableObject.CreateInstance<DefaultOutputRule>();
+            AssetDatabase.CreateAsset(outputRule, outputRulePath);
             AssetDatabase.SaveAssets();
      
             return outputRule;
-        }
-        
-        static AddressableAssetGroupTemplate FindDefaultAddressableGroupTemplate()
-        {
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-
-            if (settings == null)
-                throw new ("AddressableAssetSettings not found. Ensure Addressables are initialized.");
-            
-            var templates = settings.GroupTemplateObjects;
-
-            if (templates == null || templates.Count == 0)
-               throw new ("No group templates found in Addressable Settings.");
-            
-            // Assuming the first template is the default one
-            var defaultTemplate = templates[0];
-            return defaultTemplate as AddressableAssetGroupTemplate;
         }
 
         #region Utils
