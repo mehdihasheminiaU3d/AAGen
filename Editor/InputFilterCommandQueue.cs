@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AAGen.AssetDependencies;
 using UnityEditor;
+using UnityEngine;
 
 namespace AAGen
 {
@@ -31,7 +32,7 @@ namespace AAGen
                 var fileName = node.FileName; 
                 
                 AddCommand(() => AddRuledFileToIgnoredList(localNode), fileName);
-                AddCommand(() => AddUnsupportedFileToIgnoreAssets(localNode), fileName);
+                AddCommand(() => AddUnsupportedFileToIgnoredAssets(localNode), fileName);
             }
             
             AddCommand(AddBuiltinScenesToIgnoredList, nameof(AddBuiltinScenesToIgnoredList));
@@ -50,13 +51,24 @@ namespace AAGen
             }
         }
         
-        void AddUnsupportedFileToIgnoreAssets(AssetNode node)
+        void AddUnsupportedFileToIgnoredAssets(AssetNode node)
         {
+            if (m_DataContainer.IgnoredAssets.Contains(node)) //Already ignored
+                return;
+            
             var mainAssetType = AssetDatabase.GetMainAssetTypeAtPath(node.AssetPath);
             if (mainAssetType == null || mainAssetType == typeof(DefaultAsset))
             {
                 m_DataContainer.IgnoredAssets.Add(node);
                 m_IgnoredUnsupportedFiles++;
+                return;
+            }
+            
+            if(!AreAssetFlagsEligibleForBuild(node.AssetPath))
+            {
+                m_DataContainer.IgnoredAssets.Add(node);
+                m_IgnoredUnsupportedFiles++;
+                return;
             }
         }
         
@@ -91,6 +103,18 @@ namespace AAGen
             summary += $"{nameof(nodesPassed).ToReadableFormat()} = {nodesPassed}";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
+        }
+        
+        public static bool AreAssetFlagsEligibleForBuild(string path)
+        {
+            var asset = AssetDatabase.LoadMainAssetAtPath(path);
+            if (asset == null)
+                return false;
+
+            var flags = asset.hideFlags;
+            return (flags & HideFlags.DontSave) == 0 &&
+                   (flags & HideFlags.DontSaveInBuild) == 0 &&
+                   (flags & HideFlags.DontSaveInEditor) == 0;
         }
     }
 }
