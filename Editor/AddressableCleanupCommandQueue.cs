@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -15,24 +16,62 @@ namespace AAGen
         
         readonly DataContainer m_DataContainer;
         
-        int m_EmptyGroupCount;
         int m_EmptyGroupRemoved;
+        int m_UnnecessaryEntriesRemoved;
         
         public override void PreExecute()
         {
             ClearQueue();
             AddCommand(StartAssetEditing);
+            AddCommand(RemoveUnusedEntries);
             AddCommand(RemoveEmptyAddressableGroups);
             AddCommand(StopAssetEditing);
         }
+        
+        void RemoveUnusedEntries()
+        {
+            if (!m_DataContainer.Settings.RemoveUnnecessaryEntries)
+                return;
 
+            //List all assets used in group layouts
+            var allNodesInGroupLayouts = new HashSet<string>();
+            foreach (var groupLayout in m_DataContainer.GroupLayout.Values)
+            {
+                foreach (var node in groupLayout.Nodes)
+                {
+                    allNodesInGroupLayouts.Add(node.Guid.ToString());
+                }
+            }
+            
+            //Find entries that aren't included in group layout
+            var entriesToRemove = new List<string>();
+            foreach (var group in AddressableSettings.groups)
+            {
+                foreach (var entry in group.entries)
+                {
+                    var entryGuid = entry.guid;
+                    
+                    if(!allNodesInGroupLayouts.Contains(entryGuid))
+                    {
+                        entriesToRemove.Add(entryGuid);
+                    }
+                }
+            }
+
+            //Remove entries
+            foreach (var guid in entriesToRemove)
+            {
+                AddressableSettings.RemoveAssetEntry(guid);
+                m_UnnecessaryEntriesRemoved++;
+            }
+        }
+        
         void RemoveEmptyAddressableGroups()
         {
-            if (!m_DataContainer.Settings.RemoveEmptyAddressableGroups)
+            if (!m_DataContainer.Settings.RemoveEmptyGroups)
                 return;
             
             var groups = AddressableSettings.groups.Where(CanRemoveGroup).ToList();
-            m_EmptyGroupCount = groups.Count;
             
             foreach (var group in groups)
             {
@@ -72,8 +111,8 @@ namespace AAGen
                 return;
 
             var summary = $"\n=== Addressable Group Cleanup ===\n";
-            summary += $"{nameof(m_EmptyGroupCount).ToReadableFormat()} = {m_EmptyGroupCount} \n";
             summary += $"{nameof(m_EmptyGroupRemoved).ToReadableFormat()} = {m_EmptyGroupRemoved}\n";
+            summary += $"{nameof(m_UnnecessaryEntriesRemoved).ToReadableFormat()} = {m_UnnecessaryEntriesRemoved}\n";
             
             m_DataContainer.SummaryReport.AppendLine(summary);
         }

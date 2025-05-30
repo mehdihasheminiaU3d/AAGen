@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AAGen.Shared;
-using UnityEditor.AddressableAssets.Settings;
-using UnityEngine.Serialization;
 
 namespace AAGen
 {
@@ -34,7 +32,10 @@ namespace AAGen
         
         [Header("Cleanup")]
         [SerializeField]
-        bool m_RemoveEmptyAddressableGroups = true;
+        [Tooltip("Should the tool remove the addressable asset entries that used to be needed but no longer are")]
+        bool m_RemoveUnnecessaryEntries = true;
+        [SerializeField]
+        bool m_RemoveEmptyGroups = true;
         
         [Header("Process")]
         [SerializeField]
@@ -62,7 +63,9 @@ namespace AAGen
         public bool GenerateSummaryReport => m_GenerateSummaryReport;
         public bool SaveGraphOnDisk => m_SaveGraphOnDisk;
 
-        public bool RemoveEmptyAddressableGroups => m_RemoveEmptyAddressableGroups;
+        public bool RemoveEmptyGroups => m_RemoveEmptyGroups;
+
+        public bool RemoveUnnecessaryEntries => m_RemoveUnnecessaryEntries;
 
         public void Validate()
         {
