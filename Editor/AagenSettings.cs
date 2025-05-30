@@ -28,6 +28,14 @@ namespace AAGen
     [CreateAssetMenu(menuName = Constants.ContextMenus.Root + "Settings")]
     public class AagenSettings : ScriptableObject
     {
+        [Header("Rules")]
+        public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
+        public List<OutputRule> OutputRules = new List<OutputRule>();
+        
+        [Header("Cleanup")]
+        [SerializeField]
+        bool m_RemoveEmptyAddressableGroups = true;
+        
         [Header("Process")]
         [SerializeField]
         ProcessingStepID m_ProcessingSteps = (ProcessingStepID)~0;
@@ -37,10 +45,6 @@ namespace AAGen
         bool m_CheckBuiltinSceneDuplicates = true;
         [SerializeField]
         bool m_SaveGraphOnDisk = false;
-        
-        [Header("Rules")]
-        public List<InputFilterRule> InputFilterRules = new List<InputFilterRule>();
-        public List<OutputRule> OutputRules = new List<OutputRule>();
         
         [Header("Reports")]
         [SerializeField]
@@ -57,7 +61,9 @@ namespace AAGen
         public bool RunInBackground => m_RunInBackground;
         public bool GenerateSummaryReport => m_GenerateSummaryReport;
         public bool SaveGraphOnDisk => m_SaveGraphOnDisk;
-        
+
+        public bool RemoveEmptyAddressableGroups => m_RemoveEmptyAddressableGroups;
+
         public void Validate()
         {
         }

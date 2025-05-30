@@ -28,6 +28,9 @@ namespace AAGen
 
         void RemoveEmptyAddressableGroups()
         {
+            if (!m_DataContainer.Settings.RemoveEmptyAddressableGroups)
+                return;
+            
             var groups = AddressableSettings.groups.Where(CanRemoveGroup).ToList();
             m_EmptyGroupCount = groups.Count;
             
