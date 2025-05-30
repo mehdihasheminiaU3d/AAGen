@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AAGen.Shared;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace AAGen
 {
@@ -9,11 +13,16 @@ namespace AAGen
     {
         protected override bool DoesSubgraphMatchSelectionCriteria(SubgraphInfo subgraph)
         {
-            return subgraph.Nodes.Count > 1;
+            return true;
         }
 
         protected override string CalculateName(SubgraphInfo subgraph)
         {
+            if(subgraph.Nodes.Count > 1 && TryGetCommonParentFolderName(subgraph.Nodes.Select((x)=>x.AssetPath).ToList(), out var commonFolder))
+            {
+                return commonFolder + subgraph.HashOfSources.ToString();
+            }
+
             if (SubgraphTopologyUtil.IsSingleSourceNode(subgraph, m_DependencyGraph))
             {
                 if (subgraph.Sources.Count == 1)
@@ -43,8 +52,13 @@ namespace AAGen
 
             if (SubgraphTopologyUtil.IsShared(subgraph))
             {
-                var join = string.Join("-", subgraph.Sources.Select((x) => x.FileName.RemoveExtension()));
-                join = join.Replace(" ", "_");
+                string join = string.Empty;
+                if (subgraph.Sources.Count < 4)
+                {
+                    join = string.Join("-", subgraph.Sources.Select((x) => x.FileName.RemoveExtension()));
+                    join = join.Replace(" ", "_");
+                }
+
                 return $"Shared by {subgraph.Sources.Count} {join} {subgraph.HashOfSources.ToString()} R{RandInt}";
             }
 
@@ -67,6 +81,26 @@ namespace AAGen
                 // return 1;
                 return Random.Range(1, 100);
             }
+        }
+        
+        public static bool TryGetCommonParentFolderName(List<string> filePaths, out string folderName)
+        {
+            folderName = string.Empty;
+            
+            if (filePaths == null || filePaths.Count == 0)
+                return false;
+
+            var parentDirs = filePaths
+                .Select(path => Path.GetDirectoryName(path)?.Replace('\\', '/').TrimEnd('/'))
+                .Distinct()
+                .ToList();
+
+            if (parentDirs.Count != 1)
+                return false;
+
+            string commonDir = parentDirs[0];
+            folderName = Path.GetFileName(commonDir);
+            return true;
         }
     }
 }
