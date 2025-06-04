@@ -115,7 +115,7 @@ namespace AAGen
             var sceneEntry = GetAddressableEntryByPath(scenePath);
             
             AssetReference sceneReference = new AssetReference(sceneEntry.guid);
-            bootLoader.m_SceneToLoad = sceneReference; // Set the AssetReference
+            bootLoader.SceneToLoad = sceneReference; // Set the AssetReference
         }
         
         static AddressableAssetEntry GetAddressableEntryByPath(string assetPath) //ToDo: Add to a shared util Class
