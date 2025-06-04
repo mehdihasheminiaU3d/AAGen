@@ -11,6 +11,22 @@ namespace AAGen.Shared
     /// </summary>
     public class EditorUiGroup
     {
+        #region Constants
+        //Styles
+        private const string BoxStyleName = "box";
+        
+        private const int Space = 5;
+        
+        private const int FieldWidth = 800;
+        
+        private const int ButtonWidth = 350;
+        
+        private const int ButtonHeight = 25;
+
+        private const int TextBoxHeight = 250;
+        #endregion
+
+        #region Types
         [Flags]
         public enum UIVisibilityFlag
         {
@@ -23,7 +39,20 @@ namespace AAGen.Shared
             ShowObjectFiled1 = 1 << 6,
             ShowObjectFiled2 = 1 << 7,
         }
+        #endregion
 
+        #region Fields
+        private Vector2 _textBoxScrollPosition;
+
+        private bool _isUnfolded;
+
+        //Delegates
+        public Action ButtonAction;
+
+        private GUIStyle _boldFoldoutStyle;
+        #endregion
+
+        #region Properties
         public UIVisibilityFlag UIVisibility { get; set; } = 0;
 
         //labels
@@ -44,22 +73,9 @@ namespace AAGen.Shared
         public string OutputText { get; set; }
         
         public MessageType HelpMessageType { get; set; } = MessageType.Info;
-        
-        private Vector2 _textBoxScrollPosition;
-        private bool _isUnfolded;
+        #endregion
 
-        //Delegates
-        public Action ButtonAction;
-
-        //Styles
-        private const string BoxStyleName = "box";
-        private const int Space = 5;
-        private const int FieldWidth = 800;
-        private const int ButtonWidth = 350;
-        private const int ButtonHeight = 25;
-        private const int TextBoxHeight = 250;
-        private GUIStyle _boldFoldoutStyle;
-
+        #region Methods
         public EditorUiGroup()
         {
             _boldFoldoutStyle = new GUIStyle(EditorStyles.foldout)
@@ -135,5 +151,6 @@ namespace AAGen.Shared
             GUILayout.EndVertical();
             GUILayout.Space(Space);
         }
+        #endregion
     }
 }

@@ -7,18 +7,25 @@ namespace AAGen.Shared
 {
     /// <summary>
     /// Represents a graph structure for managing and processing nodes and edges.
+    /// </summary>
+    /// <remarks>
     /// By default, the implementation represents a directed graph. However, some concepts
     /// are only applicable to an undirected graph and are explicitly mentioned in the method names.
-    /// </summary>
+    /// </remarks>
     [Serializable]
     public class Graph<T> where T:IEquatable<T>
     {
+        #region Fields
         [JsonRequired]
         protected Dictionary<T, List<T>> _adjacencyList;
+        #endregion
 
+        #region Properties
         [JsonIgnore]
         public int NodeCount => _adjacencyList.Count;
+        #endregion
 
+        #region Methods
         public Graph()
         {
             _adjacencyList = new Dictionary<T, List<T>>();
@@ -251,7 +258,9 @@ namespace AAGen.Shared
                 _adjacencyList = subgraphAdjacencyList
             };
         }
-        
+        #endregion
+
+        #region Static Methods
         public static Graph<T> ToUndirected(Graph<T> directedGraph)
         {
             Graph<T> undirectedGraph = new Graph<T>();
@@ -309,5 +318,6 @@ namespace AAGen.Shared
 
             return components;
         }
+        #endregion
     }
 }

@@ -10,6 +10,7 @@ namespace AAGen.Shared
 {
     internal static class FileUtils
     {
+        #region Static Methods
         public static void SaveToFile(string filePath, string data)
         {
             EnsureDirectoryExist(filePath);
@@ -198,5 +199,6 @@ namespace AAGen.Shared
             
             onComplete?.Invoke(true);
         }
+        #endregion
     }
 }

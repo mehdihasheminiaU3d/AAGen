@@ -10,6 +10,7 @@ namespace AAGen.Shared
     /// </summary>
     public class EditorJobGroup: JobGroup
     {
+        #region Fields
         private int _progressId;
         private string _name;
         
@@ -18,7 +19,10 @@ namespace AAGen.Shared
 
         private readonly bool _IsCancellable;
         private bool _isCancelled;
-        
+        #endregion
+
+        #region Methods
+        #region Constructors
         /// <summary>
         /// IsCancellable = false is almost 5X faster!
         /// </summary>
@@ -35,6 +39,7 @@ namespace AAGen.Shared
             _name = name;
             _IsCancellable = isCancellable;
         }
+        #endregion
 
         public override IEnumerator Run()
         {
@@ -127,5 +132,6 @@ namespace AAGen.Shared
         {
             _isCancelled = true;
         }
+        #endregion
     }
 }
