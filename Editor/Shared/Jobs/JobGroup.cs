@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace AAGen.Shared
 {
+    /// <summary>
+    /// Represents a job that is composed of a sewuence of other jobs.
+    /// </summary>
     public abstract class JobGroup : IJob
     {
         #region Properties
