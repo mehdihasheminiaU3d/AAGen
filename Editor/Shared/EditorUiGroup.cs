@@ -6,15 +6,15 @@ using Object = UnityEngine.Object;
 namespace AAGen.Shared
 {
     /// <summary>
-    /// A generic collection of UI components that can be customized using a flag system.
-    /// It serves as a reusable UI to speed up the development of various tools related to the dependency graph.
+    /// Represents a generic collection of UI components that can custonize the presentation using a bitmask.
     /// </summary>
+    /// <remarks>
+    /// It serves as a reusable UI to speed up the development of various tools related to the dependency graph.
+    /// </remarks>
+    // NOTE: appears the need for this class can be refactored or eliminated if UI toolkit was used.
     public class EditorUiGroup
     {
-        #region Constants
-        //Styles
-        private const string BoxStyleName = "box";
-        
+        #region Constants        
         private const int Space = 5;
         
         private const int FieldWidth = 800;
@@ -27,6 +27,9 @@ namespace AAGen.Shared
         #endregion
 
         #region Types
+        /// <summary>
+        /// Represents a value indicating the method of drawing a field.
+        /// </summary>
         [Flags]
         public enum UIVisibilityFlag
         {
@@ -36,8 +39,8 @@ namespace AAGen.Shared
             ShowOutput = 1 << 3,
             ShowFoldout = 1 << 4,
             ShowButton1 = 1 << 5,
-            ShowObjectFiled1 = 1 << 6,
-            ShowObjectFiled2 = 1 << 7,
+            ShowObjectField1 = 1 << 6,
+            ShowObjectField2 = 1 << 7,
         }
         #endregion
 
@@ -53,6 +56,9 @@ namespace AAGen.Shared
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets or sets a bitmask of values that indicate which fields are drawn in the UI.
+        /// </summary>
         public UIVisibilityFlag UIVisibility { get; set; } = 0;
 
         //labels
@@ -70,6 +76,10 @@ namespace AAGen.Shared
         public string StringInput1 { get; private set; }
         public Object ObjectInput1 { get; private set; }
         public Object ObjectInput2 { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the text that is outputted by
+        /// </summary>
         public string OutputText { get; set; }
         
         public MessageType HelpMessageType { get; set; } = MessageType.Info;
@@ -90,65 +100,109 @@ namespace AAGen.Shared
 
         public virtual void OnGUI()
         {
+            // Draw an area of the UI that separates this area from other properties.
             GUILayout.Space(Space);
-            GUILayout.BeginVertical(BoxStyleName);
 
-            _isUnfolded = !UIVisibility.HasFlag(UIVisibilityFlag.ShowFoldout) ||
-                       EditorGUILayout.Foldout(_isUnfolded, FoldoutLabel, _boldFoldoutStyle);
-            
-            if (_isUnfolded)
+            // Draw this section with a vertical layout with a box style that encapsulates the items.
+            using (var verticalScope = new GUILayout.VerticalScope(GUI.skin.box))
             {
-                GUILayout.BeginHorizontal();
-                {
-                    GUILayout.BeginVertical(GUILayout.Width(FieldWidth));
-                    {
-                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowHelpBox))
-                            EditorGUILayout.HelpBox(HelpText, HelpMessageType);
-                        
-                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowObjectFiled1))
-                            ObjectInput1 = EditorGUILayout.ObjectField(ObjectFieldLabel1, ObjectInput1, typeof(Object), false);
-                        
-                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowObjectFiled2))
-                            ObjectInput2 = EditorGUILayout.ObjectField(ObjectFieldLabel2, ObjectInput2, typeof(Object), false);
 
-                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowIntField1))
-                            IntegerInput1 = EditorGUILayout.IntField(IntegerFieldLabel1, IntegerInput1);
-                            
-                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowStringField1))
-                            StringInput1 = EditorGUILayout.TextField(StringFieldLabel1, StringInput1);
-                    }
-                    GUILayout.EndVertical();
-                }
-                GUILayout.EndHorizontal();
-                
-                GUILayout.BeginHorizontal();
+                // If the group should draw a foldout, then draw the foldout,
+                // otherwise assume there is no foldout to draw and it is not needed to draw the fields in the group.
+                _isUnfolded = !UIVisibility.HasFlag(UIVisibilityFlag.ShowFoldout) ||
+                           EditorGUILayout.Foldout(_isUnfolded, FoldoutLabel, _boldFoldoutStyle);
+
+                // If the foldout is open or there is no foldout, then:
+                if (_isUnfolded)
                 {
-                    if (UIVisibility.HasFlag(UIVisibilityFlag.ShowButton1))
+                    // Draw this section with a horizontal layout.
+                    using (var horizontalScope = new GUILayout.HorizontalScope())
                     {
-                        if (GUILayout.Button(ButtonLabel, GUILayout.MaxWidth(ButtonWidth), GUILayout.Height(ButtonHeight)))
+                        // Draw this section with a vertical layout with a box style that encapsulates the items.
+                        using (var verticalScope2 = new GUILayout.VerticalScope(GUI.skin.box))
                         {
-                            ButtonAction?.Invoke();
+                            // If the group should draw a help box, then:
+                            if (UIVisibility.HasFlag(UIVisibilityFlag.ShowHelpBox))
+                            {
+                                // Draw the help box.
+                                EditorGUILayout.HelpBox(HelpText, HelpMessageType);
+                            }
+
+                            // If the group should draw a object field, then:
+                            if (UIVisibility.HasFlag(UIVisibilityFlag.ShowObjectField1))
+                            {
+                                // Draw the object field and capture the result of user control.
+                                ObjectInput1 = EditorGUILayout.ObjectField(ObjectFieldLabel1, ObjectInput1, typeof(Object), false);
+                            }
+
+                            // If the group should draw a second object field, then:
+                            if (UIVisibility.HasFlag(UIVisibilityFlag.ShowObjectField2))
+                            {
+                                // Draw the second object field and capture the result of user control.
+                                ObjectInput2 = EditorGUILayout.ObjectField(ObjectFieldLabel2, ObjectInput2, typeof(Object), false);
+                            }
+
+                            // If the group should draw a integer field, then:
+                            if (UIVisibility.HasFlag(UIVisibilityFlag.ShowIntField1))
+                            {
+                                // Draw the second int field and capture the result of user control.
+                                IntegerInput1 = EditorGUILayout.IntField(IntegerFieldLabel1, IntegerInput1);
+                            }
+
+                            // If the group should draw a string field, then:
+                            if (UIVisibility.HasFlag(UIVisibilityFlag.ShowStringField1))
+                            {
+                                // Draw the second string field and capture the result of user control.
+                                StringInput1 = EditorGUILayout.TextField(StringFieldLabel1, StringInput1);
+                            }
                         }
                     }
-                    GUILayout.FlexibleSpace();
+
+                    // Draw this section with a horizontal layout.
+                    using (var horizontalScope = new GUILayout.HorizontalScope())
+                    {
+                        // If the group should draw a button, then:
+                        if (UIVisibility.HasFlag(UIVisibilityFlag.ShowButton1))
+                        {
+                            // Draw the button and capture the result of user control. If the button was clicked, then:
+                            if (GUILayout.Button(ButtonLabel, GUILayout.MaxWidth(ButtonWidth), GUILayout.Height(ButtonHeight)))
+                            {
+                                // Notify the subscriber that the button has been clicked.
+                                ButtonAction?.Invoke();
+                            }
+                        }
+
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    // If the group should draw the output and the output text is valid, then:
+                    if (UIVisibility.HasFlag(UIVisibilityFlag.ShowOutput) &&
+                        !string.IsNullOrEmpty(OutputText))
+                    {
+                        // Draw the output text label.
+                        GUILayout.Label(OutputLabel);
+
+                        // Draw a scollable area, with every item in the sope a part of the scollable area.
+                        using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(_textBoxScrollPosition, GUILayout.MaxHeight(TextBoxHeight)))
+                        {
+                            // Cache the position of the scrollable area to maintain the position.
+                            _textBoxScrollPosition = scrollViewScope.scrollPosition;
+
+                            // Draw a text area that presents the output text.
+                            OutputText = EditorGUILayout.TextArea(OutputText, GUILayout.ExpandHeight(true));
+                        }
+                    }
                 }
-                GUILayout.EndHorizontal();
-                
-                if (UIVisibility.HasFlag(UIVisibilityFlag.ShowOutput) && !string.IsNullOrEmpty(OutputText))
+                else
                 {
-                    GUILayout.Label(OutputLabel);
-                    
-                    _textBoxScrollPosition = EditorGUILayout.BeginScrollView(_textBoxScrollPosition,  GUILayout.MaxHeight(TextBoxHeight));
-                    OutputText = EditorGUILayout.TextArea(OutputText,  GUILayout.ExpandHeight(true));
-                    EditorGUILayout.EndScrollView();
+                    // Otherwise, the foldout is closed or otherwise the group should not be drawn.
+
+                    // Set the output text to an invalid state.
+                    OutputText = null;
                 }
-            }
-            else
-            {
-                OutputText = null;
             }
 
-            GUILayout.EndVertical();
+            // Draw an area of the UI that separates this area from other properties.
             GUILayout.Space(Space);
         }
         #endregion

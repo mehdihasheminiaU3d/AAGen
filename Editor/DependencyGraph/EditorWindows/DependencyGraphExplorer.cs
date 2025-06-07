@@ -50,7 +50,7 @@ namespace AAGen.AssetDependencies
             {
                 FoldoutLabel = "Find Source Nodes",
                 UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
-                               EditorUiGroup.UIVisibilityFlag.ShowObjectFiled1 |
+                               EditorUiGroup.UIVisibilityFlag.ShowObjectField1 |
                                EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
                                EditorUiGroup.UIVisibilityFlag.ShowButton1 |
                                EditorUiGroup.UIVisibilityFlag.ShowOutput,
@@ -71,7 +71,7 @@ namespace AAGen.AssetDependencies
             {
                 FoldoutLabel = "Find Sink Nodes",
                 UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
-                               EditorUiGroup.UIVisibilityFlag.ShowObjectFiled1 |
+                               EditorUiGroup.UIVisibilityFlag.ShowObjectField1 |
                                EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
                                EditorUiGroup.UIVisibilityFlag.ShowButton1 |
                                EditorUiGroup.UIVisibilityFlag.ShowOutput,
@@ -108,8 +108,8 @@ namespace AAGen.AssetDependencies
             {
                 FoldoutLabel = "Display paths between two assets",
                 UIVisibility = EditorUiGroup.UIVisibilityFlag.ShowFoldout |
-                               EditorUiGroup.UIVisibilityFlag.ShowObjectFiled1 |
-                               EditorUiGroup.UIVisibilityFlag.ShowObjectFiled2 |
+                               EditorUiGroup.UIVisibilityFlag.ShowObjectField1 |
+                               EditorUiGroup.UIVisibilityFlag.ShowObjectField2 |
                                EditorUiGroup.UIVisibilityFlag.ShowHelpBox |
                                EditorUiGroup.UIVisibilityFlag.ShowButton1 |
                                EditorUiGroup.UIVisibilityFlag.ShowOutput,
